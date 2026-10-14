@@ -1,0 +1,6 @@
+# LF everywhere: the verbatim quote check compares contract text byte for byte.
+* text=auto eol=lf
+*.pdf binary
+*.docx binary
+*.png binary
+*.ico binary
