@@ -29,6 +29,7 @@ export type AuditAction =
   | "commitment.add"
   | "commitment.edit"
   | "waiver.add"
+  | "precedent.label"
   | "demo.reset"
   | "auth.sign_in"
   | "auth.sign_out"

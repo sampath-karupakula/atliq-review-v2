@@ -15,6 +15,7 @@ export type SignedRow = {
   ends: string | null;
   inForce: boolean;
   promises: string[];
+  sourceFile: string | null;
 };
 
 export async function getSignedContracts(): Promise<SignedRow[]> {
@@ -31,9 +32,10 @@ export async function getSignedContracts(): Promise<SignedRow[]> {
       signed_date: string | null;
       ends: string | null;
       promises: string[] | null;
+      source_file: string | null;
     }[]
   >`
-    select c.id, c.title, c.counterparty, c.doc_type, c.company_id, co.name as company_name,
+    select c.id, c.source_file, c.title, c.counterparty, c.doc_type, c.company_id, co.name as company_name,
            to_char(c.signed_date, 'YYYY-MM-DD') as signed_date, to_char(c.ends, 'YYYY-MM-DD') as ends,
            (select array_agg(m.id order by m.id) from commitments m where m.contract_id = c.id) as promises
     from contracts c left join companies co on co.id = c.company_id
@@ -50,5 +52,6 @@ export async function getSignedContracts(): Promise<SignedRow[]> {
     ends: r.ends,
     inForce: !r.ends || r.ends >= today,
     promises: r.promises ?? [],
+    sourceFile: r.source_file,
   }));
 }

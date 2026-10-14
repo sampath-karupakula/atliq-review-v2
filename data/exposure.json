@@ -1,0 +1,2480 @@
+{
+  "generatedAt": "2026-10-12T19:25:23.926Z",
+  "provider": "anthropic",
+  "model": "claude-opus-5-5",
+  "entries": [
+    {
+      "file": "2022-07-01_orbit_travels_msa_scanned.md",
+      "tracker": "C-001",
+      "title": "Orbit Travels — MSA (scanned)",
+      "counterparty": "Orbit Travels Pvt Ltd",
+      "status": "done",
+      "band": "High",
+      "score": 54,
+      "counts": {
+        "serious": 1,
+        "negotiable": 2,
+        "minor": 4,
+        "not_sure": 3,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The biggest risk is a new non-compete on AtliQ in India (clause 6.1), which could cost us future work in that market for the whole period and may breach promises to existing clients, possibly including Al Noor Hospitality Group's MSA non-compete running until 14 Sep 2029.",
+          "findingIds": [
+            "F1",
+            "F8"
+          ]
+        },
+        {
+          "text": "Second, we cannot see what we are agreeing to: the Statement of Work, including the fees, is referred to but not attached, and the indemnity text is illegible, so AtliQ could end up covering the client's own negligence with no money limit.",
+          "findingIds": [
+            "F2",
+            "F9",
+            "F10"
+          ]
+        },
+        {
+          "text": "Do not sign until the non-compete is removed or narrowed, the SOW and a readable indemnity are provided, the Al Noor Hospitality Group clash is checked, and standard confidentiality exceptions are added to clause 4.1.",
+          "findingIds": [
+            "F1",
+            "F2",
+            "F9",
+            "F10",
+            "F8",
+            "F3"
+          ]
+        }
+      ],
+      "coverageLine": "Read 17 of 17 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "full_read",
+          "category": "restriction",
+          "severity": "serious",
+          "title": "New non-compete on AtliQ (India)",
+          "clause": "6.1",
+          "foundIn": "6.1",
+          "quote": "provide travel-booking software to any online travel agency operating in India.",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ could not AtliQ may not develop, license or provide travel-booking software to any online travel agency operating in India. Hotels, airlines, other non-OTA businesses and non-travel-booking work are carved out in [6.2]. for during the term and for twelve months after expiry or termination (scan shows 'twelve (l2)').",
+          "whatItCouldCost": "Lost future work in this market for the whole period; may also breach promises to existing clients.",
+          "howToSoften": "Delete it, or narrow it to the named project, a short period and the client's direct competitors only.",
+          "related": {
+            "type": "non_compete",
+            "scope": "AtliQ may not develop, license or provide travel-booking software to any online travel agency operating in India. Hotels, airlines, other non-OTA businesses and non-travel-booking work are carved out in [6.2].",
+            "territory": "India",
+            "duration": "during the term and for twelve months after expiry or termination (scan shows 'twelve (l2)')"
+          }
+        },
+        {
+          "id": "F2",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Statement(s) of Work is referred to but missing",
+          "clause": "1.1",
+          "foundIn": "1.1",
+          "quote": "as described in the Statement(s) of Work executed under this Agreement (\"Services\").",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Statement(s) of Work, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Statement(s) of Work and review it before signing."
+        },
+        {
+          "id": "F3",
+          "check": "missing_protection",
+          "category": "confidentiality",
+          "severity": "negotiable",
+          "title": "No standard exceptions to confidentiality",
+          "clause": "4.1",
+          "foundIn": "4.1",
+          "quote": "Each party shall keep confidential all information received from the other party including fare data, supplier contracts, customer data and source code",
+          "quoteVerified": true,
+          "whatItMeans": "Even public information, things AtliQ already knew or built independently, or disclosures required by law would count as a breach.",
+          "whatItCouldCost": "Disputes over information AtliQ is entitled to use.",
+          "howToSoften": "Add the usual exceptions: public, already known, independently developed, received from a third party, required by law."
+        },
+        {
+          "id": "F8",
+          "check": "clash",
+          "category": "restriction",
+          "severity": "not_sure",
+          "title": "May clash with Al Noor Hospitality Group — MSA non-compete (until 14 Sep 2029)",
+          "clause": "Parties",
+          "foundIn": "Parties",
+          "quote": "development and maintenance of its booking engine, fare search and reporting modules",
+          "quoteVerified": true,
+          "whatItMeans": "The client is an Indian online travel booking business. It may count as a Hospitality Business if it provides distribution services to hotels or serviced apartments. The work is mainly building and maintaining software, but it includes 'reporting modules', which could be data analytics. The client is not headquartered in the GCC. The contract does not say whether the booking engine or reports relate to hotels or properties in a GCC state. If they do, the Al Noor Hospitality Group non-compete could be breached. The founder should check whether this client sells GCC hotel stays and what the reporting modules do. Under §1.11 a Hospitality Business includes an entity providing 'distribution' services to hotel operators, which an online travel agency may do. Under §12.2 the work is 'in the GCC' only if the services relate to properties in a GCC state, and the contract is silent on that.",
+          "whatItCouldCost": "If it does apply: breach of Al Noor Hospitality Group — MSA §1.2, §1.11, §1.14, §12.1, §12.2, §12.3, §12.4.",
+          "howToSoften": "Check the scope against the original clause, or ask counsel.",
+          "related": {
+            "commitmentId": "CMT-001",
+            "contract": "Al Noor Hospitality Group — MSA",
+            "clause": "1.2, 1.11, 1.14, 12.1, 12.2, 12.3, 12.4",
+            "quote": "the Supplier undertakes that neither it nor any of its Affiliates shall, during the Restricted Period, directly or indirectly, provide data analytics, artificial intelligence or revenue-management services to any Hospitality Business in the GCC.",
+            "ends": "2029-09-14",
+            "status": "live",
+            "waivers": [
+              "WVR-001 (10 Feb 2026) covers only: Demand-forecasting services to Seaside Hotels LLC, Muscat, Oman, solely as described in the Seaside SOW dated February 2026. It excludes: Any extension, renewal, change order or follow-on SOW; any other services to Seaside; any other Hospitality Business in Oman or the GCC; any Affiliate of the Supplier."
+            ],
+            "notSureReason": "scope unclear"
+          }
+        },
+        {
+          "id": "F9",
+          "check": "bundle_missing",
+          "category": "payment",
+          "severity": "not_sure",
+          "title": "SOW (fees) is referred to but not attached — the price is unknown",
+          "clause": "2.1",
+          "foundIn": "2.1",
+          "quote": "The Client shall pay the fees set out in each SOW.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract relies on SOW (fees) for the pricing, but it is not in the document. The value is not guessed.",
+          "whatItCouldCost": "Unknown until the attachment is seen.",
+          "howToSoften": "Ask for SOW (fees) before reviewing further."
+        },
+        {
+          "id": "F10",
+          "check": "full_read",
+          "category": "indemnity",
+          "severity": "not_sure",
+          "title": "Indemnity text illegible — cannot tell if client's own negligence is excluded",
+          "clause": "9.1",
+          "foundIn": null,
+          "quote": "[illegible] ... own negligence or wilful misconduct.",
+          "quoteVerified": false,
+          "whatItMeans": "Only AtliQ gives an indemnity, covering third-party IP claims. Part of the clause cannot be read. The missing words might exclude claims caused by the client's own negligence, which is good for AtliQ. Or they might make AtliQ cover them, which is bad. The indemnity is also one-way, while AtliQ's usual terms make it mutual. It is not clear whether the indemnity sits under the 8.1 cap.",
+          "whatItCouldCost": "If the hidden words make AtliQ cover the client's negligence, or if the indemnity sits outside the cap, AtliQ's exposure could have no money limit.",
+          "howToSoften": "Get a clean copy of the signed original and read the full 9.1. When renewing, make it mutual. State that it excludes the indemnified party's own negligence and that it is subject to the 8.1 cap."
+        }
+      ]
+    },
+    {
+      "file": "2024-08-01_crestline_retail_msa.md",
+      "tracker": "C-002",
+      "title": "Crestline Retail — MSA",
+      "counterparty": "Crestline Retail Inc",
+      "status": "done",
+      "band": "High",
+      "score": 100,
+      "counts": {
+        "serious": 5,
+        "negotiable": 7,
+        "minor": 5,
+        "not_sure": 1,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "Clause 6.4 adds a best-price promise binding AtliQ and its Affiliates, which could force retroactive credits on any discount given elsewhere, plus a restriction that would put AtliQ in breach on signing because it already works for Acme Retail Group, Northwind Logistics and CloudSpan Technologies.",
+          "findingIds": [
+            "F1",
+            "F2",
+            "F3",
+            "F4"
+          ]
+        },
+        {
+          "text": "Clause 12.2 makes liability unlimited for confidentiality breaches and all indemnities, so one data incident or IP claim could cost many times the USD 120,000 deal, which breaks AtliQ's hard line against unlimited liability.",
+          "findingIds": [
+            "F5"
+          ]
+        },
+        {
+          "text": "Do not sign until clause 6.4 is removed and liability is capped; also negotiate access to the missing referenced documents, fixed rather than changeable security rules, written approval for the Pune team's production data access, and a lower $2,000,000 insurance demand.",
+          "findingIds": [
+            "F1",
+            "F2",
+            "F3",
+            "F4",
+            "F5",
+            "F6",
+            "F7",
+            "F8",
+            "F9",
+            "F10",
+            "F11",
+            "F12"
+          ]
+        }
+      ],
+      "coverageLine": "Read 49 of 49 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "full_read",
+          "category": "restriction",
+          "severity": "serious",
+          "title": "New best-price promise on AtliQ, binding Affiliates",
+          "clause": "6.4",
+          "foundIn": "6.4",
+          "quote": "such lower rates shall apply to Crestline retroactively from the date they were first offered to such other customer",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ would promise this client its best rates, so any lower price offered elsewhere must be passed on to them.",
+          "whatItCouldCost": "Retroactive credits on every discount given to anyone else (the Crestline pattern).",
+          "howToSoften": "Delete it, or narrow it to the named project, a short period and the client's direct competitors only.",
+          "related": {
+            "type": "best_price",
+            "scope": "Rates, fees and other commercial terms must be no less favourable than those AtliQ or its Affiliates offer any other customer for substantially similar services. Any lower rate applies retroactively, and AtliQ must issue a credit for the difference.",
+            "territory": null,
+            "duration": "During the Term"
+          }
+        },
+        {
+          "id": "F2",
+          "check": "clash",
+          "category": "restriction",
+          "severity": "serious",
+          "title": "New restriction would breach current work for Acme Retail Group",
+          "clause": "6.4",
+          "foundIn": "6.4",
+          "quote": "no less favorable than those offered by Supplier or its Affiliates to any other customer for substantially similar services during the Term",
+          "quoteVerified": true,
+          "whatItMeans": "This is a most-favored-customer pricing promise, not a non-compete. It does not stop AtliQ from working for anyone. Acme Retail Group (retail analytics, India) is the existing client whose work is most like this deal. If Acme Retail Group already pays lower rates, AtliQ is in breach of 6.4 from day one. AtliQ would also owe Crestline a credit back to the date the lower rate was first offered. 'Affiliates' likely pulls in AtliQ's Indian entity. Acme Retail Group's rates are not in the material, so this is not sure.",
+          "whatItCouldCost": "AtliQ would be in breach on signing, because it already works for Acme Retail Group.",
+          "howToSoften": "Delete the restriction, or carve out existing clients by name.",
+          "related": {
+            "client": "Acme Retail Group"
+          }
+        },
+        {
+          "id": "F3",
+          "check": "clash",
+          "category": "restriction",
+          "severity": "serious",
+          "title": "New restriction would breach current work for Northwind Logistics",
+          "clause": "6.4",
+          "foundIn": "6.4",
+          "quote": "If, during the Term, Supplier or any of its Affiliates offers lower rates to any other customer for substantially similar services, Supplier shall promptly notify Crestline",
+          "quoteVerified": true,
+          "whatItMeans": "Northwind Logistics (logistics / pipeline engineering, UK) gets data engineering work that may count as 'substantially similar' to the services in [2.1]. If Northwind Logistics's rates are lower, AtliQ must tell Crestline. AtliQ would then have to give Crestline a retroactive credit. Rates are not given, so this is not sure.",
+          "whatItCouldCost": "AtliQ would be in breach on signing, because it already works for Northwind Logistics.",
+          "howToSoften": "Delete the restriction, or carve out existing clients by name.",
+          "related": {
+            "client": "Northwind Logistics"
+          }
+        },
+        {
+          "id": "F4",
+          "check": "clash",
+          "category": "restriction",
+          "severity": "serious",
+          "title": "New restriction would breach current work for CloudSpan Technologies",
+          "clause": "6.4",
+          "foundIn": "6.4",
+          "quote": "such lower rates shall apply to Crestline retroactively from the date they were first offered to such other customer",
+          "quoteVerified": true,
+          "whatItMeans": "CloudSpan Technologies (data platform partner, Singapore) may receive data engineering services similar to this deal. If its rates are lower, the lower rate would apply to Crestline back to the date first offered. AtliQ would have to pay the credit within 30 days. The other analytics clients could also count as 'substantially similar services' under [2.1]: PayTrack Technologies, Al Noor Hospitality Group, Sunrise Foods, Brightwater Insurance Inc, Trustline NBFC and CareBridge Clinics Inc. The founder should compare their rates with Exhibit B. Not sure.",
+          "whatItCouldCost": "AtliQ would be in breach on signing, because it already works for CloudSpan Technologies.",
+          "howToSoften": "Delete the restriction, or carve out existing clients by name.",
+          "related": {
+            "client": "CloudSpan Technologies"
+          }
+        },
+        {
+          "id": "F5",
+          "check": "full_read",
+          "category": "liability",
+          "severity": "serious",
+          "title": "Liability is unlimited for confidentiality breaches and all indemnities",
+          "clause": "12.2",
+          "foundIn": "12.2",
+          "quote": "EXCEPT FOR BREACH OF SECTION 7 OR A PARTY'S INDEMNIFICATION OBLIGATIONS, EACH PARTY'S AGGREGATE LIABILITY SHALL NOT EXCEED",
+          "quoteVerified": true,
+          "whatItMeans": "The cap does not apply to any breach of confidentiality (Section 7) or to any indemnity claim. [12.1] also lets the client claim lost profits and other indirect losses in those cases. A data leak of retail customer data would likely count as a Section 7 breach.",
+          "whatItCouldCost": "There is no ceiling. One data incident or IP claim could exceed the whole USD 120,000 deal many times over. AtliQ's hard line is never unlimited liability.",
+          "howToSoften": "Put confidentiality and indemnity claims under a cap. Use a separate higher cap if needed, for example 2× fees or the insurance limit. Keep uncapped only fraud and wilful misconduct. Keep the indirect-damages exclusion in [12.1] for data breaches."
+        },
+        {
+          "id": "F6",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Work Orders (executed) is referred to but missing",
+          "clause": "2.2",
+          "foundIn": "2.2",
+          "quote": "Each Work Order shall specify the roles, estimated hours, duration, and any Deliverables.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Work Orders (executed), but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Work Orders (executed) and review it before signing."
+        },
+        {
+          "id": "F7",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Crestline information security, acceptable use and on-site policies is referred to but missing",
+          "clause": "3.2",
+          "foundIn": "3.2",
+          "quote": "Supplier Personnel shall comply with Crestline's information security, acceptable use and on-site policies.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Crestline information security, acceptable use and on-site policies, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Crestline information security, acceptable use and on-site policies and review it before signing."
+        },
+        {
+          "id": "F8",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Crestline travel policy is referred to but missing",
+          "clause": "5.4",
+          "foundIn": "5.4",
+          "quote": "incurred in accordance with Crestline's travel policy",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Crestline travel policy, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Crestline travel policy and review it before signing."
+        },
+        {
+          "id": "F9",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Crestline Vendor Data Security Requirements (as updated from time to time) is referred to but missing",
+          "clause": "13.1",
+          "foundIn": "13.1",
+          "quote": "Supplier shall comply with Crestline's Vendor Data Security Requirements, as updated from time to time",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Crestline Vendor Data Security Requirements (as updated from time to time), but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Crestline Vendor Data Security Requirements (as updated from time to time) and review it before signing."
+        },
+        {
+          "id": "F10",
+          "check": "full_read",
+          "category": "data",
+          "severity": "negotiable",
+          "title": "Must follow client security rules that client can change at any time",
+          "clause": "13.1",
+          "foundIn": "13.1",
+          "quote": "as updated from time to time",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ must follow the client's Vendor Data Security Requirements, and the client can change them on its own. The requirements are not attached to the contract.",
+          "whatItCouldCost": "New tools, audits or controls could be imposed at AtliQ's cost. Rates already include all overheads under [6.3]. Failing to meet new rules is a breach.",
+          "howToSoften": "Attach the current version. Require notice of changes. Material changes should apply only by mutual agreement or with a rate adjustment and a reasonable time to comply."
+        },
+        {
+          "id": "F11",
+          "check": "full_read",
+          "category": "data",
+          "severity": "negotiable",
+          "title": "Pune team may not access production data without written approval",
+          "clause": "13.3",
+          "foundIn": "13.3",
+          "quote": "Supplier shall not access Crestline production data from outside the United States without Crestline's prior written approval.",
+          "quoteVerified": true,
+          "whatItMeans": "The work is delivered by AtliQ's team in Pune. Any access to production data from India is a breach unless the client has approved it in writing first.",
+          "whatItCouldCost": "If no written approval exists, AtliQ may already be in breach. That could support termination for breach. Combined with [12.2], it could also feed an uncapped confidentiality claim.",
+          "howToSoften": "Get a written approval from the client now, naming the Pune team and offshore access. Ideally record it in each Work Order or an amendment."
+        },
+        {
+          "id": "F12",
+          "check": "deal_value",
+          "category": "insurance",
+          "severity": "negotiable",
+          "title": "Insurance demanded: $2,000,000 (16.7× the deal)",
+          "clause": "14.1",
+          "foundIn": "14.1",
+          "quote": "professional liability (errors and omissions) insurance of at least $2,000,000",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ's cyber and professional-indemnity cover is about $1M. This asks for $2,000,000.",
+          "whatItCouldCost": "Buying extra cover could cost more than the margin on the deal, or AtliQ is in breach from day one.",
+          "howToSoften": "Offer AtliQ's existing $1M cover, or cap the requirement in proportion to the deal value."
+        },
+        {
+          "id": "F18",
+          "check": "entity_law",
+          "category": "entity",
+          "severity": "not_sure",
+          "title": "India team likely acting as a subcontractor: needs approval and matching back-to-back terms",
+          "clause": "1.5",
+          "foundIn": "1.5",
+          "quote": "employees and approved subcontractors of Supplier",
+          "quoteVerified": true,
+          "whatItMeans": "The contracting party is AtliQ Inc (Delaware), but the Pune team does the work. If the Pune staff are employed by an AtliQ India company, they are subcontractors. The client must approve them. AtliQ Inc stays liable for them.",
+          "whatItCouldCost": "Using unapproved subcontractors is a breach. If the intercompany agreement lacks matching terms, AtliQ Inc carries the risk alone. Those terms are confidentiality, data security, IP assignment to AtliQ Inc and the 72-hour incident notice.",
+          "howToSoften": "Confirm who employs the Pune staff. If it is the India entity, get the client's written approval. Also make sure the intercompany agreement mirrors Sections 7, 8 and 13."
+        }
+      ]
+    },
+    {
+      "file": "2025-01-22_al_noor_mutual_nda.md",
+      "tracker": "C-013",
+      "title": "Al Noor Hospitality — Mutual NDA",
+      "counterparty": "Al Noor Hospitality Group",
+      "status": "done",
+      "band": "Low",
+      "score": 6,
+      "counts": {
+        "serious": 0,
+        "negotiable": 0,
+        "minor": 2,
+        "not_sure": 1,
+        "info": 1
+      },
+      "summary": [
+        {
+          "text": "Matches AtliQ's usual terms; nothing serious found.",
+          "findingIds": []
+        }
+      ],
+      "coverageLine": "Read 17 of 17 clauses",
+      "findings": [
+        {
+          "id": "F3",
+          "check": "full_read",
+          "category": "liability",
+          "severity": "not_sure",
+          "title": "No cap on liability for breach of the NDA",
+          "clause": "2.2",
+          "foundIn": null,
+          "quote": null,
+          "quoteVerified": false,
+          "whatItMeans": "The NDA has no limit on what a party pays if it breaches. Clause 2.2 makes AtliQ responsible for breaches by its staff, advisers and subcontractors. Clause 8.1 also lets the client seek court orders on top of damages. Silence means liability is uncapped under general law. The terms are mutual. But AtliQ is the side receiving the most sensitive data: guest and occupancy data from a hotel portfolio. So in practice AtliQ carries more of the risk.",
+          "whatItCouldCost": "If guest data leaks from the Pune team, the client could claim all its losses with no ceiling. These could include guest claims, regulator fines it passes on, and reputational loss. This conflicts with AtliQ's hard line of never accepting unlimited liability.",
+          "howToSoften": "The NDA is already signed, so a change needs a written amendment signed by both parties (clause 9.1). Uncapped NDAs are common in the market. Still, ask for a mutual cap, or make sure the main services agreement sets a cap (1x total fees) and expressly overrides this NDA for all data handling once work starts. At a minimum, exclude indirect and consequential losses."
+        },
+        {
+          "id": "F4",
+          "check": "history",
+          "category": "restriction",
+          "severity": "info",
+          "title": "History: Orbit Travels — MSA (scanned) non-compete ended 30 Jun 2025",
+          "clause": null,
+          "foundIn": null,
+          "quote": null,
+          "quoteVerified": false,
+          "whatItMeans": "AtliQ once promised develop, license or provide travel-booking software would not be provided to any online travel agency operating in India (India). It ended on 30 Jun 2025 and no longer binds AtliQ.",
+          "whatItCouldCost": "Nothing now — shown so you know the history in this domain.",
+          "howToSoften": "No action needed.",
+          "related": {
+            "commitmentId": "CMT-005",
+            "contract": "Orbit Travels — MSA (scanned)",
+            "clause": "6.1, 6.2",
+            "quote": "it shall not develop, license or provide travel-booking software to any online travel agency operating in India.",
+            "ends": "2025-06-30",
+            "status": "expired",
+            "waivers": []
+          }
+        }
+      ]
+    },
+    {
+      "file": "2025-01-22_paytrack_technologies_msa.md",
+      "tracker": "C-005",
+      "title": "PayTrack Technologies — MSA",
+      "counterparty": "PayTrack Technologies",
+      "status": "done",
+      "band": "Medium",
+      "score": 52,
+      "counts": {
+        "serious": 0,
+        "negotiable": 4,
+        "minor": 6,
+        "not_sure": 0,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The contract binds AtliQ to documents it has not seen: SOW-1 (clause 2.1) and PayTrack's information security policies and RBI outsourcing guidelines (clause 2.3), so AtliQ would be taking on obligations it has not read.",
+          "findingIds": [
+            "F1",
+            "F2"
+          ]
+        },
+        {
+          "text": "The confidentiality terms are also one-sided: they lack the standard exceptions, which invites disputes over information AtliQ is entitled to use (clause 7.1), and they never expire, creating indefinite record-keeping and breach risk (clause 7.3).",
+          "findingIds": [
+            "F3",
+            "F4"
+          ]
+        },
+        {
+          "text": "Negotiate before signing: get and review the referenced documents, and ask for standard confidentiality exceptions and a fixed end date for confidentiality.",
+          "findingIds": [
+            "F1",
+            "F2",
+            "F3",
+            "F4"
+          ]
+        }
+      ],
+      "coverageLine": "Read 41 of 41 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "SOW-1 is referred to but missing",
+          "clause": "2.1",
+          "foundIn": "2.1",
+          "quote": "SOW-1 covers the design and development of a transaction analytics data platform and an ML-based anomaly detection module for merchant settlements.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates SOW-1, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for SOW-1 and review it before signing."
+        },
+        {
+          "id": "F2",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "PayTrack information security policies and RBI guidelines on outsourcing of IT services is referred to but missing",
+          "clause": "2.3",
+          "foundIn": "2.3",
+          "quote": "AtliQ shall comply with PayTrack's information security policies and the RBI guidelines on outsourcing of IT services",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates PayTrack information security policies and RBI guidelines on outsourcing of IT services, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for PayTrack information security policies and RBI guidelines on outsourcing of IT services and review it before signing."
+        },
+        {
+          "id": "F3",
+          "check": "missing_protection",
+          "category": "confidentiality",
+          "severity": "negotiable",
+          "title": "No standard exceptions to confidentiality",
+          "clause": "7.1",
+          "foundIn": "7.1",
+          "quote": "Each Party shall keep confidential the other Party's confidential information and use it only for the purposes of this Agreement.",
+          "quoteVerified": true,
+          "whatItMeans": "Even public information, things AtliQ already knew or built independently, or disclosures required by law would count as a breach.",
+          "whatItCouldCost": "Disputes over information AtliQ is entitled to use.",
+          "howToSoften": "Add the usual exceptions: public, already known, independently developed, received from a third party, required by law."
+        },
+        {
+          "id": "F4",
+          "check": "baseline",
+          "category": "confidentiality",
+          "severity": "negotiable",
+          "title": "Confidentiality never ends",
+          "clause": "7.3",
+          "foundIn": "7.3",
+          "quote": "These obligations survive for five (5) years following termination, and indefinitely in respect of Client Data.",
+          "quoteVerified": true,
+          "whatItMeans": "The obligation continues forever; AtliQ's usual is about 3 years after the agreement ends.",
+          "whatItCouldCost": "Indefinite record-keeping and breach risk.",
+          "howToSoften": "Limit to 3 years after termination (trade secrets can stay protected while they remain secret)."
+        }
+      ]
+    },
+    {
+      "file": "2025-03-10_acme_retail_group_msa.md",
+      "tracker": "C-006",
+      "title": "Acme Retail Group — MSA",
+      "counterparty": "Acme Retail Group",
+      "status": "done",
+      "band": "Low",
+      "score": 24,
+      "counts": {
+        "serious": 0,
+        "negotiable": 2,
+        "minor": 2,
+        "not_sure": 0,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The contract refers to a work order (SOW-1, dated 10 March 2025) that is missing, so AtliQ would be agreeing to obligations it has not read.",
+          "findingIds": [
+            "F1"
+          ]
+        },
+        {
+          "text": "The confidentiality clause lacks the standard exceptions, which could lead to disputes over information AtliQ is entitled to use.",
+          "findingIds": [
+            "F2"
+          ]
+        },
+        {
+          "text": "Negotiate before signing: get a copy of SOW-1 to review and ask for the standard confidentiality exceptions to be added.",
+          "findingIds": [
+            "F1",
+            "F2"
+          ]
+        }
+      ],
+      "coverageLine": "Read 38 of 38 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "SOW-1 dated 10 March 2025 is referred to but missing",
+          "clause": "2.1",
+          "foundIn": "2.1",
+          "quote": "SOW-1 dated 10 March 2025 covers the design and implementation of Power BI dashboards",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates SOW-1 dated 10 March 2025, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for SOW-1 dated 10 March 2025 and review it before signing."
+        },
+        {
+          "id": "F2",
+          "check": "missing_protection",
+          "category": "confidentiality",
+          "severity": "negotiable",
+          "title": "No standard exceptions to confidentiality",
+          "clause": "8.1",
+          "foundIn": "8.1",
+          "quote": "Each Party shall maintain the other Party's Confidential Information in strict confidence",
+          "quoteVerified": true,
+          "whatItMeans": "Even public information, things AtliQ already knew or built independently, or disclosures required by law would count as a breach.",
+          "whatItCouldCost": "Disputes over information AtliQ is entitled to use.",
+          "howToSoften": "Add the usual exceptions: public, already known, independently developed, received from a third party, required by law."
+        }
+      ]
+    },
+    {
+      "file": "2025-03-15_al_noor_hospitality_msa.md",
+      "tracker": "C-007",
+      "title": "Al Noor Hospitality — MSA",
+      "counterparty": "Al Noor Hospitality Group",
+      "status": "done",
+      "band": "High",
+      "score": 100,
+      "counts": {
+        "serious": 3,
+        "negotiable": 5,
+        "minor": 6,
+        "not_sure": 0,
+        "info": 1
+      },
+      "summary": [
+        {
+          "text": "The biggest risk is a new non-compete covering the whole GCC that also binds AtliQ's Affiliates, which would cost future work in that market and put AtliQ in breach the moment it signs because it already works for CloudSpan Technologies.",
+          "findingIds": [
+            "F1",
+            "F2"
+          ]
+        },
+        {
+          "text": "Second, AtliQ would have unlimited liability for any confidentiality breach, including Guest Data for 14 properties, far above the USD 185,000 deal value and the USD 1M cyber policy; this crosses AtliQ's hard line, and the missing DPA for Pune team access could trigger it.",
+          "findingIds": [
+            "F3",
+            "F6"
+          ]
+        },
+        {
+          "text": "Do not sign until the non-compete is removed and liability is capped; also negotiate a DPA, the delay penalty, the DIFC law and courts, and obtain the missing security policies and Annex A property list.",
+          "findingIds": [
+            "F1",
+            "F2",
+            "F3",
+            "F6",
+            "F5",
+            "F7",
+            "F4",
+            "F8"
+          ]
+        }
+      ],
+      "coverageLine": "Read 76 of 76 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "full_read",
+          "category": "restriction",
+          "severity": "serious",
+          "title": "New non-compete on AtliQ (GCC (UAE, Saudi Arabia, Qatar, Kuwait, Bahrain, Oman). Applies if the client is headquartered in the GCC or the work relates to GCC properties, wherever the work is performed (12.2).), binding Affiliates",
+          "clause": "12.1",
+          "foundIn": "12.1",
+          "quote": "neither it nor any of its Affiliates shall, during the Restricted Period, directly or indirectly, provide data analytics, artificial intelligence or revenue-management services to any Hospitality Business in the GCC",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ and its Affiliates could not Providing data analytics, artificial intelligence or revenue-management services to any Hospitality Business (hotel/resort/serviced-apartment owners, operators, managers, franchisors, and their distribution, revenue-management or guest-analytics providers). This is AtliQ's core service line. The Client may waive it case by case (12.4). for Restricted Period: the Term (3 years) plus eighteen (18) months after expiry or termination.",
+          "whatItCouldCost": "Lost future work in this market for the whole period; may also breach promises to existing clients.",
+          "howToSoften": "Delete it, or narrow it to the named project, a short period and the client's direct competitors only.",
+          "related": {
+            "type": "non_compete",
+            "scope": "Providing data analytics, artificial intelligence or revenue-management services to any Hospitality Business (hotel/resort/serviced-apartment owners, operators, managers, franchisors, and their distribution, revenue-management or guest-analytics providers). This is AtliQ's core service line. The Client may waive it case by case (12.4).",
+            "territory": "GCC (UAE, Saudi Arabia, Qatar, Kuwait, Bahrain, Oman). Applies if the client is headquartered in the GCC or the work relates to GCC properties, wherever the work is performed (12.2).",
+            "duration": "Restricted Period: the Term (3 years) plus eighteen (18) months after expiry or termination"
+          }
+        },
+        {
+          "id": "F2",
+          "check": "clash",
+          "category": "restriction",
+          "severity": "serious",
+          "title": "New restriction would breach current work for CloudSpan Technologies",
+          "clause": "12.1",
+          "foundIn": "12.1",
+          "quote": "neither it nor any of its Affiliates shall, during the Restricted Period, directly or indirectly, provide data analytics",
+          "quoteVerified": true,
+          "whatItMeans": "Not sure. CloudSpan Technologies is a data platform partner. If AtliQ's work through CloudSpan Technologies reaches a hotel, resort or serviced-apartment business, or a guest-analytics provider, that is headquartered in or has properties in the GCC, it would be 'indirectly' providing data analytics to a Hospitality Business in the GCC ([1.11], [12.2]). The facts are not in the contract. Check CloudSpan Technologies's end customers before signing.",
+          "whatItCouldCost": "AtliQ would be in breach on signing, because it already works for CloudSpan Technologies.",
+          "howToSoften": "Delete the restriction, or carve out existing clients by name.",
+          "related": {
+            "client": "CloudSpan Technologies"
+          }
+        },
+        {
+          "id": "F3",
+          "check": "full_read",
+          "category": "liability",
+          "severity": "serious",
+          "title": "Unlimited liability for any breach of confidentiality, including Guest Data",
+          "clause": "14.3",
+          "foundIn": "14.3",
+          "quote": "Nothing in this Agreement limits liability for fraud, wilful misconduct, breach of Clause 8 (Confidentiality)",
+          "quoteVerified": true,
+          "whatItMeans": "The liability cap in [14.2] does not apply to any breach of Clause 8. Confidential Information includes Client Data ([8.1]), and Client Data includes all Guest Data and data generated by the Platform ([1.4]). So any data leak or security incident in the Pune team's work could create unlimited liability for AtliQ. This overrides the cap.",
+          "whatItCouldCost": "No upper limit. Guest data for 14 properties could mean claims, regulatory costs and client losses far above the USD 185,000 deal value and above AtliQ's USD 1M cyber policy. This crosses AtliQ's hard line of never accepting unlimited liability.",
+          "howToSoften": "Remove 'breach of Clause 8 (Confidentiality)' from 14.3. If the Client insists, agree a separate higher cap for confidentiality and data breaches (e.g. 2× total fees or the USD 1M cyber policy limit), never unlimited."
+        },
+        {
+          "id": "F4",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Client's site, health and safety and information security policies is referred to but missing",
+          "clause": "7.2",
+          "foundIn": "7.2",
+          "quote": "shall comply with the Client's site, health and safety and information security policies.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Client's site, health and safety and information security policies, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Client's site, health and safety and information security policies and review it before signing."
+        },
+        {
+          "id": "F5",
+          "check": "baseline",
+          "category": "delay_penalty",
+          "severity": "negotiable",
+          "title": "Delay penalty above AtliQ's usual (1% of the Fees payable for the affected Milestone per week, cap 10%)",
+          "clause": "10.3",
+          "foundIn": "10.3",
+          "quote": "one percent (1%) of the Fees payable for the affected Milestone for each complete week of delay",
+          "quoteVerified": true,
+          "whatItMeans": "The penalty is capped, but higher than AtliQ's usual 0.5% of the milestone fee per week, capped at 5%.",
+          "whatItCouldCost": "Up to 10% of the Fees payable for the affected Milestone; aggregate cap is 10% of total Fees payable under this Agreement.",
+          "howToSoften": "Bring it to 0.5% of the milestone fee per week with a 5% cap."
+        },
+        {
+          "id": "F6",
+          "check": "full_read",
+          "category": "data",
+          "severity": "negotiable",
+          "title": "No DPA and no transfer mechanism for Pune team access to Guest Data",
+          "clause": "16.3",
+          "foundIn": "16.3",
+          "quote": "Any Guest Data accessed from India shall be accessed remotely from UAE-hosted environments only.",
+          "quoteVerified": true,
+          "whatItMeans": "The Pune team will work with guest personal data. The contract has only short processor terms ([16.2]) and no full data processing agreement. It does not say whether remote access from India counts as a transfer under DIFC or UAE law, or what legal mechanism covers it. AtliQ must also work only in UAE-hosted environments and report breaches within 48 hours ([16.2]).",
+          "whatItCouldCost": "If remote access is treated as an unlawful transfer, AtliQ is in breach of [16] and Clause 8, which carries unlimited liability under [14.3]. UAE hosting may add infrastructure cost not priced into the fees.",
+          "howToSoften": "Ask the Client to attach a DPA that records the Client's written consent to remote access from India, the legal transfer basis, security measures, and who pays for UAE hosting. Confirm the Client provides the UAE-hosted environment."
+        },
+        {
+          "id": "F7",
+          "check": "entity_law",
+          "category": "law",
+          "severity": "negotiable",
+          "title": "Foreign governing law: Laws of the Dubai International Financial Centre (DIFC) (Courts of the Dubai International Financial Centre (exclusive), after 30 days of good-faith negotiation (clause 21.2))",
+          "clause": "21.1",
+          "foundIn": "21.1",
+          "quote": "shall be governed by the laws of the Dubai International Financial Centre",
+          "quoteVerified": true,
+          "whatItMeans": "Disputes would be decided under Laws of the Dubai International Financial Centre (DIFC) in Courts of the Dubai International Financial Centre (exclusive), after 30 days of good-faith negotiation (clause 21.2), where AtliQ has no presence. AtliQ's usual is Indian law.",
+          "whatItCouldCost": "Defending or enforcing a claim abroad means foreign lawyers and travel — often more than a small claim is worth (the Brightwater lesson).",
+          "howToSoften": "Ask for Indian law with arbitration seated in Pune or Mumbai, or neutral arbitration (e.g. SIAC) as a fallback."
+        },
+        {
+          "id": "F8",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Annex A to SOW-1 (list of 14 properties) is referred to but missing",
+          "clause": "Schedule 1, text",
+          "foundIn": "Schedule 1, text",
+          "quote": "14 properties across Dubai, Abu Dhabi and Ras Al Khaimah as listed in Annex A to SOW-1.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Annex A to SOW-1 (list of 14 properties), but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Annex A to SOW-1 (list of 14 properties) and review it before signing."
+        },
+        {
+          "id": "F15",
+          "check": "history",
+          "category": "restriction",
+          "severity": "info",
+          "title": "History: Orbit Travels — MSA (scanned) non-compete ended 30 Jun 2025",
+          "clause": null,
+          "foundIn": null,
+          "quote": null,
+          "quoteVerified": false,
+          "whatItMeans": "AtliQ once promised develop, license or provide travel-booking software would not be provided to any online travel agency operating in India (India). It ended on 30 Jun 2025 and no longer binds AtliQ.",
+          "whatItCouldCost": "Nothing now — shown so you know the history in this domain.",
+          "howToSoften": "No action needed.",
+          "related": {
+            "commitmentId": "CMT-005",
+            "contract": "Orbit Travels — MSA (scanned)",
+            "clause": "6.1, 6.2",
+            "quote": "it shall not develop, license or provide travel-booking software to any online travel agency operating in India.",
+            "ends": "2025-06-30",
+            "status": "expired",
+            "waivers": []
+          }
+        }
+      ]
+    },
+    {
+      "file": "2025-04-18_sunrise_foods_msa.md",
+      "tracker": "C-008",
+      "title": "Sunrise Foods — MSA",
+      "counterparty": "Sunrise Foods",
+      "status": "done",
+      "band": "Medium",
+      "score": 32,
+      "counts": {
+        "serious": 0,
+        "negotiable": 2,
+        "minor": 5,
+        "not_sure": 1,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The contract refers to SOW-1 (Distributor Portal v1) in clause 1.6, but that document is missing, so AtliQ would be taking on obligations it has not read.",
+          "findingIds": [
+            "F1"
+          ]
+        },
+        {
+          "text": "The confidentiality clause (9.1) lacks the standard exceptions, which could lead to disputes over information AtliQ is entitled to use.",
+          "findingIds": [
+            "F2"
+          ]
+        },
+        {
+          "text": "Negotiate before signing: get and review SOW-1 and add the standard confidentiality exceptions, and check with an advisor whether billing in USD between two Indian companies (clause 5.1) exposes AtliQ to exchange-rate losses or invoicing and compliance issues.",
+          "findingIds": [
+            "F1",
+            "F2",
+            "F8"
+          ]
+        }
+      ],
+      "coverageLine": "Read 44 of 44 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "SOW-1 (Distributor Portal v1) is referred to but missing",
+          "clause": "1.6",
+          "foundIn": "1.6",
+          "quote": "SOW-1 (Distributor Portal v1) is executed concurrently with this Agreement.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates SOW-1 (Distributor Portal v1), but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for SOW-1 (Distributor Portal v1) and review it before signing."
+        },
+        {
+          "id": "F2",
+          "check": "missing_protection",
+          "category": "confidentiality",
+          "severity": "negotiable",
+          "title": "No standard exceptions to confidentiality",
+          "clause": "9.1",
+          "foundIn": "9.1",
+          "quote": "Each Party shall treat the other Party's confidential information (including distributor lists, pricing, schemes and source code) as strictly confidential",
+          "quoteVerified": true,
+          "whatItMeans": "Even public information, things AtliQ already knew or built independently, or disclosures required by law would count as a breach.",
+          "whatItCouldCost": "Disputes over information AtliQ is entitled to use.",
+          "howToSoften": "Add the usual exceptions: public, already known, independently developed, received from a third party, required by law."
+        },
+        {
+          "id": "F8",
+          "check": "full_read",
+          "category": "payment",
+          "severity": "not_sure",
+          "title": "Fees in USD between two Indian companies",
+          "clause": "5.1",
+          "foundIn": "5.1",
+          "quote": "The total Fees under SOW-1 are **USD 33,000** (United States Dollars Thirty-Three Thousand only)",
+          "quoteVerified": true,
+          "whatItMeans": "Both parties are Indian companies. The fee is stated in US dollars, with no exchange rate, conversion date or rupee settlement rule. It is unclear how invoices, GST and TDS will be worked out, and whether a USD-priced deal between two Indian residents raises foreign exchange (FEMA) questions.",
+          "whatItCouldCost": "Exchange-rate swings could reduce what AtliQ receives in rupees. There may also be invoicing or compliance issues. The amount cannot be estimated here.",
+          "howToSoften": "Check with AtliQ's CA. If needed, state fees in INR, or fix the conversion rate source and date, and say payment is made in INR."
+        }
+      ]
+    },
+    {
+      "file": "2025-04-28_rohan_iyer_contractor_agreement.md",
+      "tracker": "C-039",
+      "title": "Rohan Iyer — Contractor Agreement",
+      "counterparty": "Rohan Iyer",
+      "status": "done",
+      "band": "High",
+      "score": 100,
+      "counts": {
+        "serious": 3,
+        "negotiable": 9,
+        "minor": 2,
+        "not_sure": 2,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The biggest risk is IP: the client will own the deliverables, but the freelancer keeps ownership of his work and has not licensed his own templates and components to AtliQ, so AtliQ would owe the client rights it cannot get from the person doing the work.",
+          "findingIds": [
+            "F1",
+            "F2"
+          ]
+        },
+        {
+          "text": "Second, a confidentiality carve-out leaves AtliQ's own liability with no money limit, while the client's ERP and point-of-sale data would go to a freelancer who has no data-protection terms and whom the client MSA does not allow AtliQ to share confidential information with.",
+          "findingIds": [
+            "F3",
+            "F4",
+            "F11"
+          ]
+        },
+        {
+          "text": "Do not sign until the freelancer assigns or licenses his work to AtliQ, the uncapped confidentiality liability is addressed, data-protection terms are passed on to him, and AtliQ has read the missing SOW-1 and client security requirements.",
+          "findingIds": [
+            "F1",
+            "F2",
+            "F3",
+            "F6",
+            "F11",
+            "F5",
+            "F10"
+          ]
+        }
+      ],
+      "coverageLine": "Read 31 of 31 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "pass_down",
+          "category": "data",
+          "severity": "serious",
+          "title": "Client will own the deliverables, but the freelancer keeps ownership of his work",
+          "clause": "5.2",
+          "foundIn": "5.2",
+          "quote": "The Contractor retains ownership of all intellectual property rights in the Work Product",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ promises the client it will own the dashboards and data models once it pays. The freelancer agreement says the freelancer owns them. Clause [5.3] only gives AtliQ a non-exclusive licence. AtliQ cannot transfer ownership it never received. So AtliQ would be in breach of the MSA on every deliverable the freelancer builds. The client could withhold payment or claim against AtliQ. The freelancer could also reuse or sell the same work to others. The freelancer must assign his Work Product to AtliQ, not just license it.",
+          "whatItCouldCost": "AtliQ would owe the client obligations it cannot pass on to the party actually doing the work.",
+          "howToSoften": "Add matching confidentiality, IP and data-protection terms to the subcontract before work starts.",
+          "related": {
+            "docB": "PARTY_C — MSA",
+            "clauseB": "9.1",
+            "quoteB": "Upon receipt of full payment, all intellectual property rights in the Deliverables created specifically for the Client shall vest in the Client.",
+            "absentInB": false,
+            "dataMustNotMoveUntil": null,
+            "linkedDocs": [
+              "Acme Retail Group — MSA"
+            ],
+            "quoteBVerified": false
+          }
+        },
+        {
+          "id": "F2",
+          "check": "pass_down",
+          "category": "data",
+          "severity": "serious",
+          "title": "Freelancer's own templates and components are not licensed to AtliQ for passing on to the client",
+          "clause": "5.2",
+          "foundIn": "5.2",
+          "quote": "and in any pre-existing materials, components and templates of the Contractor",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ licenses to the client any pre-existing materials built into the deliverables. The freelancer keeps his own pre-existing materials. His licence in [5.3] covers only the 'Work Product', not his pre-existing items. If he puts his own templates into the dashboards, AtliQ may have no right to license them to the client. The freelancer should grant AtliQ a perpetual, sublicensable licence to any pre-existing materials he incorporates.",
+          "whatItCouldCost": "AtliQ would owe the client obligations it cannot pass on to the party actually doing the work.",
+          "howToSoften": "Add matching confidentiality, IP and data-protection terms to the subcontract before work starts.",
+          "related": {
+            "docB": "PARTY_C — MSA",
+            "clauseB": "9.2",
+            "quoteB": "grants the Client a non-exclusive, perpetual, royalty-free licence to use any such pre-existing materials incorporated into the Deliverables for the Client's internal business purposes",
+            "absentInB": false,
+            "dataMustNotMoveUntil": null,
+            "linkedDocs": [
+              "Acme Retail Group — MSA"
+            ],
+            "quoteBVerified": false
+          }
+        },
+        {
+          "id": "F3",
+          "check": "full_read",
+          "category": "liability",
+          "severity": "serious",
+          "title": "Confidentiality carve-out makes AtliQ's own liability unlimited",
+          "clause": "8.1",
+          "foundIn": "8.1",
+          "quote": "except for breach of Clause 6 or fraud",
+          "quoteVerified": true,
+          "whatItMeans": "The cap applies to both sides. But any confidentiality breach is uncapped for AtliQ as well as for the freelancer. Your hard line is never unlimited liability. In practice AtliQ's exposure is small, because it holds little of the freelancer's confidential information. The carve-out mostly protects AtliQ if he leaks Acme Retail Group data. Even so, a freelancer is unlikely to be able to pay a large claim.",
+          "whatItCouldCost": "In theory, no money limit on AtliQ's side for a confidentiality breach.",
+          "howToSoften": "Keep the carve-out for fraud. For Clause 6 breaches, either use a higher fixed cap (e.g. 2-3× fees) for both sides, or make only the Contractor's confidentiality liability uncapped. Your call on which is more practical."
+        },
+        {
+          "id": "F4",
+          "check": "bundle_conflict",
+          "category": "data",
+          "severity": "negotiable",
+          "title": "Client MSA lets AtliQ share confidential information only with employees and advisers, not a freelancer",
+          "clause": "6.1",
+          "foundIn": "6.1",
+          "quote": "in the case of AtliQ, of AtliQ's clients, received in connection with this Agreement",
+          "quoteVerified": true,
+          "whatItMeans": "The freelancer is an independent contractor, not an AtliQ employee. Under the MSA, giving him the client's confidential information or data may itself breach [8.1]. The freelancer agreement expects AtliQ to pass him client information. The MSA has no clause allowing subcontractors. The deal note also says only the AtliQ Pune team touches the data. AtliQ should get the client's written consent to use this freelancer before sharing anything.",
+          "whatItCouldCost": "The documents cannot both be complied with.",
+          "howToSoften": "Align the two documents before signing either.",
+          "related": {
+            "docB": "PARTY_C — MSA",
+            "clauseB": "8.1",
+            "quoteB": "shall not disclose it to any third party except to its employees and professional advisers on a need-to-know basis",
+            "absentInB": false,
+            "dataMustNotMoveUntil": "The client (PARTY_C) agrees in writing that AtliQ may disclose Confidential Information to this freelancer.",
+            "linkedDocs": [
+              "Acme Retail Group — MSA"
+            ],
+            "quoteBVerified": false
+          }
+        },
+        {
+          "id": "F5",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "AtliQ clients' confidentiality and data-security requirements (notified in writing) is referred to but missing",
+          "clause": "6.2",
+          "foundIn": "6.2",
+          "quote": "The Contractor shall comply with any confidentiality and data-security requirements of AtliQ's clients notified to him in writing",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates AtliQ clients' confidentiality and data-security requirements (notified in writing), but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for AtliQ clients' confidentiality and data-security requirements (notified in writing) and review it before signing."
+        },
+        {
+          "id": "F6",
+          "check": "full_read",
+          "category": "data",
+          "severity": "negotiable",
+          "title": "No data-protection flow-down from the Acme Retail Group SOW to the freelancer",
+          "clause": "6.2",
+          "foundIn": "6.2",
+          "quote": "comply with any confidentiality and data-security requirements of AtliQ's clients notified to him in writing",
+          "quoteVerified": true,
+          "whatItMeans": "The freelancer handles Acme Retail Group sales, inventory and store data. He is only bound by client data rules if AtliQ sends them to him in writing. There are no terms on any personal data under India's DPDP Act. There are also no breach-notification, deletion-at-end or audit terms. Unclear from this document whether personal data such as customer or loyalty data is involved.",
+          "whatItCouldCost": "If he mishandles Acme Retail Group data, AtliQ answers to Acme Retail Group under SOW-1. AtliQ's recovery from him is limited by 8.1 and 8.2.",
+          "howToSoften": "Attach SOW-1's data and security terms as a schedule he must follow. Add: notify AtliQ of any data incident within 24-48 hours; return or delete all client data at the end; no client data on personal devices; DPDP Act compliance if personal data is processed."
+        },
+        {
+          "id": "F7",
+          "check": "pass_down",
+          "category": "data",
+          "severity": "negotiable",
+          "title": "AtliQ gives the client a full IP indemnity; freelancer gives only a knowledge-limited warranty",
+          "clause": "7.2",
+          "foundIn": "7.2",
+          "quote": "The Contractor warrants that the Work Product will not, to his knowledge, infringe the intellectual property rights of any third party.",
+          "quoteVerified": true,
+          "whatItMeans": "If the freelancer's work infringes someone's IP or he leaks client information, AtliQ must pay the client's losses. The freelancer only promises no infringement 'to his knowledge'. He gives no indemnity back to AtliQ. AtliQ would carry that cost alone. Consider asking for a matching indemnity from the freelancer, perhaps capped at his fees.",
+          "whatItCouldCost": "AtliQ would owe the client obligations it cannot pass on to the party actually doing the work.",
+          "howToSoften": "Add matching confidentiality, IP and data-protection terms to the subcontract before work starts.",
+          "related": {
+            "docB": "PARTY_C — MSA",
+            "clauseB": "11.1",
+            "quoteB": "shall indemnify the other against losses arising from third-party claims caused by the Indemnifying Party's breach of confidentiality, infringement of third-party intellectual property rights",
+            "absentInB": false,
+            "dataMustNotMoveUntil": null,
+            "linkedDocs": [
+              "Acme Retail Group — MSA"
+            ],
+            "quoteBVerified": false
+          }
+        },
+        {
+          "id": "F8",
+          "check": "fairness",
+          "category": "termination",
+          "severity": "negotiable",
+          "title": "Exit on 15 days' notice",
+          "clause": "9.1",
+          "foundIn": "9.1",
+          "quote": "Either party may terminate this Agreement for convenience by giving fifteen (15) days' written notice.",
+          "quoteVerified": true,
+          "whatItMeans": "The vendor can be dropped on 15 days' notice. AtliQ's usual is 30 days with work done and in progress paid.",
+          "whatItCouldCost": "Little time to redeploy the team.",
+          "howToSoften": "30 days' notice; pay for all work done and work in progress up to the termination date."
+        },
+        {
+          "id": "F9",
+          "check": "full_read",
+          "category": "restriction",
+          "severity": "negotiable",
+          "title": "Non-solicitation is narrow and does not stop the freelancer taking Acme Retail Group work",
+          "clause": "10.1",
+          "foundIn": "10.1",
+          "quote": "shall not directly solicit any AtliQ client",
+          "quoteVerified": true,
+          "whatItMeans": "It only stops him from directly approaching AtliQ clients. He is not stopped if Acme Retail Group approaches him. He is not stopped from working through another agency. It lasts only 6 months. Together with 4.2 and his IP ownership, he could take over the Acme Retail Group dashboard work.",
+          "whatItCouldCost": "Loss of follow-on revenue from Acme Retail Group.",
+          "howToSoften": "Cover 'solicit or accept' work from introduced clients, directly or indirectly, for 12 months. Keep it limited to clients he worked with through AtliQ."
+        },
+        {
+          "id": "F10",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "SOW-1 dated 10 March 2025 (AtliQ and Acme Retail Group Pvt Ltd) is referred to but missing",
+          "clause": "Engagement Schedule, row 2",
+          "foundIn": "Engagement Schedule, row 2",
+          "quote": "Acme Retail Group Pvt Ltd (Chennai), SOW-1 dated 10 March 2025: sales, inventory and store-performance dashboards",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates SOW-1 dated 10 March 2025 (AtliQ and Acme Retail Group Pvt Ltd), but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for SOW-1 dated 10 March 2025 (AtliQ and Acme Retail Group Pvt Ltd) and review it before signing."
+        },
+        {
+          "id": "F11",
+          "check": "pass_down",
+          "category": "data",
+          "severity": "negotiable",
+          "title": "No data-protection terms for the freelancer, but the client's ERP and point-of-sale data will be shared",
+          "clause": null,
+          "foundIn": null,
+          "quote": null,
+          "quoteVerified": false,
+          "whatItMeans": "Not found after reading all clauses given. AtliQ must handle client personal data only for the Services, under India's DPDP Act, with reasonable security. The client will give access to ERP and point-of-sale data ([3.1]), which may hold customer details. The freelancer agreement has no data-protection clause. Clause [6.2] only covers client requirements 'notified to him in writing'. If the freelancer misuses or leaks personal data, AtliQ answers to the client and may face indemnity under [11.1]. The freelancer needs matching terms: purpose limit, DPDP compliance, security, no personal devices, and deletion at the end.",
+          "whatItCouldCost": "AtliQ would owe the client obligations it cannot pass on to the party actually doing the work.",
+          "howToSoften": "Add matching confidentiality, IP and data-protection terms to the subcontract before work starts.",
+          "related": {
+            "docB": "PARTY_C — MSA",
+            "clauseB": "13.1",
+            "quoteB": "The Service Provider shall process personal data received from the Client only for the purpose of the Services and in compliance with the Digital Personal Data Protection Act, 2023",
+            "absentInB": true,
+            "dataMustNotMoveUntil": "The freelancer signs data-protection terms matching MSA [13.1]. Also, any client requirements under [6.2] must be sent to him in writing.",
+            "linkedDocs": [
+              "Acme Retail Group — MSA"
+            ],
+            "quoteBVerified": false
+          }
+        },
+        {
+          "id": "F12",
+          "check": "pass_down",
+          "category": "data",
+          "severity": "negotiable",
+          "title": "AtliQ fixes defects for 60 days after acceptance; freelancer has no matching duty",
+          "clause": null,
+          "foundIn": null,
+          "quote": null,
+          "quoteVerified": false,
+          "whatItMeans": "Not found after reading all clauses given. AtliQ must fix deliverables that do not match the SOW for sixty days after acceptance. The freelancer agreement has no warranty period or duty to fix defects. If the engagement has ended, AtliQ would pay its own staff or the freelancer again to fix his work. Add a matching fix-at-no-cost period.",
+          "whatItCouldCost": "AtliQ would owe the client obligations it cannot pass on to the party actually doing the work.",
+          "howToSoften": "Add matching confidentiality, IP and data-protection terms to the subcontract before work starts.",
+          "related": {
+            "docB": "PARTY_C — MSA",
+            "clauseB": "10.1",
+            "quoteB": "the Deliverables shall conform materially to the SOW for sixty (60) days from acceptance",
+            "absentInB": true,
+            "dataMustNotMoveUntil": null,
+            "linkedDocs": [
+              "Acme Retail Group — MSA"
+            ],
+            "quoteBVerified": false
+          }
+        },
+        {
+          "id": "F15",
+          "check": "delivery",
+          "category": "data",
+          "severity": "not_sure",
+          "title": "Executed freelancer agreement stored on a personal laptop Downloads folder",
+          "clause": "Parties",
+          "foundIn": "Parties",
+          "quote": "Stored: Dhaval's laptop, Downloads folder",
+          "quoteVerified": true,
+          "whatItMeans": "The signed freelancer agreement sits in one person's Downloads folder, not with the other contracts. If the laptop is lost, AtliQ may be unable to prove the freelancer's obligations. This is not a contract term, but it is worth moving the file to the shared Contracts folder.",
+          "whatItCouldCost": "The documents cannot both be complied with.",
+          "howToSoften": "Align the two documents before signing either.",
+          "related": {
+            "docB": "PARTY_C — MSA",
+            "clauseB": "Parties",
+            "quoteB": "Stored: Google Drive > Contracts > 2025",
+            "absentInB": false,
+            "dataMustNotMoveUntil": null,
+            "linkedDocs": [
+              "Acme Retail Group — MSA"
+            ],
+            "quoteBVerified": false
+          }
+        },
+        {
+          "id": "F16",
+          "check": "bundle_missing",
+          "category": "data",
+          "severity": "not_sure",
+          "title": "Client SOW not in the bundle, so freelancer scope cannot be checked against client deliverables",
+          "clause": "1.4",
+          "foundIn": null,
+          "quote": "\"**Statement of Work**\" or \"**SOW**\" means a document executed by both Parties describing specific services, Deliverables, Milestones and Fees.",
+          "quoteVerified": false,
+          "whatItMeans": "The client deliverables, deadlines and review times are set in an SOW, which was not given. The freelancer's key deliverables are in [Engagement Schedule, row 7] of his agreement. Without the SOW we cannot check that his scope and dates match what AtliQ owes the client. The deal note also says 'Acme dashboards', but the client MSA is with Acme Retail Group. The freelancer agreement does not name the client. Please confirm this freelancer is for this client and share the SOW.",
+          "whatItCouldCost": "The documents cannot both be complied with.",
+          "howToSoften": "Align the two documents before signing either.",
+          "related": {
+            "docB": "Statement of Work (not provided)",
+            "clauseB": null,
+            "quoteB": null,
+            "absentInB": true,
+            "dataMustNotMoveUntil": null,
+            "linkedDocs": [
+              "Acme Retail Group — MSA"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "file": "2025-06-20_northwind_logistics_msa.md",
+      "tracker": "C-009",
+      "title": "Northwind Logistics — MSA (+ SOW-1)",
+      "counterparty": "Northwind Logistics",
+      "status": "done",
+      "band": "High",
+      "score": 100,
+      "counts": {
+        "serious": 4,
+        "negotiable": 4,
+        "minor": 4,
+        "not_sure": 0,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The biggest risk is that AtliQ's own reusable tools would be handed over to the client permanently under clauses S1.2 and 9.2, repeating the Northwind PipeKit problem.",
+          "findingIds": [
+            "F1",
+            "F2"
+          ]
+        },
+        {
+          "text": "Second, the data processing terms (Schedule 3) and the UK international data transfer addendum are referred to but missing, so AtliQ cannot check its data-protection obligations or fine exposure, and other referenced documents (client IT and security policies, the change control procedure, LCIA Rules) are also missing, with disputes sent to LCIA arbitration in London under English law.",
+          "findingIds": [
+            "F3",
+            "F4",
+            "F5",
+            "F6",
+            "F7",
+            "F8"
+          ]
+        },
+        {
+          "text": "Do not sign until AtliQ's tools are carved out of the assignment and the missing data-protection documents are supplied and agreed, and negotiate to see the other missing documents and a dispute forum closer to home.",
+          "findingIds": [
+            "F1",
+            "F2",
+            "F3",
+            "F4",
+            "F5",
+            "F6",
+            "F7",
+            "F8"
+          ]
+        }
+      ],
+      "coverageLine": "Read 57 of 57 clauses (+6 schedule items)",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "baseline",
+          "category": "ip",
+          "severity": "serious",
+          "title": "AtliQ's own tools would be assigned to the client",
+          "clause": "S1.2",
+          "foundIn": "S1.2",
+          "quote": "PipeKit will be configured and extended for the Client and incorporated into the delivered pipeline as its ingestion and orchestration layer.",
+          "quoteVerified": true,
+          "whatItMeans": "Pre-existing tools and frameworks built into the deliverables would belong to the client. AtliQ could not reuse them for anyone else.",
+          "whatItCouldCost": "Permanent loss of reusable tools (the Northwind §9.2 PipeKit problem).",
+          "howToSoften": "Client owns deliverables made for it; AtliQ keeps its pre-existing tools and grants a non-exclusive licence."
+        },
+        {
+          "id": "F2",
+          "check": "baseline",
+          "category": "ip",
+          "severity": "serious",
+          "title": "AtliQ's own tools would be assigned to the client",
+          "clause": "9.2",
+          "foundIn": "9.2",
+          "quote": "including any software, tools, frameworks, libraries and pre-existing materials incorporated into the Deliverables, shall vest in the Client absolutely upon payment of the Charges",
+          "quoteVerified": true,
+          "whatItMeans": "Pre-existing tools and frameworks built into the deliverables would belong to the client. AtliQ could not reuse them for anyone else.",
+          "whatItCouldCost": "Permanent loss of reusable tools (the Northwind §9.2 PipeKit problem).",
+          "howToSoften": "Client owns deliverables made for it; AtliQ keeps its pre-existing tools and grants a non-exclusive licence."
+        },
+        {
+          "id": "F3",
+          "check": "bundle_missing",
+          "category": "data",
+          "severity": "serious",
+          "title": "Schedule 3 — data processing terms is referred to but missing",
+          "clause": "14.1",
+          "foundIn": "14.1",
+          "quote": "in accordance with the data processing terms in Schedule 3",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Schedule 3 — data processing terms, but it was not provided. AtliQ would be agreeing to terms it has not seen — and these govern how personal data is handled.",
+          "whatItCouldCost": "Data-protection obligations (and fines) AtliQ cannot check; data must not move until it is agreed.",
+          "howToSoften": "Ask for Schedule 3 — data processing terms and review it before signing."
+        },
+        {
+          "id": "F4",
+          "check": "bundle_missing",
+          "category": "data",
+          "severity": "serious",
+          "title": "UK International Data Transfer Addendum to the EU Standard Contractual Clauses is referred to but missing",
+          "clause": "14.2",
+          "foundIn": "14.2",
+          "quote": "subject to the UK International Data Transfer Addendum to the EU Standard Contractual Clauses",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates UK International Data Transfer Addendum to the EU Standard Contractual Clauses, but it was not provided. AtliQ would be agreeing to terms it has not seen — and these govern how personal data is handled.",
+          "whatItCouldCost": "Data-protection obligations (and fines) AtliQ cannot check; data must not move until it is agreed.",
+          "howToSoften": "Ask for UK International Data Transfer Addendum to the EU Standard Contractual Clauses and review it before signing."
+        },
+        {
+          "id": "F5",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Client's IT and security policies is referred to but missing",
+          "clause": "4.2",
+          "foundIn": "4.2",
+          "quote": "the Client's reasonable IT and security policies notified in writing",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Client's IT and security policies, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Client's IT and security policies and review it before signing."
+        },
+        {
+          "id": "F6",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Schedule 2 — change control procedure is referred to but missing",
+          "clause": "4.4",
+          "foundIn": "4.4",
+          "quote": "via the change control procedure in Schedule 2",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Schedule 2 — change control procedure, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Schedule 2 — change control procedure and review it before signing."
+        },
+        {
+          "id": "F7",
+          "check": "entity_law",
+          "category": "law",
+          "severity": "negotiable",
+          "title": "Foreign governing law: England and Wales (No courts named. Disputes go to LCIA arbitration with one arbitrator, seated in London, in English (clause 17.2).)",
+          "clause": "17.1",
+          "foundIn": "17.1",
+          "quote": "shall be governed by the law of England and Wales.",
+          "quoteVerified": true,
+          "whatItMeans": "Disputes would be decided under England and Wales in No courts named. Disputes go to LCIA arbitration with one arbitrator, seated in London, in English (clause 17.2)., where AtliQ has no presence. AtliQ's usual is Indian law.",
+          "whatItCouldCost": "Defending or enforcing a claim abroad means foreign lawyers and travel — often more than a small claim is worth (the Brightwater lesson).",
+          "howToSoften": "Ask for Indian law with arbitration seated in Pune or Mumbai, or neutral arbitration (e.g. SIAC) as a fallback."
+        },
+        {
+          "id": "F8",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "LCIA Rules is referred to but missing",
+          "clause": "17.2",
+          "foundIn": "17.2",
+          "quote": "finally resolved by arbitration under the LCIA Rules",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates LCIA Rules, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for LCIA Rules and review it before signing."
+        }
+      ]
+    },
+    {
+      "file": "2025-09-01_cloudspan_strategic_partnership_agreement.md",
+      "tracker": "C-032",
+      "title": "CloudSpan Technologies — Partnership Agreement",
+      "counterparty": "CloudSpan Technologies",
+      "status": "done",
+      "band": "High",
+      "score": 100,
+      "counts": {
+        "serious": 3,
+        "negotiable": 6,
+        "minor": 5,
+        "not_sure": 2,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The liability cap does not cover IP indemnity or confidentiality breaches, so AtliQ's exposure is unlimited: one claim could exceed its USD 1M professional indemnity and cyber cover and far exceed anything it earns from this partnership.",
+          "findingIds": [
+            "F3"
+          ]
+        },
+        {
+          "text": "The contract also binds AtliQ and its Affiliates to exclusivity in India and the GCC, which means lost future work there for the whole period and a possible breach of promises to existing clients.",
+          "findingIds": [
+            "F1"
+          ]
+        },
+        {
+          "text": "Do not sign until the cap covers these claims, the exclusivity is removed, and AtliQ has seen and agreed the missing data-processing agreement with each Customer; also ask for the other missing referenced documents and push back on Singapore law and SIAC arbitration.",
+          "findingIds": [
+            "F3",
+            "F1",
+            "F2",
+            "F4",
+            "F5",
+            "F6",
+            "F7",
+            "F8",
+            "F9"
+          ]
+        }
+      ],
+      "coverageLine": "Read 63 of 63 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "full_read",
+          "category": "restriction",
+          "severity": "serious",
+          "title": "New exclusivity on AtliQ (India and the GCC (UAE, Saudi Arabia, Qatar, Kuwait, Bahrain, Oman)), binding Affiliates",
+          "clause": "7.1",
+          "foundIn": "7.1",
+          "quote": "during the Term Partner and its Affiliates shall not act as an implementation, reseller or referral partner for any Competing Platform in India or the GCC.",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ and its Affiliates could not AtliQ and all its Affiliates may not be an implementation, reseller or referral partner for any 'Competing Platform'. [7.2] defines this very broadly: any cloud data-warehouse, lakehouse or unified analytics platform offered as a service. AtliQ may still serve a customer who picked another platform independently, but only if AtliQ has no partner appointment with that provider and gets no fee or benefit from it ([7.3]). This cuts across AtliQ's data/analytics practice in India and the GCC. Note that [2.2] calls the appointment non-exclusive 'save as provided in Clause 7'. for During the Term (3 years to 31 August 2028); ceases when termination takes effect ([14.4]).",
+          "whatItCouldCost": "Lost future work in this market for the whole period; may also breach promises to existing clients.",
+          "howToSoften": "Delete it, or narrow it to the named project, a short period and the client's direct competitors only.",
+          "related": {
+            "type": "exclusivity",
+            "scope": "AtliQ and all its Affiliates may not be an implementation, reseller or referral partner for any 'Competing Platform'. [7.2] defines this very broadly: any cloud data-warehouse, lakehouse or unified analytics platform offered as a service. AtliQ may still serve a customer who picked another platform independently, but only if AtliQ has no partner appointment with that provider and gets no fee or benefit from it ([7.3]). This cuts across AtliQ's data/analytics practice in India and the GCC. Note that [2.2] calls the appointment non-exclusive 'save as provided in Clause 7'.",
+            "territory": "India and the GCC (UAE, Saudi Arabia, Qatar, Kuwait, Bahrain, Oman)",
+            "duration": "During the Term (3 years to 31 August 2028); ceases when termination takes effect ([14.4])"
+          }
+        },
+        {
+          "id": "F2",
+          "check": "bundle_missing",
+          "category": "data",
+          "severity": "serious",
+          "title": "AtliQ's own agreement with each Customer (for processing Customer personal data) is referred to but missing",
+          "clause": "10.1",
+          "foundIn": "10.1",
+          "quote": "it does so under its own agreement with that Customer",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates AtliQ's own agreement with each Customer (for processing Customer personal data), but it was not provided. AtliQ would be agreeing to terms it has not seen — and these govern how personal data is handled.",
+          "whatItCouldCost": "Data-protection obligations (and fines) AtliQ cannot check; data must not move until it is agreed.",
+          "howToSoften": "Ask for AtliQ's own agreement with each Customer (for processing Customer personal data) and review it before signing."
+        },
+        {
+          "id": "F3",
+          "check": "full_read",
+          "category": "liability",
+          "severity": "serious",
+          "title": "Liability cap does not apply to IP indemnity or confidentiality breach — unlimited exposure",
+          "clause": "13.3",
+          "foundIn": "13.3",
+          "quote": "Clauses 13.1 and 13.2 do not apply to liability under Clause 12, breach of Clause 9",
+          "quoteVerified": true,
+          "whatItMeans": "The cap in 13.2 and the exclusion of indirect loss and lost profit in 13.1 both fall away for two things. The first is AtliQ's IP indemnity in 12.2. The second is any breach of confidentiality in Clause 9. For these, AtliQ's liability has no limit. It can include the client's lost profits and consequential losses. AtliQ's hard line is that liability is never unlimited.",
+          "whatItCouldCost": "There is no ceiling. A single IP claim arising from an implementation, or a confidentiality slip, could exceed AtliQ's USD 1M professional indemnity and cyber cover. It could also far exceed anything AtliQ earns under this partnership.",
+          "howToSoften": "Ask that the IP indemnity and confidentiality breaches have their own higher cap rather than no cap. For example, a fixed amount aligned with AtliQ's USD 1M insurance. Keep the 13.1 exclusion of indirect loss and lost profit for these claims too. Only fraud, wilful misconduct and liability that cannot be limited by law should be uncapped. This needs a signed written amendment."
+        },
+        {
+          "id": "F4",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "CloudSpan's published implementation guidelines is referred to but missing",
+          "clause": "3.2",
+          "foundIn": "3.2",
+          "quote": "in accordance with CloudSpan's published implementation guidelines",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates CloudSpan's published implementation guidelines, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for CloudSpan's published implementation guidelines and review it before signing."
+        },
+        {
+          "id": "F5",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "CloudSpan's published documentation is referred to but missing",
+          "clause": "3.3",
+          "foundIn": "3.3",
+          "quote": "beyond those contained in CloudSpan's published documentation",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates CloudSpan's published documentation, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for CloudSpan's published documentation and review it before signing."
+        },
+        {
+          "id": "F6",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Annual co-marketing plan (to be agreed) is referred to but missing",
+          "clause": "5.3",
+          "foundIn": "5.3",
+          "quote": "The Parties shall agree an annual co-marketing plan.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Annual co-marketing plan (to be agreed), but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Annual co-marketing plan (to be agreed) and review it before signing."
+        },
+        {
+          "id": "F7",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Owning Party's brand guidelines is referred to but missing",
+          "clause": "6.1",
+          "foundIn": "6.1",
+          "quote": "in accordance with the owning Party's brand guidelines",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Owning Party's brand guidelines, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Owning Party's brand guidelines and review it before signing."
+        },
+        {
+          "id": "F8",
+          "check": "entity_law",
+          "category": "law",
+          "severity": "negotiable",
+          "title": "Foreign governing law: Laws of the Republic of Singapore (SIAC arbitration under the SIAC Rules, seat Singapore, one arbitrator, in English (see [15.3]))",
+          "clause": "15.1",
+          "foundIn": "15.1",
+          "quote": "This Agreement is governed by the laws of the Republic of Singapore.",
+          "quoteVerified": true,
+          "whatItMeans": "Disputes would be decided under Laws of the Republic of Singapore in SIAC arbitration under the SIAC Rules, seat Singapore, one arbitrator, in English (see [15.3]), where AtliQ has no presence. AtliQ's usual is Indian law.",
+          "whatItCouldCost": "Defending or enforcing a claim abroad means foreign lawyers and travel — often more than a small claim is worth (the Brightwater lesson).",
+          "howToSoften": "Ask for Indian law with arbitration seated in Pune or Mumbai, or neutral arbitration (e.g. SIAC) as a fallback."
+        },
+        {
+          "id": "F9",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "SIAC Rules is referred to but missing",
+          "clause": "15.3",
+          "foundIn": "15.3",
+          "quote": "under the SIAC Rules in force at the time",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates SIAC Rules, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for SIAC Rules and review it before signing."
+        },
+        {
+          "id": "F15",
+          "check": "full_read",
+          "category": "ip",
+          "severity": "not_sure",
+          "title": "Client owns 'all improvements' to its platform and can use AtliQ feedback without restriction",
+          "clause": "8.1",
+          "foundIn": "8.1",
+          "quote": "CloudSpan owns the CloudSpan Platform and all improvements to it.",
+          "quoteVerified": true,
+          "whatItMeans": "Clause 8.2 says AtliQ keeps its own tools, accelerators and know-how, which is good. But 'all improvements' to the platform is not defined. It is unclear whether AtliQ-built connectors, extensions or accelerators that work with the platform could be claimed as 'improvements'. Clause 8.3 also lets the client use AtliQ's feedback 'without restriction'. That could cover ideas drawn from AtliQ's accelerators.",
+          "whatItCouldCost": "There is a risk of a dispute over ownership of AtliQ connectors or accelerators. The client could also build AtliQ's ideas into its platform for free.",
+          "howToSoften": "Clarify that 'improvements' means only changes made by CloudSpan to its own platform. State that 8.2 prevails over 8.1 and 8.3. Limit feedback to general comments, excluding AtliQ code, tools and accelerators."
+        },
+        {
+          "id": "F16",
+          "check": "full_read",
+          "category": "indemnity",
+          "severity": "not_sure",
+          "title": "Unclear who pays the cost of assisting with an indemnity defence",
+          "clause": "12.3",
+          "foundIn": "12.3",
+          "quote": "provide reasonable assistance at its cost",
+          "quoteVerified": true,
+          "whatItMeans": "'Its cost' could mean the indemnified party's cost or the indemnifying party's cost. Normally the party giving the indemnity pays for the assistance it asks for. As written, AtliQ might have to bear its own costs when helping defend a claim that the client must cover under 12.1.",
+          "whatItCouldCost": "AtliQ's staff time and legal costs while helping the client defend platform IP claims.",
+          "howToSoften": "Reword to say assistance is 'at the indemnifying Party's cost'."
+        }
+      ]
+    },
+    {
+      "file": "2025-10-06_atliq_intercompany_subcontractor_baa.md",
+      "tracker": "C-044",
+      "title": "AtliQ intercompany — Subcontractor BAA",
+      "counterparty": "AtliQ Technologies Pvt Ltd (intercompany)",
+      "status": "done",
+      "band": "High",
+      "score": 78,
+      "counts": {
+        "serious": 1,
+        "negotiable": 5,
+        "minor": 3,
+        "not_sure": 1,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The biggest risk is that the Upstream BAA (No. CBC-BAA-2025-014) is referred to but not attached, so AtliQ cannot check the data-protection obligations and fines it carries, and no data should move until it is agreed.",
+          "findingIds": [
+            "F1"
+          ]
+        },
+        {
+          "text": "The Pune team is also bound by that unseen BAA, so if it breaks a rule it never saw, AtliQ Inc could breach its BAA with the client, risking termination and HIPAA exposure; it is also unconfirmed whether the client allows offshore access from India.",
+          "findingIds": [
+            "F3",
+            "F10"
+          ]
+        },
+        {
+          "text": "Do not sign until the Upstream BAA, Intercompany Agreement, MSA and SOW-1, and subcontractor personnel list are attached and reviewed, offshore access is confirmed, and standard confidentiality exceptions are added.",
+          "findingIds": [
+            "F1",
+            "F2",
+            "F5",
+            "F6",
+            "F10",
+            "F4"
+          ]
+        }
+      ],
+      "coverageLine": "Read 21 of 21 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "bundle_missing",
+          "category": "data",
+          "severity": "serious",
+          "title": "Upstream BAA (Business Associate Agreement No. CBC-BAA-2025-014) is referred to but missing",
+          "clause": "Schedule 1, row 2",
+          "foundIn": "Schedule 1, row 2",
+          "quote": "Business Associate Agreement No. CBC-BAA-2025-014 dated October 6, 2025",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Upstream BAA (Business Associate Agreement No. CBC-BAA-2025-014), but it was not provided. AtliQ would be agreeing to terms it has not seen — and these govern how personal data is handled.",
+          "whatItCouldCost": "Data-protection obligations (and fines) AtliQ cannot check; data must not move until it is agreed.",
+          "howToSoften": "Ask for Upstream BAA (Business Associate Agreement No. CBC-BAA-2025-014) and review it before signing."
+        },
+        {
+          "id": "F2",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Intercompany Agreement is referred to but missing",
+          "clause": "2.1",
+          "foundIn": "2.1",
+          "quote": "Any services Subcontractor performs for Business Associate other than the Engagement Services are governed by the Intercompany Agreement.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Intercompany Agreement, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Intercompany Agreement and review it before signing."
+        },
+        {
+          "id": "F3",
+          "check": "full_read",
+          "category": "data",
+          "severity": "negotiable",
+          "title": "Pune team is bound by an Upstream BAA that is not attached",
+          "clause": "2.2",
+          "foundIn": "2.2",
+          "quote": "The restrictions, conditions and requirements of the Upstream BAA that apply to Business Associate apply equally to Subcontractor",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ Technologies Pvt Ltd must follow every rule in the client BAA (No. CBC-BAA-2025-014). That document is not attached. Key terms such as \"Covered Entity Environment\" ([3.2]) are defined only there. The Pune team cannot see all the rules it has agreed to follow.",
+          "whatItCouldCost": "If the Pune team breaks an upstream rule it never saw, AtliQ Inc is in breach of its BAA with the client. That can lead to termination of the client contract and HIPAA exposure.",
+          "howToSoften": "Attach the Upstream BAA, or at least the relevant sections, as a schedule. Confirm the Pune team lead has read it before access is granted."
+        },
+        {
+          "id": "F4",
+          "check": "missing_protection",
+          "category": "confidentiality",
+          "severity": "negotiable",
+          "title": "No standard exceptions to confidentiality",
+          "clause": "3.1",
+          "foundIn": "3.1",
+          "quote": "Subcontractor and its personnel shall access De-identified Data only. Subcontractor shall not access, receive, store, view or process PHI.",
+          "quoteVerified": true,
+          "whatItMeans": "Even public information, things AtliQ already knew or built independently, or disclosures required by law would count as a breach.",
+          "whatItCouldCost": "Disputes over information AtliQ is entitled to use.",
+          "howToSoften": "Add the usual exceptions: public, already known, independently developed, received from a third party, required by law."
+        },
+        {
+          "id": "F5",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Master Services Agreement and SOW-1 (Patient-Scheduling Analytics) is referred to but missing",
+          "clause": "Schedule 1, row 3",
+          "foundIn": "Schedule 1, row 3",
+          "quote": "Master Services Agreement dated October 6, 2025 between CareBridge Clinics, Inc. and AtliQ Inc, and SOW-1 (Patient-Scheduling Analytics)",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Master Services Agreement and SOW-1 (Patient-Scheduling Analytics), but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Master Services Agreement and SOW-1 (Patient-Scheduling Analytics) and review it before signing."
+        },
+        {
+          "id": "F6",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Subcontractor personnel list is referred to but missing",
+          "clause": "Schedule 1, row 5",
+          "foundIn": "Schedule 1, row 5",
+          "quote": "As listed by Business Associate from time to time (initial list held by Pranav, CTO)",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Subcontractor personnel list, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Subcontractor personnel list and review it before signing."
+        },
+        {
+          "id": "F10",
+          "check": "full_read",
+          "category": "data",
+          "severity": "not_sure",
+          "title": "Confirm the Upstream BAA allows offshore access from India",
+          "clause": "3.2",
+          "foundIn": "3.2",
+          "quote": "Subcontractor shall access De-identified Data only within the Covered Entity Environment (as defined in the Upstream BAA)",
+          "quoteVerified": true,
+          "whatItMeans": "The Pune team logs in from India to the client's environment. Data is de-identified and stays in the client's systems, so no data transfer to India is set out. But we cannot tell whether the Upstream BAA or MSA forbids offshore access or offshore subcontractors.",
+          "whatItCouldCost": "If the client contract bans offshore access, using the Pune team could breach the client MSA. The client could then terminate or claim damages.",
+          "howToSoften": "Check the Upstream BAA and MSA for offshore or subcontractor limits. If they exist, get the client's written approval for access from Pune."
+        }
+      ]
+    },
+    {
+      "file": "2025-10-06_carebridge_clinics_baa.md",
+      "tracker": "C-043",
+      "title": "CareBridge Clinics — BAA",
+      "counterparty": "CareBridge Clinics Inc",
+      "status": "done",
+      "band": "High",
+      "score": 48,
+      "counts": {
+        "serious": 1,
+        "negotiable": 2,
+        "minor": 2,
+        "not_sure": 2,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The biggest risk is that the contract bans patient health data from leaving the US, yet AtliQ's Pune team handles it, which could lead to termination, breach notification and credit monitoring costs, and HIPAA fines that no contract cap limits.",
+          "findingIds": [
+            "F1"
+          ]
+        },
+        {
+          "text": "Second, AtliQ's liability cap is set at twice the fees (up to $152,000 instead of the usual $76,000), and the Master Services Agreement and Statements of Work it refers to are missing, so some obligations and the real cap are unknown.",
+          "findingIds": [
+            "F2",
+            "F3",
+            "F7"
+          ]
+        },
+        {
+          "text": "Do not sign until the offshore data issue is resolved (including a subcontractor agreement if the Pune team is a separate company), the cap is negotiated down to 1× fees, and the missing documents have been reviewed.",
+          "findingIds": [
+            "F1",
+            "F6",
+            "F2",
+            "F3",
+            "F7"
+          ]
+        }
+      ],
+      "coverageLine": "Read 40 of 40 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "full_read",
+          "category": "data",
+          "severity": "serious",
+          "title": "PHI banned outside the US, but the Pune team handles the data",
+          "clause": "3.2",
+          "foundIn": "3.2",
+          "quote": "No PHI shall be accessed, stored or processed outside the United States.",
+          "quoteVerified": true,
+          "whatItMeans": "Only US-based AtliQ staff, named in writing to the client, may touch patient data (see also [3.1]). Staff outside the US may see de-identified data only, inside the client's US systems. The deal says the AtliQ Pune team touches the data. If Pune staff see PHI, AtliQ breaches this BAA from day one. As a Business Associate, AtliQ would also be directly exposed under HIPAA. There is no transfer route to India because the contract forbids it. This BAA is already signed.",
+          "whatItCouldCost": "A cure notice and possible termination of the MSA under [10.2]. Breach notification and credit monitoring costs under [5.4]. Contract claims up to the [9.1] cap. HIPAA regulators can fine AtliQ directly, and those fines are not limited by any contract cap.",
+          "howToSoften": "Act now, before any Pune access. Option 1: staff PHI work with named US personnel and give Pune only de-identified data inside the client environment. Option 2: ask the client for a written amendment under [11.1] allowing named offshore staff to access PHI only inside the US-hosted Covered Entity Environment (virtual desktops, MFA, no download). Get legal advice before relying on either option."
+        },
+        {
+          "id": "F2",
+          "check": "baseline",
+          "category": "liability",
+          "severity": "negotiable",
+          "title": "Liability cap 2× the fees (usual 1×)",
+          "clause": "9.1",
+          "foundIn": "9.1",
+          "quote": "aggregate liability for claims relating to a Breach or a violation of this BAA shall not exceed two (2) times the Fees paid or payable",
+          "quoteVerified": true,
+          "whatItMeans": "Bounded, but above AtliQ's usual cap of 1× the fees (9 of 12 contracts).",
+          "whatItCouldCost": "Up to $152,000 instead of $76,000.",
+          "howToSoften": "Ask for 1× the fees; accept up to 1.5× only if the deal justifies it."
+        },
+        {
+          "id": "F3",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Statements of Work under the Master Services Agreement is referred to but missing",
+          "clause": "RECITALS, text",
+          "foundIn": "RECITALS, text",
+          "quote": "(together with its Statements of Work, the \"**Master Services Agreement**\")",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Statements of Work under the Master Services Agreement, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Statements of Work under the Master Services Agreement and review it before signing."
+        },
+        {
+          "id": "F6",
+          "check": "missing_protection",
+          "category": "missing_protection",
+          "severity": "not_sure",
+          "title": "Subcontractor BAA needed, including the offshore ban, if the Pune team is a separate company",
+          "clause": "6.1",
+          "foundIn": "6.1",
+          "quote": "agrees in a written business associate agreement to the same restrictions, conditions and requirements that apply to Business Associate under this BAA, including Section 3",
+          "quoteVerified": true,
+          "whatItMeans": "If the Pune team is employed by AtliQ's Indian company rather than AtliQ Inc, that company is a Subcontractor. AtliQ Inc must then sign a matching BAA with it, carrying the same data, confidentiality and offshore limits. AtliQ Inc must also tell the client in writing under [6.2]. The contract does not say which company employs the Pune staff.",
+          "whatItCouldCost": "Without a back-to-back BAA and notice, AtliQ Inc is in breach and remains fully responsible for the subcontractor's acts.",
+          "howToSoften": "Confirm which company employs the Pune team. If it is a separate company, sign an intra-group BAA mirroring this one, including Section 3, confidentiality and IP terms. Then notify the client in writing."
+        },
+        {
+          "id": "F7",
+          "check": "bundle_missing",
+          "category": "liability",
+          "severity": "not_sure",
+          "title": "Master Services Agreement dated as of October 6, 2025 is referred to but not attached — the liability cap is unknown",
+          "clause": "9.1",
+          "foundIn": "9.1",
+          "quote": "is subject to the limitations and exclusions of liability in the Master Services Agreement",
+          "quoteVerified": true,
+          "whatItMeans": "The contract relies on Master Services Agreement dated as of October 6, 2025 for the cap on AtliQ's liability, but it is not in the document. The value is not guessed.",
+          "whatItCouldCost": "Unknown until the attachment is seen.",
+          "howToSoften": "Ask for Master Services Agreement dated as of October 6, 2025 before reviewing further."
+        }
+      ]
+    },
+    {
+      "file": "2025-11-28_brightwater_insurance_msa.md",
+      "tracker": "C-014",
+      "title": "Brightwater Insurance — MSA",
+      "counterparty": "Brightwater Insurance Inc",
+      "status": "done",
+      "band": "High",
+      "score": 100,
+      "counts": {
+        "serious": 6,
+        "negotiable": 15,
+        "minor": 7,
+        "not_sure": 0,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The biggest risk is a one-way, uncapped indemnity to the whole client group, made worse because the contract requires data to stay in the US while AtliQ's Pune team will work on it, which could mean unlimited costs far beyond the USD 92,000 fee and the USD 1M cyber policy.",
+          "findingIds": [
+            "F6",
+            "F5"
+          ]
+        },
+        {
+          "text": "Second, the delay penalty of 1% a day ($920) has no cap, applies even when the client causes the delay, and comes on top of any other damages the client can prove.",
+          "findingIds": [
+            "F1",
+            "F2",
+            "F3"
+          ]
+        },
+        {
+          "text": "Do not sign until the indemnity is capped and mutual, the data location issue is fixed, the delay penalty is capped and excused for client-caused delays, and IP passes only after payment; also ask for copies of the missing client policies.",
+          "findingIds": [
+            "F6",
+            "F5",
+            "F1",
+            "F2",
+            "F3",
+            "F4",
+            "F7",
+            "F10",
+            "F11"
+          ]
+        }
+      ],
+      "coverageLine": "Read 43 of 43 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "deal_value",
+          "category": "delay_penalty",
+          "severity": "serious",
+          "title": "Uncapped delay penalty: 1% of the Contract Value per day",
+          "clause": "9.1",
+          "foundIn": "9.1",
+          "quote": "the Supplier shall pay to the Customer liquidated damages in the amount of one per cent (1%) of the Contract Value for each day or part day",
+          "quoteVerified": true,
+          "whatItMeans": "There is no ceiling on what AtliQ pays for being late. AtliQ's usual is 0.5% of the milestone fee per week, capped at 5%.",
+          "whatItCouldCost": "$920 a day; reaches the full $92,000 fee in 100 days.",
+          "howToSoften": "Cap the total at 5% of the affected milestone fee, charge per week not per day, and make it the client's sole remedy for delay.",
+          "related": {
+            "perPeriod": 920,
+            "period": "day",
+            "periodsToFullFee": 100
+          }
+        },
+        {
+          "id": "F2",
+          "check": "missing_protection",
+          "category": "delay_penalty",
+          "severity": "serious",
+          "title": "Penalty applies even when the client causes the delay",
+          "clause": "9.1",
+          "foundIn": "9.1",
+          "quote": "the Supplier shall pay to the Customer liquidated damages in the amount of one per cent (1%) of the Contract Value for each day or part day",
+          "quoteVerified": true,
+          "whatItMeans": "Nothing excuses AtliQ when the client is late with access, data or approvals — AtliQ still pays the penalty.",
+          "whatItCouldCost": "At Brightwater the client gave access 19 days late and AtliQ still paid the penalty.",
+          "howToSoften": "Add: \"No liquidated damages are payable for any delay caused by the Client, its personnel or its other vendors.\""
+        },
+        {
+          "id": "F3",
+          "check": "baseline",
+          "category": "delay_penalty",
+          "severity": "serious",
+          "title": "Penalty is not the client's only remedy for delay",
+          "clause": "9.2",
+          "foundIn": "9.2",
+          "quote": "in addition to any other right",
+          "quoteVerified": true,
+          "whatItMeans": "The client can take the penalty and also sue for its actual losses. AtliQ's usual makes the penalty the sole remedy for delay.",
+          "whatItCouldCost": "Open-ended: the penalty plus any damages the client can prove.",
+          "howToSoften": "Add: \"Liquidated damages are the Client's sole and exclusive remedy for delay.\""
+        },
+        {
+          "id": "F4",
+          "check": "full_read",
+          "category": "ip",
+          "severity": "serious",
+          "title": "IP passes to the client on creation, before payment, and covers all outputs",
+          "clause": "11.1",
+          "foundIn": "11.1",
+          "quote": "All intellectual property rights in the Deliverables shall vest in the Customer on creation.",
+          "quoteVerified": true,
+          "whatItMeans": "The client owns everything AtliQ produces as soon as it is made, even if unpaid. 'Deliverables' means all outputs of the Services, not only items made specifically for this client. Generic components, data models or code AtliQ builds during the project could pass to the client. AtliQ's usual term is ownership on payment, for client-specific work only.",
+          "whatItCouldCost": "AtliQ could lose reusable work for good. It would have no IP leverage if the client terminates (clause 16.3 requires handover of work in progress) or does not pay.",
+          "howToSoften": "Change it so ownership passes on full payment. Limit it to deliverables created specifically for the Customer. Make clear that generic know-how, tools and components stay with AtliQ under a licence."
+        },
+        {
+          "id": "F5",
+          "check": "full_read",
+          "category": "data",
+          "severity": "serious",
+          "title": "Data must stay in the US, but AtliQ's Pune team will work on it",
+          "clause": "13.3",
+          "foundIn": "13.3",
+          "quote": "The Supplier shall not process Customer Data outside the United States without the Customer's prior written consent.",
+          "quoteVerified": true,
+          "whatItMeans": "The work is delivered by AtliQ's team in Pune, India, and they will touch the client's claims, policy and payments data. Without the client's prior written consent, AtliQ breaches this clause as soon as the Pune team accesses the data. A breach of clause 13 triggers the uncapped indemnity in clause 15.1.",
+          "whatItCouldCost": "Unlimited indemnity exposure. The client could also terminate for breach.",
+          "howToSoften": "Get the client's written consent to processing from India before any data access. Put the consent in a signed variation (clause 19.3). Name the Pune team and the security controls."
+        },
+        {
+          "id": "F6",
+          "check": "full_read",
+          "category": "indemnity",
+          "severity": "serious",
+          "title": "One-way, uncapped indemnity to the whole client group",
+          "clause": "15.1",
+          "foundIn": "15.1",
+          "quote": "The Supplier shall indemnify the Customer and each member of the Brightwater Group against all losses",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ must cover 'all losses' of the client and every company in its group. This covers data or confidentiality breaches, IP claims and AtliQ's negligence. The client gives AtliQ no indemnity in return. Nothing reduces AtliQ's share where the client's own fault contributed. Clause 15.3 leaves this outside the cap.",
+          "whatItCouldCost": "Unlimited. A data incident involving insurance claims and policyholder data could cost far more than the USD 92,000 contract value and the USD 1M cyber policy.",
+          "howToSoften": "Make the indemnity mutual. Limit it to third-party claims. Reduce it to the extent the client or its group caused the loss. Put it under the liability cap, or a fixed cap matched to insurance."
+        },
+        {
+          "id": "F7",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Brightwater Group policies notified to the Supplier is referred to but missing",
+          "clause": "5.1",
+          "foundIn": "5.1",
+          "quote": "all applicable laws and the Brightwater Group policies notified to the Supplier.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Brightwater Group policies notified to the Supplier, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Brightwater Group policies notified to the Supplier and review it before signing."
+        },
+        {
+          "id": "F8",
+          "check": "full_read",
+          "category": "delay_penalty",
+          "severity": "negotiable",
+          "title": "Time is of the essence for every Key Date",
+          "clause": "5.2",
+          "foundIn": "5.2",
+          "quote": "Time shall be of the essence in respect of the Key Dates.",
+          "quoteVerified": true,
+          "whatItMeans": "Missing any Key Date, even by one day, can be treated as a serious breach. This could let the client terminate and claim damages, on top of the daily penalty.",
+          "whatItCouldCost": "Loss of the contract and the remaining milestone fees after a minor slip.",
+          "howToSoften": "Delete 'time shall be of the essence'. Or limit it so that only a long delay caused by AtliQ, for example after a cure period, counts as material."
+        },
+        {
+          "id": "F9",
+          "check": "full_read",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Client sets the acceptance tests and there is no deemed acceptance",
+          "clause": "8.1",
+          "foundIn": "8.1",
+          "quote": "subject to acceptance tests determined by the Customer",
+          "quoteVerified": true,
+          "whatItMeans": "The client alone decides the tests. There are no agreed criteria. Nothing says a deliverable counts as accepted if the client stays silent after 15 Working Days. Because payment depends on acceptance (clause 7.2), the client controls when AtliQ is paid. Clause 8.2 requires fixes within 10 Working Days at no charge.",
+          "whatItCouldCost": "Delayed or withheld milestone payments. Repeated free rework.",
+          "howToSoften": "Agree the acceptance criteria in Schedule 1 in advance. Add deemed acceptance if no written rejection with reasons arrives within 15 Working Days. Allow rejection only for material failure against the agreed criteria."
+        },
+        {
+          "id": "F10",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Brightwater Group Vendor Screening Standard is referred to but missing",
+          "clause": "10.1",
+          "foundIn": "10.1",
+          "quote": "have passed background checks in accordance with the Brightwater Group Vendor Screening Standard",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Brightwater Group Vendor Screening Standard, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Brightwater Group Vendor Screening Standard and review it before signing."
+        },
+        {
+          "id": "F11",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Customer's security policies is referred to but missing",
+          "clause": "10.1",
+          "foundIn": "10.1",
+          "quote": "and comply with the Customer's security policies.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Customer's security policies, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Customer's security policies and review it before signing."
+        },
+        {
+          "id": "F12",
+          "check": "missing_protection",
+          "category": "confidentiality",
+          "severity": "negotiable",
+          "title": "No standard exceptions to confidentiality",
+          "clause": "12.1",
+          "foundIn": "12.1",
+          "quote": "The Supplier shall keep confidential all Customer Data and all information relating to the business of the Brightwater Group",
+          "quoteVerified": true,
+          "whatItMeans": "Even public information, things AtliQ already knew or built independently, or disclosures required by law would count as a breach.",
+          "whatItCouldCost": "Disputes over information AtliQ is entitled to use.",
+          "howToSoften": "Add the usual exceptions: public, already known, independently developed, received from a third party, required by law."
+        },
+        {
+          "id": "F13",
+          "check": "baseline",
+          "category": "confidentiality",
+          "severity": "negotiable",
+          "title": "Confidentiality never ends",
+          "clause": "12.3",
+          "foundIn": "12.3",
+          "quote": "This clause 12 shall survive termination indefinitely.",
+          "quoteVerified": true,
+          "whatItMeans": "The obligation continues forever; AtliQ's usual is about 3 years after the agreement ends.",
+          "whatItCouldCost": "Indefinite record-keeping and breach risk.",
+          "howToSoften": "Limit to 3 years after termination (trade secrets can stay protected while they remain secret)."
+        },
+        {
+          "id": "F14",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Brightwater Group Information Security Schedule is referred to but missing",
+          "clause": "13.1",
+          "foundIn": "13.1",
+          "quote": "and the Brightwater Group Information Security Schedule.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Brightwater Group Information Security Schedule, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Brightwater Group Information Security Schedule and review it before signing."
+        },
+        {
+          "id": "F15",
+          "check": "full_read",
+          "category": "data",
+          "severity": "negotiable",
+          "title": "24-hour security incident notice",
+          "clause": "13.2",
+          "foundIn": "13.2",
+          "quote": "within twenty-four (24) hours of becoming aware of it",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ must report any security incident affecting client data within 24 hours. The time difference with Pune makes this tight.",
+          "whatItCouldCost": "An easy breach of clause 13, which triggers the uncapped indemnity.",
+          "howToSoften": "Ask for 48 to 72 hours. Or require an initial notice within 24 hours with details to follow, limited to confirmed incidents."
+        },
+        {
+          "id": "F16",
+          "check": "full_read",
+          "category": "warranty",
+          "severity": "negotiable",
+          "title": "12-month defect warranty and a 'leading supplier' standard",
+          "clause": "14.1",
+          "foundIn": "14.1",
+          "quote": "free from material defects for a period of twelve (12) months after acceptance",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ must fix defects for 12 months after acceptance. Work is judged against 'Good Industry Practice', which clause 3.1 defines as the standard of a 'leading supplier'. That is a high bar.",
+          "whatItCouldCost": "A long period of free fix work after the project ends. Higher risk of claims about quality.",
+          "howToSoften": "Cut the warranty to 90 days. Make fixing the defect the only remedy. Define the standard as a reasonably skilled supplier."
+        },
+        {
+          "id": "F17",
+          "check": "baseline",
+          "category": "liability",
+          "severity": "negotiable",
+          "title": "Liability cap 1.5× the fees (usual 1×)",
+          "clause": "15.3",
+          "foundIn": "15.3",
+          "quote": "Subject to clauses 9, 15.1 and 15.4, the Supplier's total liability under this Agreement shall not exceed one hundred and fifty per cent (150%) of the Contract Value.",
+          "quoteVerified": true,
+          "whatItMeans": "Bounded, but above AtliQ's usual cap of 1× the fees (9 of 12 contracts).",
+          "whatItCouldCost": "Up to $138,000 instead of $92,000.",
+          "howToSoften": "Ask for 1× the fees; accept up to 1.5× only if the deal justifies it."
+        },
+        {
+          "id": "F18",
+          "check": "baseline",
+          "category": "termination",
+          "severity": "negotiable",
+          "title": "work in progress unpaid",
+          "clause": "16.3",
+          "foundIn": "16.3",
+          "quote": "On termination, the Supplier shall deliver all work in progress and Customer Data to the Customer.",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ can be dropped and is paid only for accepted deliverables, not work in progress. AtliQ's usual is 30 days with work done and in progress paid.",
+          "whatItCouldCost": "Unbilled work in progress at the time of exit is lost.",
+          "howToSoften": "30 days' notice; pay for all work done and work in progress up to the termination date."
+        },
+        {
+          "id": "F19",
+          "check": "deal_value",
+          "category": "insurance",
+          "severity": "negotiable",
+          "title": "Insurance demanded: $2,000,000 (21.7× the deal)",
+          "clause": "17.1",
+          "foundIn": "17.1",
+          "quote": "professional indemnity insurance of not less than USD 2,000,000",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ's cyber and professional-indemnity cover is about $1M. This asks for $2,000,000.",
+          "whatItCouldCost": "Buying extra cover could cost more than the margin on the deal, or AtliQ is in breach from day one.",
+          "howToSoften": "Offer AtliQ's existing $1M cover, or cap the requirement in proportion to the deal value."
+        },
+        {
+          "id": "F20",
+          "check": "full_read",
+          "category": "liability",
+          "severity": "negotiable",
+          "title": "Every client group company can enforce the indemnity and data terms",
+          "clause": "19.4",
+          "foundIn": "19.4",
+          "quote": "each member of the Brightwater Group may enforce clauses 12, 13 and 15",
+          "quoteVerified": true,
+          "whatItMeans": "Any company in the client's group, not just the contracting company, can sue AtliQ directly under the confidentiality, data and indemnity clauses.",
+          "whatItCouldCost": "More possible claimants for the uncapped indemnity. AtliQ may face claims from companies it has never dealt with.",
+          "howToSoften": "Remove third-party rights. Or require any group claims to be brought only through the Customer and counted under one shared cap."
+        },
+        {
+          "id": "F21",
+          "check": "entity_law",
+          "category": "law",
+          "severity": "negotiable",
+          "title": "Foreign governing law: England and Wales (Courts of London, England (exclusive))",
+          "clause": "20.1",
+          "foundIn": "20.1",
+          "quote": "governed by and construed in accordance with the law of England and Wales.",
+          "quoteVerified": true,
+          "whatItMeans": "Disputes would be decided under England and Wales in Courts of London, England (exclusive), where AtliQ has no presence. AtliQ's usual is a US state's law.",
+          "whatItCouldCost": "Defending or enforcing a claim abroad means foreign lawyers and travel — often more than a small claim is worth (the Brightwater lesson).",
+          "howToSoften": "Ask for a US state's law, or neutral arbitration (e.g. SIAC) as a fallback."
+        }
+      ]
+    },
+    {
+      "file": "2026-02-10_al_noor_waiver_letter.md",
+      "tracker": "C-016",
+      "title": "Al Noor — Waiver letter (Seaside)",
+      "counterparty": "Al Noor Hospitality Group",
+      "status": "stopped",
+      "band": null,
+      "score": null,
+      "counts": {
+        "serious": 0,
+        "negotiable": 0,
+        "minor": 0,
+        "not_sure": 0,
+        "info": 0
+      },
+      "summary": [],
+      "coverageLine": "",
+      "stop": {
+        "code": "not_a_contract",
+        "message": "Not a contract: no numbered clauses were found. Upload the agreement itself, not a cover letter or email.",
+        "duplicateOf": null
+      },
+      "findings": []
+    },
+    {
+      "file": "2026-07-16_meridian_healthcare_nda.md",
+      "tracker": "C-020",
+      "title": "Meridian Healthcare — NDA",
+      "counterparty": "Meridian Healthcare",
+      "status": "done",
+      "band": "High",
+      "score": 78,
+      "counts": {
+        "serious": 3,
+        "negotiable": 1,
+        "minor": 4,
+        "not_sure": 0,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The biggest risk is that AtliQ would have unlimited liability for any NDA breach, with no cap anywhere in the contract (clause 6.2), and because patient and hospital data is in scope, a single leak could pass regulator penalties under the DPDP Act, patient claims and Meridian's own costs to AtliQ with no upper limit.",
+          "findingIds": [
+            "F3"
+          ]
+        },
+        {
+          "text": "Second, although it is called \"mutual,\" the NDA only binds AtliQ (clauses 2.1, 3.1 and 5.1), so Meridian could freely use or pass on AtliQ's know-how, proposal ideas or pricing, including to competing vendors, and once that information is out it cannot be taken back.",
+          "findingIds": [
+            "F1",
+            "F2",
+            "F4"
+          ]
+        },
+        {
+          "text": "Do not sign until the indemnity is capped, since AtliQ's hard line is never unlimited liability, and the confidentiality obligations are made to bind both sides.",
+          "findingIds": [
+            "F3",
+            "F1",
+            "F2",
+            "F4"
+          ]
+        }
+      ],
+      "coverageLine": "Read 16 of 16 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "fairness",
+          "category": "confidentiality",
+          "severity": "serious",
+          "title": "\"Mutual\" NDA that only binds AtliQ",
+          "clause": "3.1",
+          "foundIn": "3.1",
+          "quote": "hold the Confidential Information in strict confidence and use it only for the Purpose",
+          "quoteVerified": true,
+          "whatItMeans": "Only the other side's information is protected. Anything AtliQ shares — architecture, pricing, methods — is not.",
+          "whatItCouldCost": "AtliQ's know-how disclosed in discussions can be used or passed on freely; once out, it cannot be taken back.",
+          "howToSoften": "Make every obligation mutual: \"each Party\" as both discloser and recipient. AtliQ only signs mutual NDAs."
+        },
+        {
+          "id": "F2",
+          "check": "fairness",
+          "category": "confidentiality",
+          "severity": "serious",
+          "title": "\"Mutual\" NDA that only binds AtliQ",
+          "clause": "5.1",
+          "foundIn": "5.1",
+          "quote": "The Recipient's obligations shall survive for three (3) years after expiry or termination.",
+          "quoteVerified": true,
+          "whatItMeans": "Only the other side's information is protected. Anything AtliQ shares — architecture, pricing, methods — is not.",
+          "whatItCouldCost": "AtliQ's know-how disclosed in discussions can be used or passed on freely; once out, it cannot be taken back.",
+          "howToSoften": "Make every obligation mutual: \"each Party\" as both discloser and recipient. AtliQ only signs mutual NDAs."
+        },
+        {
+          "id": "F3",
+          "check": "full_read",
+          "category": "indemnity",
+          "severity": "serious",
+          "title": "Uncapped indemnity for any NDA breach, with no liability cap anywhere",
+          "clause": "6.2",
+          "foundIn": "6.2",
+          "quote": "The Recipient shall indemnify Meridian against losses arising from any breach of this Agreement by the Recipient or its personnel.",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ must cover all of Meridian's losses from any breach by AtliQ or its staff. Nothing in the NDA limits the amount. Clause 6.1 also keeps Meridian's right to damages on top. Only AtliQ gives this promise.",
+          "whatItCouldCost": "Patient and hospital data is in scope. A single leak could bring regulator penalties under the DPDP Act, patient claims and Meridian's own costs. All of this could be passed to AtliQ with no upper limit. AtliQ's hard line is never unlimited liability.",
+          "howToSoften": "Cap AtliQ's total liability, for example at a fixed amount in line with the AtliQ cyber policy of USD 1M. Exclude indirect and consequential loss. Limit the indemnity to direct losses caused by AtliQ's proven breach. The PDF is marked as executed, so any change will need a signed amendment."
+        },
+        {
+          "id": "F4",
+          "check": "full_read",
+          "category": "confidentiality",
+          "severity": "negotiable",
+          "title": "One-way NDA – only AtliQ is bound",
+          "clause": "2.1",
+          "foundIn": "2.1",
+          "quote": "all information disclosed by or on behalf of Meridian to the Recipient",
+          "quoteVerified": true,
+          "whatItMeans": "Only Meridian's information is protected. Anything AtliQ shares has no protection. This includes pricing, proposals, solution designs, dashboards and methods. AtliQ's usual position is mutual NDAs only.",
+          "whatItCouldCost": "Meridian could reuse AtliQ's proposal ideas or pricing, or show them to competing vendors, at no cost.",
+          "howToSoften": "Make the NDA mutual, with the same exceptions and obligations for both parties. At minimum, add a reciprocal clause protecting AtliQ's proposals, pricing and pre-existing tools."
+        }
+      ]
+    },
+    {
+      "file": "2026-08-15_trustline_nbfc_msa.md",
+      "tracker": "C-021",
+      "title": "Trustline NBFC — MSA",
+      "counterparty": "Trustline NBFC",
+      "status": "done",
+      "band": "Medium",
+      "score": 34,
+      "counts": {
+        "serious": 0,
+        "negotiable": 2,
+        "minor": 7,
+        "not_sure": 0,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The contract binds AtliQ to the company's IT, information security and outsourcing policies, but those policies are missing (clause 2.3), so AtliQ would be agreeing to obligations it has not read.",
+          "findingIds": [
+            "F1"
+          ]
+        },
+        {
+          "text": "The confidentiality clause has none of the standard exceptions (clause 8.1), which could lead to disputes over information AtliQ is entitled to use.",
+          "findingIds": [
+            "F2"
+          ]
+        },
+        {
+          "text": "Negotiate before signing: ask for copies of the referenced policies and for the standard confidentiality exceptions to be added.",
+          "findingIds": [
+            "F1",
+            "F2"
+          ]
+        }
+      ],
+      "coverageLine": "Read 40 of 40 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "bundle_missing",
+          "category": "other",
+          "severity": "negotiable",
+          "title": "Company's IT, information security and outsourcing policies is referred to but missing",
+          "clause": "2.3",
+          "foundIn": "2.3",
+          "quote": "The Service Provider shall comply with the Company's IT, information security and outsourcing policies as notified in writing.",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Company's IT, information security and outsourcing policies, but it was not provided. AtliQ would be agreeing to terms it has not seen.",
+          "whatItCouldCost": "Obligations AtliQ has not read.",
+          "howToSoften": "Ask for Company's IT, information security and outsourcing policies and review it before signing."
+        },
+        {
+          "id": "F2",
+          "check": "missing_protection",
+          "category": "confidentiality",
+          "severity": "negotiable",
+          "title": "No standard exceptions to confidentiality",
+          "clause": "8.1",
+          "foundIn": "8.1",
+          "quote": "Each Party shall hold the other Party's confidential information in strict confidence and shall not disclose it except to its employees, auditors and advisers",
+          "quoteVerified": true,
+          "whatItMeans": "Even public information, things AtliQ already knew or built independently, or disclosures required by law would count as a breach.",
+          "whatItCouldCost": "Disputes over information AtliQ is entitled to use.",
+          "howToSoften": "Add the usual exceptions: public, already known, independently developed, received from a third party, required by law."
+        }
+      ]
+    },
+    {
+      "file": "2026-08-20_harrington_health_mutual_nda.md",
+      "tracker": "C-045",
+      "title": "Harrington Health — Mutual NDA",
+      "counterparty": "Harrington Health Systems, Inc.",
+      "status": "done",
+      "band": "High",
+      "score": 32,
+      "counts": {
+        "serious": 1,
+        "negotiable": 1,
+        "minor": 1,
+        "not_sure": 0,
+        "info": 0
+      },
+      "summary": [
+        {
+          "text": "The biggest risk is that the contract relies on a Business Associate Agreement that is missing (clause 2.3), so AtliQ cannot check its data-protection obligations or fines, and no data should move until that agreement is settled.",
+          "findingIds": [
+            "F1"
+          ]
+        },
+        {
+          "text": "Second, AtliQ's responsibility for leaks by anyone it shared information with has no money cap (clause 3.2), so damages could in theory be unlimited, and the client may also seek a court order without posting bond (clause 7.1).",
+          "findingIds": [
+            "F2"
+          ]
+        },
+        {
+          "text": "Do not sign or share any data until the Business Associate Agreement is provided and agreed, and negotiate a money cap on liability for breaches by recipients.",
+          "findingIds": [
+            "F1",
+            "F2"
+          ]
+        }
+      ],
+      "coverageLine": "Read 17 of 17 clauses",
+      "findings": [
+        {
+          "id": "F1",
+          "check": "bundle_missing",
+          "category": "data",
+          "severity": "serious",
+          "title": "Business Associate Agreement is referred to but missing",
+          "clause": "2.3",
+          "foundIn": "2.3",
+          "quote": "shall be disclosed only after execution of a Business Associate Agreement between the Parties",
+          "quoteVerified": true,
+          "whatItMeans": "The contract incorporates Business Associate Agreement, but it was not provided. AtliQ would be agreeing to terms it has not seen — and these govern how personal data is handled.",
+          "whatItCouldCost": "Data-protection obligations (and fines) AtliQ cannot check; data must not move until it is agreed.",
+          "howToSoften": "Ask for Business Associate Agreement and review it before signing."
+        },
+        {
+          "id": "F2",
+          "check": "full_read",
+          "category": "liability",
+          "severity": "negotiable",
+          "title": "Responsibility for breaches by recipients has no money cap",
+          "clause": "3.2",
+          "foundIn": "3.2",
+          "quote": "Each Party is responsible for any breach of this Agreement by persons to whom it discloses Confidential Information.",
+          "quoteVerified": true,
+          "whatItMeans": "AtliQ is answerable for any leak by its staff, Pune affiliate, contractors or advisers. The NDA sets no limit on damages for that. The clause is mutual, and uncapped NDAs are common in the market. Still, it departs from AtliQ's rule that liability is never unlimited. The client's security documentation (named in [2.1]) is the kind of material that could lead to large claims if leaked.",
+          "whatItCouldCost": "In theory, damages for a leak by anyone AtliQ shared information with are unlimited. The client may also seek a court order without posting bond under [7.1].",
+          "howToSoften": "Many clients will not accept a cap in an NDA. Practical steps instead: share the client's materials only with a small named team, keep the [3.1] written confidentiality agreements on file, and ask for a mutual exclusion of indirect or consequential damages if the client is open to it."
+        }
+      ]
+    }
+  ]
+}

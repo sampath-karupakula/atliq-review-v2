@@ -24,6 +24,8 @@ const KINDS: { key: string; label: string; prefix?: string }[] = [
   { key: "pushback", label: "Pushback", prefix: "pushback." },
   { key: "review", label: "Reviews", prefix: "review." },
   { key: "register", label: "Register", prefix: "commitment." },
+  { key: "waiver", label: "Waivers", prefix: "waiver." },
+  { key: "precedent", label: "Precedents", prefix: "precedent." },
   { key: "deal", label: "Deals", prefix: "deal." },
 ];
 
@@ -44,7 +46,8 @@ const ACTION_LABEL: Record<string, { label: string; cls: string }> = {
   "commitment.confirm": { label: "Register", cls: "bg-surface-2 text-fg" },
   "commitment.add": { label: "Register", cls: "bg-surface-2 text-fg" },
   "commitment.edit": { label: "Register", cls: "bg-surface-2 text-fg" },
-  "waiver.add": { label: "Register", cls: "bg-surface-2 text-fg" },
+  "waiver.add": { label: "Waiver", cls: "bg-surface-2 text-fg" },
+  "precedent.label": { label: "Precedent label", cls: "bg-surface-2 text-fg" },
   "demo.reset": { label: "Demo reset", cls: "bg-serious-bg text-serious" },
   "negotiation.conditions": { label: "Rejected as written", cls: "bg-negotiable-bg text-negotiable" },
   "negotiation.drop": { label: "Condition", cls: "bg-surface-2 text-fg" },

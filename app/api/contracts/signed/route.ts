@@ -1,6 +1,7 @@
 // POST /api/contracts/signed — add signed contracts in bulk (several `file` fields). Each is parsed, checked by the
 // input gate (scanned, not English, AtliQ not a party, duplicate) and stored as signed. No AI is called. The
 // response lists what happened to each file and the new coverage.
+import { getMissingSigned } from "@/lib/data/memory";
 import { NextResponse } from "next/server";
 import { parseFile, IngestError } from "@/lib/ingest/parse";
 import { runGate } from "@/lib/ingest/gate";
@@ -34,6 +35,9 @@ export async function POST(req: Request) {
   if (!files.length) return NextResponse.json({ error: "Choose at least one signed contract." }, { status: 400 });
   if (files.length > MAX_FILES) return NextResponse.json({ error: `Up to ${MAX_FILES} files at a time.` }, { status: 400 });
 
+  // One file uploaded from a placeholder fills that tracker row (signed date and expiry come from the tracker).
+  const trackerId = String(form.get("tracker") ?? "");
+  const tracker = trackerId && files.length === 1 ? ((await getMissingSigned()).find((t) => t.trackerId === trackerId) ?? null) : null;
   const results: Outcome[] = [];
   for (const file of files) {
     try {
@@ -54,6 +58,7 @@ export async function POST(req: Request) {
         docType: gate.docType,
         clauses: gate.clauses,
         sourceFile: file.name,
+        tracker,
       });
       results.push({ file: file.name, ok: true, contractId: stored.contractId, counterparty, docType: gate.docType, signedDate: stored.signedDate, clauses: gate.clauses.clauseCount });
     } catch (err) {
