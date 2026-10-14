@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
+import "./report.css";
 import { ToastProvider } from "@/components/Toast";
 import { ThemeInit } from "@/components/shell/ThemeInit";
 

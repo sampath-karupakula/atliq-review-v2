@@ -166,6 +166,8 @@ export function checkTerms(extract: Extract, deal: DealContext, docType: string,
             whatItMeans: "The cap exists but is out of proportion to what AtliQ earns from the deal. AtliQ's usual cap is 1× the fees.",
             whatItCouldCost: capped.cap_amount != null && value ? `Up to ${money(capped.cap_amount, cur)} on a ${money(value, cur)} deal.` : `Up to ${fmtMultiple(m)} the fees.`,
             howToSoften: "Cap AtliQ's liability at 1× the fees paid, mutual.",
+            // The figure the exposure card draws against the deal value (code arithmetic, never the AI's text).
+            related: { exposureUsd: capped.cap_amount ?? (value ? m * value : null) },
           }));
         } else if (m != null && m > USUAL.capMultiple) {
           out.push(draft({
@@ -175,6 +177,7 @@ export function checkTerms(extract: Extract, deal: DealContext, docType: string,
             whatItMeans: "Bounded, but above AtliQ's usual cap of 1× the fees (9 of 12 contracts).",
             whatItCouldCost: value ? `Up to ${money(m * value, cur)} instead of ${money(value, cur)}.` : `Up to ${fmtMultiple(m)} the fees.`,
             howToSoften: "Ask for 1× the fees; accept up to 1.5× only if the deal justifies it.",
+            related: { exposureUsd: value ? m * value : null },
           }));
         }
       }
@@ -202,6 +205,7 @@ export function checkTerms(extract: Extract, deal: DealContext, docType: string,
         whatItMeans: `Invoices are paid ${t.days} days after receipt; AtliQ's usual is 30 days, 45 at most.`,
         whatItCouldCost: value ? `About ${money((value * (t.days - USUAL.paymentDays)) / 365 * 0.12, cur)} of extra financing cost at 12% a year, plus cash-flow strain.` : "Slower cash flow.",
         howToSoften: "Ask for 30 days; accept 45 at most.",
+        related: { exposureUsd: value ? ((value * (t.days - USUAL.paymentDays)) / 365) * 0.12 : null },
       }));
     }
   }
