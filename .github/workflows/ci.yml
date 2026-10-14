@@ -43,8 +43,8 @@ jobs:
         run: pnpm lint
       - name: Unit tests
         run: pnpm test
-      - name: Migrate
-        run: pnpm db:migrate
+      - name: Migrate and seed
+        run: pnpm db:migrate && pnpm seed
       - name: Build
         run: pnpm build
       - name: Smoke test
@@ -53,10 +53,19 @@ jobs:
           for i in $(seq 1 30); do curl -sf localhost:3000/api/health >/dev/null && break; sleep 2; done
           curl -sf localhost:3000/api/health
           test "$(curl -s -o /dev/null -w '%{http_code}' localhost:3000/)" = "307"
-          for p in /dashboard /contracts /contracts/new /companies /deals /register /exposure /offer /counsel /deadlines /insights /activity; do
+          # /companies is the Contracts "By company" view, so it redirects.
+          test "$(curl -s -o /dev/null -w '%{http_code}' localhost:3000/companies)" = "307"
+          for p in /dashboard /contracts /contracts/new /deals /register /exposure /offer /counsel /deadlines /insights /activity; do
             code=$(curl -s -o /dev/null -w "%{http_code}" "localhost:3000$p")
             echo "$p -> $code"
             test "$code" = "200"
           done
           # Viewing as counsel still renders the dashboard.
           test "$(curl -s -o /dev/null -w '%{http_code}' -b 'atliq_role=counsel' localhost:3000/dashboard)" = "200"
+          # The seeded data shows up: 15 open drafts, the five register rows with Orbit expired.
+          for p in "/contracts?view=open" "/contracts?view=signed" "/contracts?filter=serious" "/register?tab=usual" "/register?tab=prec"; do
+            test "$(curl -s -o /dev/null -w '%{http_code}' "localhost:3000$p")" = "200"
+          done
+          curl -s "localhost:3000/contracts?view=open" | grep -q 'All open<b class="num">15</b>'
+          curl -s "localhost:3000/register?tab=promises&f=all" | grep -q 'CMT-005'
+          curl -s "localhost:3000/register?tab=promises&f=expired" | grep -q 'Orbit Travels'

@@ -1,0 +1,125 @@
+{
+  "note": "From negotiation_notes.md (an unreviewed reconstruction by Jay). Labels must be confirmed by Karandeep.",
+  "positions": [
+    {
+      "counterparty": "Crestline",
+      "date": "2024-07",
+      "term": "best-price promise §6.4",
+      "outcome": "Accepted as drafted",
+      "label": "waved_through",
+      "quote": "We never discount, so it's harmless — fine."
+    },
+    {
+      "counterparty": "PayTrack",
+      "date": "2025-01",
+      "term": "indemnity incl. client negligence",
+      "outcome": "Countered → mutual indemnity; cap 1× fees",
+      "label": "standard",
+      "quote": "Can't accept 10.1 as written — we can't insure against PayTrack's own negligence."
+    },
+    {
+      "counterparty": "Rohan Iyer (freelancer)",
+      "date": "2025-04",
+      "term": "freelancer keeps IP in work product",
+      "outcome": "Accepted from phone",
+      "label": "waved_through",
+      "quote": "ok"
+    },
+    {
+      "counterparty": "Acme Retail",
+      "date": "2025-03",
+      "term": "LD 1% of contract value/week, no cap",
+      "outcome": "0.5% of milestone/week, cap 5% of milestone, client delays excluded",
+      "label": "standard",
+      "quote": "Open-ended isn't something we can sign."
+    },
+    {
+      "counterparty": "Al Noor",
+      "date": "2025-03",
+      "term": "non-compete worldwide 3 years",
+      "outcome": "Narrowed to GCC, term + 18 months",
+      "label": "deliberate_exception",
+      "quote": "Worldwide for three years would stop us working in hospitality altogether."
+    },
+    {
+      "counterparty": "Al Noor",
+      "date": "2025-03",
+      "term": "LD cap 10% of total fees",
+      "outcome": "Accepted as one-off",
+      "label": "deliberate_exception",
+      "quote": "Approving 10% of total fees as a strategic exception for Al Noor only — not our new standard."
+    },
+    {
+      "counterparty": "Northwind",
+      "date": "2025-06",
+      "term": "LD 10% of contract value if go-live missed",
+      "outcome": "0.5%/week of milestone, cap 5%, client delays excluded",
+      "label": "standard",
+      "quote": "K countered 0.5%/week of milestone, cap 5% of milestone, client delays excluded."
+    },
+    {
+      "counterparty": "Northwind",
+      "date": "2025-06",
+      "term": "English law; IP clause",
+      "outcome": "Accepted; IP skimmed",
+      "label": "waved_through",
+      "quote": "English law / LCIA — not worth losing the deal over. Rest looks ok, I skimmed the IP and boilerplate."
+    },
+    {
+      "counterparty": "CloudSpan",
+      "date": "2025-08",
+      "term": "exclusivity India + GCC + Europe",
+      "outcome": "Narrowed to India + GCC; mutual 90-day exit",
+      "label": "standard",
+      "quote": "We can't do Europe — Europe is where we're growing."
+    },
+    {
+      "counterparty": "PixelCraft (AtliQ as buyer)",
+      "date": "2025-10",
+      "term": "1%/day penalty, 60-day payment, unlimited vendor liability in AtliQ's template",
+      "outcome": "Penalty deleted, 30-day payment, mutual cap at fees",
+      "label": "standard",
+      "quote": "I don't want our paper to be the thing I hate receiving."
+    },
+    {
+      "counterparty": "Brightwater",
+      "date": "2025-11",
+      "term": "uncapped LD, English law",
+      "outcome": "Signed from phone, no redlines",
+      "label": "waved_through",
+      "quote": "Looks standard, signing now."
+    },
+    {
+      "counterparty": "Kessler Mobility",
+      "date": "2026-01",
+      "term": "unlimited liability",
+      "outcome": "Walked away",
+      "label": "standard",
+      "quote": "Unlimited liability on a €120k deal means one bad incident … and the company is gone."
+    },
+    {
+      "counterparty": "GlobalMart",
+      "date": "2026-03",
+      "term": "one-way NDA",
+      "outcome": "Made mutual",
+      "label": "standard",
+      "quote": "We only sign mutual — we'll be sharing our architecture too."
+    },
+    {
+      "counterparty": "Meridian Healthcare",
+      "date": "2026-07",
+      "term": "NDA",
+      "outcome": "Signed within the hour, no changes",
+      "label": "waved_through",
+      "quote": "it's standard"
+    },
+    {
+      "counterparty": "Trustline NBFC",
+      "date": "2026-08",
+      "term": "90-day payment; LD 2%/week cap 10% of total",
+      "outcome": "45 days; 0.5%/week of milestone cap 5%, client delays excluded",
+      "label": "standard",
+      "quote": "K: 45 days; 0.5% of milestone fee per week, cap 5% of milestone, client delays excluded."
+    }
+  ]
+}

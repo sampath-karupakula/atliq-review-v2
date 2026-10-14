@@ -1,0 +1,78 @@
+{
+  "note": "AtliQ's usual positions, learned from its signed contracts and negotiation notes. 'count' explains how usual. Used for the comparison table (A2). Supplier side unless stated.",
+  "terms": [
+    {
+      "term": "liability_cap",
+      "usual": "Capped at 1× total fees, mutual",
+      "count": "9 of 12 contracts",
+      "hard_line": "Never unlimited — walked away from Kessler Mobility (Jan 2026) over unlimited liability",
+      "severity_if_unlimited": "serious"
+    },
+    {
+      "term": "delay_penalty",
+      "usual": "0.5% of the affected milestone fee per week of delay attributable to AtliQ, capped at 5% of that milestone fee; no penalty for client-caused delay; sole remedy for delay",
+      "count": "Acme (Mar 2025), Northwind (Jun 2025), Trustline (Aug 2026)",
+      "exceptions": [
+        "Al Noor: 1%/week on milestone, cap 10% of total fees — deliberate one-off ('not our new standard')"
+      ],
+      "hard_line": "Never open-ended (checklist)"
+    },
+    {
+      "term": "client_delay_exclusion",
+      "usual": "Always required when a delay penalty exists",
+      "source": "Checklist + Brightwater post-mortem (client caused 19-day delay, AtliQ still paid)"
+    },
+    {
+      "term": "payment_days",
+      "usual": "30 days from invoice",
+      "max": "45 days (Trustline)",
+      "source": "Checklist: '30 days, 45 max'"
+    },
+    {
+      "term": "indemnity",
+      "usual": "Mutual; each party covers its own breach/negligence; never cover the client's own negligence",
+      "source": "PayTrack (Jan 2025): 'we can't insure against PayTrack's own negligence'"
+    },
+    {
+      "term": "ip",
+      "usual": "Client owns deliverables created specifically for it on payment; AtliQ keeps pre-existing tools and grants a licence",
+      "source": "Checklist",
+      "exceptions": [
+        "Northwind §9.2 assigned pre-existing tools — waved through ('I skimmed the IP')"
+      ]
+    },
+    {
+      "term": "termination_for_convenience",
+      "usual": "Mutual, ~30 days' notice; client pays for work done and work in progress",
+      "source": "Checklist: 'they pay for work done'"
+    },
+    {
+      "term": "governing_law",
+      "usual": "India for Pvt Ltd; a US state for Inc",
+      "exceptions": [
+        "Northwind: English law accepted ('not worth losing the deal')",
+        "Al Noor: DIFC",
+        "CloudSpan: Singapore/SIAC"
+      ]
+    },
+    {
+      "term": "confidentiality",
+      "usual": "Mutual, with standard exceptions (public, already known, independently developed, received from a third party, required by law); about 3 years after term"
+    },
+    {
+      "term": "nda",
+      "usual": "Mutual only",
+      "source": "GlobalMart (Mar 2026): 'We only sign mutual'"
+    },
+    {
+      "term": "insurance",
+      "usual": "Professional indemnity ~USD 1M; AtliQ cyber policy is USD 1M",
+      "source": "Harrington huddle: 'Our cyber policy is $1M'"
+    },
+    {
+      "term": "buyer_side_terms",
+      "usual": "When AtliQ is the buyer (agency/freelancer): no per-day penalty, 30-day payment, liability capped at fees for both sides",
+      "source": "PixelCraft (Oct 2025): 'I don't want our paper to be the thing I hate receiving'"
+    }
+  ]
+}

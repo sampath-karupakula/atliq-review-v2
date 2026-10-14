@@ -1,0 +1,40 @@
+{
+  "today": "2026-09-28",
+  "entities": [
+    {
+      "id": "PVT",
+      "legal_name": "AtliQ Technologies Private Limited",
+      "aliases": [
+        "AtliQ Technologies Pvt Ltd",
+        "ATLIQ TECHNOLOGIES PRIVATE LIMITED"
+      ],
+      "country": "India",
+      "serves": "All clients outside the United States (India, Middle East, Europe, rest of world)",
+      "default_law": "India (arbitration seated in Pune or Mumbai)",
+      "invoicing": "INR, USD, EUR; GSTIN 27AAKCA4821F1Z3",
+      "signatory": "Karandeep (CEO)"
+    },
+    {
+      "id": "INC",
+      "legal_name": "AtliQ Inc",
+      "aliases": [
+        "AtliQ Inc.",
+        "ATLIQ INC."
+      ],
+      "country": "USA",
+      "serves": "Clients in the United States only",
+      "default_law": "A US state law (any state)",
+      "invoicing": "USD",
+      "signatory": "Karandeep (President)",
+      "parent": "PVT (100%)"
+    }
+  ],
+  "rules": [
+    "US client → AtliQ Inc must be the contracting party and the invoicing entity.",
+    "Non-US client → AtliQ Technologies Pvt Ltd must be the contracting party and the invoicing entity.",
+    "Contracting entity and invoicing entity must be the same (mismatch caused payment delays twice in 2025).",
+    "Any other AtliQ name (e.g. 'AtliQ Global', 'AtliQ LLP') is not a real entity → serious.",
+    "Governing law: Indian law for Pvt Ltd, US state law for Inc. Foreign law/courts where AtliQ has no presence → negotiable (Brightwater lesson).",
+    "Both entities deliver from Pune; AtliQ Inc subcontracts delivery to Pvt Ltd (intercompany). Pvt Ltd is an Affiliate of Inc and vice versa."
+  ]
+}

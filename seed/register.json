@@ -1,0 +1,169 @@
+{
+  "as_of": "2026-09-28",
+  "confirmed_by": "Karandeep (seeded for demo)",
+  "commitments": [
+    {
+      "id": "CMT-001",
+      "type": "non_compete",
+      "contract": "Al Noor Hospitality Group — MSA",
+      "signed": "2025-03-15",
+      "entity": "PVT",
+      "clauses": [
+        "1.2",
+        "1.11",
+        "1.14",
+        "12.1",
+        "12.2",
+        "12.3",
+        "12.4"
+      ],
+      "binds_affiliates": true,
+      "activity": "data analytics, artificial intelligence or revenue-management services, directly or indirectly",
+      "for_whom": "any Hospitality Business = any entity that owns, operates, manages or franchises hotels, resorts or serviced apartments, or provides distribution, revenue-management or guest-analytics services to such an entity (§1.11)",
+      "territory": [
+        "UAE",
+        "Saudi Arabia",
+        "Qatar",
+        "Kuwait",
+        "Bahrain",
+        "Oman"
+      ],
+      "territory_rule": "Services are 'in the GCC' if the business is headquartered in, or the services relate to properties or operations located in, any GCC state, wherever performed (§12.2)",
+      "domain": "hospitality",
+      "starts": "2025-03-15",
+      "ends": "2029-09-14",
+      "end_rule": "Term (to 2028-03-14) + 18 months (§1.14)",
+      "waivers": [
+        "WVR-001"
+      ],
+      "status": "live",
+      "confirmed": true,
+      "quote": "the Supplier undertakes that neither it nor any of its Affiliates shall, during the Restricted Period, directly or indirectly, provide data analytics, artificial intelligence or revenue-management services to any Hospitality Business in the GCC."
+    },
+    {
+      "id": "CMT-002",
+      "type": "best_price",
+      "contract": "Crestline Retail — MSA",
+      "signed": "2024-08-01",
+      "entity": "INC",
+      "clauses": [
+        "6.4"
+      ],
+      "binds_affiliates": true,
+      "activity": "rates, fees and commercial terms for substantially similar services (data engineering / BI resources, time and materials)",
+      "for_whom": "any other customer",
+      "territory": [
+        "worldwide"
+      ],
+      "domain": "data engineering services (any industry)",
+      "reference_rates_usd_per_hour": {
+        "Senior Data Engineer": 85,
+        "Data Engineer": 62,
+        "BI Developer": 58
+      },
+      "consequence": "Lower rates apply to Crestline retroactively from the date first offered; credit within 30 days",
+      "starts": "2024-08-01",
+      "ends": "2027-07-31",
+      "status": "live",
+      "confirmed": true,
+      "waivers": [],
+      "quote": "Supplier represents and warrants that the rates, fees and other commercial terms offered to Crestline under this Agreement are and shall remain no less favorable than those offered by Supplier or its Affiliates to any other customer for substantially similar services during the Term."
+    },
+    {
+      "id": "CMT-003",
+      "type": "partner_exclusivity",
+      "contract": "CloudSpan Technologies — Partnership Agreement",
+      "signed": "2025-09-01",
+      "entity": "PVT",
+      "clauses": [
+        "7.1",
+        "7.2",
+        "7.3"
+      ],
+      "binds_affiliates": true,
+      "activity": "act as an implementation, reseller or referral partner",
+      "for_whom": "any Competing Platform = any cloud data-warehouse, lakehouse or unified analytics platform offered as a service (§7.2)",
+      "territory": [
+        "India",
+        "UAE",
+        "Saudi Arabia",
+        "Qatar",
+        "Kuwait",
+        "Bahrain",
+        "Oman"
+      ],
+      "carve_outs": "Does not restrict services outside India and the GCC, or services to a customer that independently selected a platform where AtliQ holds no partner appointment/fee from its provider (§7.3)",
+      "domain": "data platform partnerships",
+      "starts": "2025-09-01",
+      "ends": "2028-08-31",
+      "status": "live",
+      "confirmed": true,
+      "waivers": [],
+      "quote": "during the Term Partner and its Affiliates shall not act as an implementation, reseller or referral partner for any Competing Platform in India or the GCC."
+    },
+    {
+      "id": "CMT-004",
+      "type": "ip_assigned",
+      "contract": "Northwind Logistics — MSA (+ SOW-1)",
+      "signed": "2025-06-20",
+      "entity": "PVT",
+      "clauses": [
+        "MSA 9.2",
+        "SOW-1 S1.2"
+      ],
+      "binds_affiliates": false,
+      "activity": "ownership of IP in Deliverables, including software, tools, frameworks, libraries and pre-existing materials incorporated into them",
+      "for_whom": "Northwind Logistics",
+      "territory": [
+        "worldwide"
+      ],
+      "domain": "IP / reusable tools",
+      "assets_affected": [
+        "PipeKit (incorporated into the Northwind pipeline under SOW-1)"
+      ],
+      "starts": "2025-06-20",
+      "ends": null,
+      "status": "permanent",
+      "confirmed": true,
+      "waivers": [],
+      "quote": "All Intellectual Property Rights in the Deliverables, including any software, tools, frameworks, libraries and pre-existing materials incorporated into the Deliverables, shall vest in the Client absolutely upon payment"
+    },
+    {
+      "id": "CMT-005",
+      "type": "non_compete",
+      "contract": "Orbit Travels — MSA (scanned)",
+      "signed": "2022-07-01",
+      "entity": "PVT",
+      "clauses": [
+        "6.1",
+        "6.2"
+      ],
+      "binds_affiliates": false,
+      "activity": "develop, license or provide travel-booking software",
+      "for_whom": "any online travel agency operating in India",
+      "territory": [
+        "India"
+      ],
+      "domain": "travel technology",
+      "starts": "2022-07-01",
+      "ends": "2025-06-30",
+      "end_rule": "Term (to 2024-06-30) + 12 months",
+      "status": "expired",
+      "confirmed": true,
+      "waivers": [],
+      "ocr_quality": "partly unreadable scan",
+      "quote": "it shall not develop, license or provide travel-booking software to any online travel agency operating in India."
+    }
+  ],
+  "waivers": [
+    {
+      "id": "WVR-001",
+      "commitment": "CMT-001",
+      "source": "Al Noor waiver letter ANHG/LGL/2026/031",
+      "dated": "2026-02-10",
+      "scope": "Demand-forecasting services to Seaside Hotels LLC, Muscat, Oman, solely as described in the Seaside SOW dated February 2026",
+      "excludes": "Any extension, renewal, change order or follow-on SOW; any other services to Seaside; any other Hospitality Business in Oman or the GCC; any Affiliate of the Supplier",
+      "quote": "This consent is strictly limited to the Seaside SOW."
+    }
+  ]
+}
