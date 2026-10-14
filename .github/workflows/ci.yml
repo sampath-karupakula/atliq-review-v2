@@ -71,3 +71,12 @@ jobs:
           curl -s "localhost:3000/contracts?view=open" | grep -q 'All open<b class="num">15</b>'
           curl -s "localhost:3000/register?tab=promises&f=all" | grep -q 'CMT-005'
           curl -s "localhost:3000/register?tab=promises&f=expired" | grep -q 'Orbit Travels'
+          # Upload (no AI): a contract is stored, a scanned PDF and a duplicate are refused, a viewer is refused,
+          # and a bulk signed upload moves coverage from 17 to 18.
+          D="-F counterparty=Kaveri -F owner=Dhaval -F domain=retail -F clientCountry=India"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -F file=@test_contracts/contracts/TC01_kaveri_retail_msa.md $D localhost:3000/api/contracts)" = "201"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -F file=@test_contracts/contracts/TC01_kaveri_retail_msa.md $D localhost:3000/api/contracts)" = "409"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -F file=@test_contracts/formats/TC47_konkan_ports_msa_scanned.pdf $D localhost:3000/api/contracts)" = "422"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -b atliq_role=counsel -F file=@test_contracts/contracts/TC02_maplecrest_outdoor_msa.md $D localhost:3000/api/contracts)" = "403"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -F file=@test_contracts/contracts/TC03_sahyadri_agritech_nda.md localhost:3000/api/contracts/signed)" = "201"
+          curl -s localhost:3000/register | grep -q 'Checked against 18 of 30'
