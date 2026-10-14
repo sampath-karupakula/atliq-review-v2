@@ -52,4 +52,11 @@ jobs:
           pnpm start -p 3000 &
           for i in $(seq 1 30); do curl -sf localhost:3000/api/health >/dev/null && break; sleep 2; done
           curl -sf localhost:3000/api/health
-          test "$(curl -s -o /dev/null -w '%{http_code}' localhost:3000/)" = "200"
+          test "$(curl -s -o /dev/null -w '%{http_code}' localhost:3000/)" = "307"
+          for p in /dashboard /contracts /contracts/new /companies /deals /register /exposure /offer /counsel /deadlines /insights /activity; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "localhost:3000$p")
+            echo "$p -> $code"
+            test "$code" = "200"
+          done
+          # Viewing as counsel still renders the dashboard.
+          test "$(curl -s -o /dev/null -w '%{http_code}' -b 'atliq_role=counsel' localhost:3000/dashboard)" = "200"
