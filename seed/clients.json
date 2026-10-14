@@ -1,0 +1,109 @@
+{
+  "note": "Active and past relationships from contract_tracker.csv (signed rows). Used to detect NEW restrictions in an incoming contract that would put current work in breach.",
+  "clients": [
+    {
+      "name": "Crestline Retail Inc",
+      "entity": "INC",
+      "country": "USA",
+      "domain": "retail data engineering / BI",
+      "ends": "2027-07-31",
+      "status": "live"
+    },
+    {
+      "name": "PayTrack Technologies",
+      "entity": "PVT",
+      "country": "India",
+      "domain": "payments / fraud detection analytics",
+      "ends": "2027-01-21",
+      "status": "live"
+    },
+    {
+      "name": "Acme Retail Group",
+      "entity": "PVT",
+      "country": "India",
+      "domain": "retail analytics",
+      "ends": "2027-03-09",
+      "status": "live"
+    },
+    {
+      "name": "Al Noor Hospitality Group",
+      "entity": "PVT",
+      "country": "UAE",
+      "domain": "hospitality guest analytics",
+      "ends": "2028-03-14",
+      "status": "live"
+    },
+    {
+      "name": "Sunrise Foods",
+      "entity": "PVT",
+      "country": "India",
+      "domain": "food supply-chain analytics",
+      "ends": "2028-04-17",
+      "status": "live"
+    },
+    {
+      "name": "Northwind Logistics",
+      "entity": "PVT",
+      "country": "UK",
+      "domain": "logistics / pipeline engineering",
+      "ends": "2028-06-19",
+      "status": "live"
+    },
+    {
+      "name": "Brightwater Insurance Inc",
+      "entity": "INC",
+      "country": "USA",
+      "domain": "insurance analytics",
+      "ends": "2027-05-27",
+      "status": "live"
+    },
+    {
+      "name": "Trustline NBFC",
+      "entity": "PVT",
+      "country": "India",
+      "domain": "lending (NBFC) analytics",
+      "ends": "2027-08-14",
+      "status": "live"
+    },
+    {
+      "name": "CareBridge Clinics Inc",
+      "entity": "INC",
+      "country": "USA",
+      "domain": "healthcare analytics",
+      "ends": "2026-10-05",
+      "status": "live"
+    },
+    {
+      "name": "CloudSpan Technologies",
+      "entity": "PVT",
+      "country": "Singapore",
+      "domain": "data platform partner",
+      "ends": "2028-08-31",
+      "status": "live"
+    },
+    {
+      "name": "DataNest",
+      "entity": "PVT",
+      "country": "India",
+      "domain": "staff augmentation",
+      "ends": "2026-08-10",
+      "status": "ended"
+    },
+    {
+      "name": "Seaside Hotels LLC",
+      "entity": "PVT",
+      "country": "Oman",
+      "domain": "hospitality demand forecasting",
+      "ends": "2026-08-31",
+      "status": "ended"
+    },
+    {
+      "name": "Orbit Travels",
+      "entity": "PVT",
+      "country": "India",
+      "domain": "travel booking",
+      "ends": "2024-06-30",
+      "status": "ended"
+    }
+  ]
+}

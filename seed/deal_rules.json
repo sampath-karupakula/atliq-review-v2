@@ -1,0 +1,47 @@
+{
+  "rules": [
+    {
+      "id": "R-HC-US",
+      "when": "US client AND protected health information (PHI) is involved",
+      "requires": [
+        "NDA",
+        "MSA",
+        "HIPAA Business Associate Agreement (BAA)"
+      ],
+      "also": "Every subcontractor/freelancer touching PHI needs a subcontractor BAA before data moves; BAA location/subcontractor terms must allow how AtliQ delivers (Pune)."
+    },
+    {
+      "id": "R-EU-PD",
+      "when": "Client in EU/EEA/UK AND personal data is involved",
+      "requires": [
+        "MSA",
+        "Data Processing Agreement (Art. 28 GDPR)",
+        "Transfer mechanism to India (e.g. EU SCCs)"
+      ],
+      "also": "Subprocessors (agencies/freelancers) touching personal data need matching data-protection terms."
+    },
+    {
+      "id": "R-REF",
+      "when": "A contract says a document is 'attached' / an Annex / Exhibit / Schedule",
+      "requires": [
+        "That document present in the upload or the deal bundle"
+      ],
+      "also": "Referenced-but-missing → serious if it governs data, liability or price; otherwise negotiable."
+    },
+    {
+      "id": "R-PASS",
+      "when": "An agency or freelancer agreement is linked to a client deal",
+      "requires": [
+        "Confidentiality at least as strict as the client contract",
+        "IP in work product assigned to AtliQ when the client contract gives the client ownership",
+        "Data-protection terms when the subcontractor touches personal data/PHI"
+      ]
+    },
+    {
+      "id": "R-SCOPE",
+      "when": "Freelancer, employee, recruiter or government agreement uploaded on its own",
+      "requires": [],
+      "also": "Out of scope as a deal: show a scope message and offer to link it to a client deal."
+    }
+  ]
+}
