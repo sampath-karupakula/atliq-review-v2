@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+/* Design tokens from the prototype: a quiet paper workspace. Red is reserved for Serious findings and clashes.
+   P1 extends these; P0 only needs the base palette and type. */
+:root {
+  --paper: #f4f5f2;
+  --surface: #ffffff;
+  --sunk: #ebede8;
+  --ink: #18212c;
+  --ink-2: #465160;
+  --ink-3: #737d89;
+  --rule: #d8dcd4;
+  --accent: #1e4a73;
+  --accent-soft: #e2eaf3;
+  --serious: #b42318;
+  --serious-soft: #fbe9e7;
+  --nego: #8f5400;
+  --nego-soft: #faf0dc;
+  --ok: #2c6743;
+  --ok-soft: #e3f0e7;
+  --unsure: #53598a;
+  --unsure-soft: #ecedf6;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12161b;
+    --surface: #1a1f26;
+    --sunk: #232a33;
+    --ink: #e6e9ed;
+    --ink-2: #b2bac4;
+    --ink-3: #86909c;
+    --rule: #2e3640;
+    --accent: #8fb7df;
+    --accent-soft: #1d2d3f;
+    --serious: #f28a7f;
+    --serious-soft: #3a1f1c;
+    --nego: #e6b45c;
+    --nego-soft: #33290f;
+    --ok: #7dc697;
+    --ok-soft: #163022;
+    --unsure: #aab0e2;
+    --unsure-soft: #252840;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #12161b;
+  --surface: #1a1f26;
+  --sunk: #232a33;
+  --ink: #e6e9ed;
+  --ink-2: #b2bac4;
+  --ink-3: #86909c;
+  --rule: #2e3640;
+  --accent: #8fb7df;
+  --accent-soft: #1d2d3f;
+  --serious: #f28a7f;
+  --serious-soft: #3a1f1c;
+  --nego: #e6b45c;
+  --nego-soft: #33290f;
+  --ok: #7dc697;
+  --ok-soft: #163022;
+  --unsure: #aab0e2;
+  --unsure-soft: #252840;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunk: var(--sunk);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-serious: var(--serious);
+  --color-serious-soft: var(--serious-soft);
+  --color-nego: var(--nego);
+  --color-nego-soft: var(--nego-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-unsure: var(--unsure);
+  --color-unsure-soft: var(--unsure-soft);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(26px, 3.4vw, 36px);
+  letter-spacing: -0.01em;
+}
+
+.wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-block: 32px 80px;
+  padding-inline: max(16px, env(safe-area-inset-left, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--ink-3);
+}
