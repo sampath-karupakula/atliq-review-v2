@@ -7,9 +7,12 @@ import { ROLE_ORDER, ROLES, type Role } from "@/lib/roles";
 import { setViewingAs } from "@/app/actions/viewer";
 import { CommandPalette } from "./CommandPalette";
 import { KeysSheet, useKeysSheet } from "./KeysSheet";
+import { NotificationBell } from "@/components/workflow/NotificationBell";
+
+export type BellNote = { id: string; text: string; read: boolean; contractId: string | null; createdAt: string; kind: string };
 
 // One sticky bar on every screen: brand, the role's short nav, search, notifications, and "Viewing as".
-export function TopBar({ role, unread }: { role: Role; unread: number }) {
+export function TopBar({ role, unread, notes }: { role: Role; unread: number; notes: BellNote[] }) {
   const pathname = usePathname();
   const keys = useKeysSheet();
   const openKeys = useCallback(() => keys.setOpen(true), [keys]);
@@ -33,12 +36,7 @@ export function TopBar({ role, unread }: { role: Role; unread: number }) {
         </nav>
         <div className="tb-right">
           <CommandPalette role={role} onKeys={openKeys} />
-          <Link href="/activity" className="bell" aria-label={`Notifications, ${unread} unread`}>
-            <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true">
-              <path d="M10 2.5a5 5 0 0 0-5 5v3l-1.5 3h13L15 10.5v-3a5 5 0 0 0-5-5Z M8 15.5a2 2 0 0 0 4 0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-            </svg>
-            {unread ? <span className="bcount">{unread}</span> : null}
-          </Link>
+          <NotificationBell notes={notes} unread={unread} />
           <form action={setViewingAs} className="role">
             <label htmlFor="viewing-as">
               <span>Viewing as</span>

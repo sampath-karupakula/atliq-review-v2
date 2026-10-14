@@ -2,7 +2,7 @@ import "server-only";
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/lib/db/client";
-import { contractLinks, contracts, dealDocuments, deals } from "@/lib/db/schema";
+import { contractLinks, contracts, dealDocuments, deals, negotiationConditions } from "@/lib/db/schema";
 import type { DocType } from "@/lib/ingest/doctype";
 import type { ClauseMap } from "@/lib/ingest/clauses";
 import { notify } from "./notify";
@@ -130,6 +130,11 @@ export async function storeUpload(args: {
         .set({ contractId: contract.id })
         .where(and(eq(dealDocuments.dealId, dealId), eq(dealDocuments.contractId, previousVersionId)));
       await tx.insert(contractLinks).values({ fromId: contract.id, toId: previousVersionId, kind: "version_of" });
+      // Karandeep's open conditions carry over: the re-review checks each against the new version.
+      const carried = await tx.select().from(negotiationConditions).where(and(eq(negotiationConditions.contractId, previousVersionId), eq(negotiationConditions.open, true)));
+      if (carried.length) {
+        await tx.insert(negotiationConditions).values(carried.map((c) => ({ contractId: contract.id, round: version, text: c.text, createdBy: c.createdBy, open: true, addressed: null })));
+      }
       const [{ n }] = await tx
         .select({ n: sql<number>`count(*)::int` })
         .from(dealDocuments)
