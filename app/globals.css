@@ -95,6 +95,23 @@
   --font-display: var(--f-display);
   --font-body: var(--f-body);
   --font-mono: var(--f-mono);
+  /* Aliases for components ported from the first build, which use its token names. They resolve to the mock's
+     palette, so ported screens look like the rest. */
+  --color-bg: var(--paper);
+  --color-surface-2: var(--sunk);
+  --color-line: var(--rule);
+  --color-fg: var(--ink);
+  --color-muted: var(--ink-3);
+  --color-serious-bg: var(--serious-soft);
+  --color-negotiable: var(--nego);
+  --color-negotiable-bg: var(--nego-soft);
+  --color-minor: var(--ink-2);
+  --color-minor-bg: var(--sunk);
+  --color-unsure-bg: var(--unsure-soft);
+  --color-info: var(--accent);
+  --color-info-bg: var(--accent-soft);
+  --color-ok-bg: var(--ok-soft);
+  --color-highlight: var(--nego-soft);
 }
 
 /* ---------- base ---------- */
