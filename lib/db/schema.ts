@@ -426,3 +426,45 @@ export const sessions = pgTable(
   },
   (t) => [index("sessions_user_idx").on(t.userId)],
 );
+
+// ---------- Negotiation (P6) ----------
+
+/**
+ * Karandeep's conditions when he rejects a version as written but stays open to negotiate ("written waiver from Al
+ * Noor before signing"). They join the pushback list; the next version's reviewer marks each addressed or not.
+ * Open conditions are carried to the next version of the contract.
+ */
+export const negotiationConditions = pgTable(
+  "negotiation_conditions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    contractId: uuid("contract_id")
+      .notNull()
+      .references(() => contracts.id),
+    /** The contract version the condition was set on. */
+    round: integer("round").notNull(),
+    text: text("text").notNull(),
+    open: boolean("open").notNull().default(true),
+    /** Set in a re-review: yes | no. */
+    addressed: text("addressed"),
+    createdBy: text("created_by").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("negotiation_conditions_contract_idx").on(t.contractId)],
+);
+
+/** A pushback sent to the counterparty (by the user, from their own email; the app never sends). */
+export const pushbacks = pgTable(
+  "pushbacks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    contractId: uuid("contract_id")
+      .notNull()
+      .references(() => contracts.id),
+    round: integer("round").notNull(),
+    items: jsonb("items").$type<string[]>().notNull().default([]),
+    sentBy: text("sent_by").notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [index("pushbacks_contract_idx").on(t.contractId)],
+);

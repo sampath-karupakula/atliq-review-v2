@@ -24,6 +24,12 @@ import {
 } from "@/lib/report/model";
 import type { DiffRow } from "@/lib/ux/diff";
 import { RunReviewPanel } from "@/components/report/ReviewRunner";
+import { FindingActions, type Perms } from "@/components/report/FindingActions";
+import { DecisionPanel } from "@/components/report/DecisionPanel";
+import { NegotiationPanel, type PushItem } from "@/components/report/NegotiationPanel";
+import { dismissMany, restoreMany } from "@/app/actions/workflow";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/Toast";
 
 export type Tab = "findings" | "text" | "ai" | "versions";
 
@@ -47,6 +53,18 @@ export type ReportProps = {
   reviewedAt: string | null;
   model: string | null;
   canDecide: boolean;
+  perms: Perms;
+  decision: "sign_intended" | "reject" | null;
+  decisionNote: string | null;
+  /** Set while the contract is negotiating: conditions and whether the pushback went out. */
+  negotiation: {
+    round: number;
+    counterparty: string;
+    from: string;
+    conditions: { id: string; text: string; open: boolean; addressed: string | null }[];
+    sentOn: string | null;
+  } | null;
+  history: { at: string; text: string }[];
   /** Set when the viewer may run the review again. */
   rerun: { clauses: number; daysUntilDue: number | null; horizonDays: number } | null;
 };
@@ -93,6 +111,8 @@ export function Report(p: ReportProps) {
   const [howtoSeen, setHowtoSeen] = useState(true);
   const [flash, setFlash] = useState<string | null>(null);
   const [minorOpen, setMinorOpen] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
   const [dismissedOpen, setDismissedOpen] = useState(false);
   const money = useCallback((n: number) => (SYMBOL[p.currency] ?? `${p.currency} `) + Math.round(n).toLocaleString("en-US"), [p.currency]);
 
@@ -106,7 +126,6 @@ export function Report(p: ReportProps) {
   // Low risk reads calm on purpose: no red, so the next red report stands out. Items to check by hand stay visible.
   const calm = counts.serious === 0 && band === "Low";
   const serious = p.findings.filter((f) => f.severity === "serious" && !f.dismissed && f.versionTag !== "resolved");
-  const settled = serious.filter((f) => f.accepted).length;
 
   useEffect(() => {
     try {
@@ -312,7 +331,11 @@ export function Report(p: ReportProps) {
                 Dismissed by {f.dismissedBy}: {f.dismissReason}
               </p>
             ) : null}
-            {f.accepted ? <p className="hint">Accepted with a note: {f.acceptNote}</p> : null}
+            <FindingActions
+              f={{ id: f.id, severity: f.severity, title: f.title, dismissed: f.dismissed, accepted: f.accepted, acceptNote: f.acceptNote, hasHighlight: hasHl }}
+              perms={p.perms}
+              onOpenContract={() => showInText(f.id)}
+            />
           </div>
         ) : null}
       </article>
@@ -386,6 +409,9 @@ export function Report(p: ReportProps) {
   }
   const deliverVerdict = deliveryRows.some((r) => r.mk === "n") ? ["serious", "Not deliverable as written"] : deliveryRows.some((r) => r.mk === "w") ? ["negotiable", "Deliverable with conditions"] : ["okc", "Deliverable"];
   const usualDiffers = usual.filter((u) => u.differs).length;
+  const pushItems: PushItem[] = p.findings
+    .filter((f) => !f.dismissed && !f.accepted && f.versionTag !== "resolved" && (f.severity === "serious" || f.severity === "negotiable"))
+    .map((f) => ({ id: f.id, label: f.clause ? clauseLabel(f.clause) : "Whole document", title: f.title, ask: f.howToSoften || f.whatItMeans || f.title, severity: f.severity }));
   const missingCount = g.missing.length;
 
   const findingsTab = (
@@ -415,6 +441,21 @@ export function Report(p: ReportProps) {
             Got it
           </button>
         </div>
+      ) : null}
+
+      {p.negotiation ? (
+        <NegotiationPanel
+          contractId={p.contractId}
+          round={p.negotiation.round}
+          counterparty={p.negotiation.counterparty}
+          from={p.negotiation.from}
+          conditions={p.negotiation.conditions}
+          items={pushItems}
+          sentOn={p.negotiation.sentOn}
+          canEdit={p.perms.comment}
+          canDecide={p.perms.decide}
+          onJump={go}
+        />
       ) : null}
 
       {calm ? (
@@ -557,6 +598,22 @@ export function Report(p: ReportProps) {
         >
           <div className="group" style={{ paddingTop: 4 }}>
             {g.minor.map(card)}
+            {p.perms.dismiss ? (
+              <button
+                type="button"
+                className="btn small"
+                style={{ alignSelf: "flex-start" }}
+                onClick={async () => {
+                  const ids = g.minor.map((f) => f.id);
+                  const r = await dismissMany(ids, "Standard for AtliQ");
+                  if (!r.ok) return toast(r.error, { tone: "error" });
+                  router.refresh();
+                  toast(`${ids.length} minor item${ids.length === 1 ? "" : "s"} dismissed as standard.`, () => void restoreMany(ids).then(() => router.refresh()));
+                }}
+              >
+                Dismiss all minor as standard
+              </button>
+            ) : null}
           </div>
         </Fold>
       ) : null}
@@ -782,41 +839,30 @@ export function Report(p: ReportProps) {
         </div>
       ) : null}
 
-      <div className="decide">
-        <h3>Decision</h3>
-        <div className="lock">
-          <span className="state">
-            {serious.length && settled < serious.length ? "Locked until Serious items are settled" : serious.length ? "Ready to decide" : "No Serious items: nothing locks the decision"}
-          </span>
-          {serious.length ? (
-            <>
-              <div className="progress-head">
-                <span>
-                  <b className="num">
-                    {settled} of {serious.length}
-                  </b>{" "}
-                  Serious settled
+      <DecisionPanel
+        contractId={p.contractId}
+        serious={serious.map((f) => ({ id: f.id, title: f.title, settled: f.accepted }))}
+        decision={p.decision}
+        decisionNote={p.decisionNote}
+        canDecide={p.canDecide}
+        onJump={go}
+      />
+      {p.history.length ? (
+        <div className="score-card">
+          <h3>Stage history</h3>
+          <ul className="mini-list">
+            {[...p.history].reverse().map((h, i) => (
+              <li key={i} style={{ alignItems: "flex-start", fontSize: 13 }}>
+                <span>{h.text}</span>
+                <span className="hint num" style={{ whiteSpace: "nowrap" }}>
+                  {h.at}
                 </span>
-                <span className="hint">{serious.length - settled ? `${serious.length - settled} to go` : "Done"}</span>
-              </div>
-              <div className="meter goal">
-                <i style={{ width: `${(settled / serious.length) * 100}%` }} />
-              </div>
-              <ul>
-                {serious.map((f) => (
-                  <li key={f.id} className={f.accepted ? "done" : ""}>
-                    <button type="button" onClick={() => go(f.id)}>
-                      {f.title}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : null}
-          <span className="hint">{p.canDecide ? "Accepting with a note and recording the decision arrive in P6." : "Only Karandeep records the decision."}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="hint">Built from what happened. Nobody moves a stage by hand.</p>
         </div>
-        <p className="guard">AtliQ Review never signs, sends or edits a contract.</p>
-      </div>
+      ) : null}
       {p.rerun ? (
         <details className="decide">
           <summary style={{ cursor: "pointer", fontWeight: 600 }}>Run the review again</summary>

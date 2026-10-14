@@ -14,7 +14,9 @@ import { RunReviewPanel } from "@/components/report/ReviewRunner";
 import { Report, type Tab } from "@/components/report/Report";
 import { INTERRUPTED_MS } from "@/lib/data/driver";
 import { getCurrentUser } from "@/lib/auth/session";
-import { can } from "@/lib/auth/permissions";
+import { can, permsFor } from "@/lib/auth/permissions";
+import { getContractStage } from "@/lib/data/stage";
+import { StageTracker } from "@/components/report/StageTracker";
 import { deadlineWords } from "@/lib/queue";
 import { money } from "@/lib/format";
 import { diffParagraphs } from "@/lib/ux/diff";
@@ -83,6 +85,9 @@ export default async function ContractPage({ params, searchParams }: { params: P
   }
 
   const state = (review?.artifacts as { state?: { extract?: unknown } } | undefined)?.state;
+  const st = await getContractStage(contract.id);
+  const perms = permsFor(me);
+  const negotiating = st && st.stage.key === "negotiating" ? st : null;
   const bundleDocs = data.bundle.filter((b) => b.id !== contract.id);
   const initialTab: Tab = (["findings", "text", "ai", "versions"] as const).includes(sp.tab as Tab) ? (sp.tab as Tab) : "findings";
 
@@ -133,6 +138,7 @@ export default async function ContractPage({ params, searchParams }: { params: P
             </Link>
           </p>
         ) : null}
+        {st ? <StageTracker stage={st.stage} round={contract.version} /> : null}
         <span className="coverage">
           {done && review?.coverageLine ? review.coverageLine : `${contract.clauseCount} numbered clauses found`} · {data.registerLine}
         </span>
@@ -159,6 +165,21 @@ export default async function ContractPage({ params, searchParams }: { params: P
           reviewedAt={review?.finishedAt?.toISOString() ?? null}
           model={review?.model ?? null}
           canDecide={can(me, "decision.set")}
+          perms={{ accept: perms.accept, dismiss: perms.dismiss, dismissSerious: perms.dismissSerious, decide: perms.decide, comment: perms.comment }}
+          decision={contract.decision === "sign_intended" || contract.decision === "reject" ? contract.decision : null}
+          decisionNote={contract.decisionNote}
+          negotiation={
+            negotiating
+              ? {
+                  round: contract.version,
+                  counterparty: negotiating.facts.counterparty,
+                  from: me.name,
+                  conditions: negotiating.conditions.map((c) => ({ id: c.id, text: c.text, open: c.open, addressed: c.addressed })),
+                  sentOn: negotiating.pushback ? negotiating.pushback.sentAt.toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : null,
+                }
+              : null
+          }
+          history={st?.history ?? []}
           rerun={canRun ? { clauses, daysUntilDue: daysLeft, horizonDays: reviewHorizonDays() } : null}
         />
       ) : canRun ? (

@@ -138,6 +138,10 @@ export function PageTitle({ title, subtitle, actions }: { title: string; subtitl
   );
 }
 
+export function Pill({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-[11.5px] font-semibold ${className}`}>{children}</span>;
+}
+
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <section className={`rounded-lg border border-line bg-surface ${className}`}>{children}</section>;
 }
