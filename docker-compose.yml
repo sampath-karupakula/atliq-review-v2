@@ -1,0 +1,67 @@
+# Local development. Production runs on Vercel + Neon; the `prod` profile only proves the production image.
+#
+#   docker compose up                   Postgres + the app with hot reload on http://localhost:3000
+#   docker compose up -d --wait db      Postgres only (then `pnpm dev` on the host)
+#   docker compose --profile prod up    the production image (standalone Next build) on http://localhost:3000
+#
+# The project name, container names, volume and host port (5433) are distinct from the first build's, so both can
+# exist on one machine without sharing a database.
+name: atliq-review-v2
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: atliq-v2-db
+    environment:
+      POSTGRES_USER: atliq
+      POSTGRES_PASSWORD: atliq
+      POSTGRES_DB: atliq
+    ports:
+      - "5433:5432"
+    volumes:
+      - atliq-v2-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U atliq -d atliq"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: atliq-v2-app
+    env_file:
+      - path: .env.local
+        required: false
+    environment:
+      DATABASE_URL: postgres://atliq:atliq@db:5432/atliq
+      WATCHPACK_POLLING: "true"
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      db:
+        condition: service_healthy
+
+  prod:
+    profiles: ["prod"]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: atliq-v2-prod
+    env_file:
+      - path: .env.local
+        required: false
+    environment:
+      DATABASE_URL: postgres://atliq:atliq@db:5432/atliq
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  atliq-v2-pgdata:

@@ -1,0 +1,55 @@
+# CI: everything that needs no AI key. Typecheck, lint, unit tests, then a real build against Postgres with
+# migrations and a smoke test. Required on every PR before it can merge to main (see CONTRIBUTING.md).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: atliq
+          POSTGRES_PASSWORD: atliq
+          POSTGRES_DB: atliq
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U atliq" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://atliq:atliq@localhost:5432/atliq
+      APP_TODAY: "2026-09-28"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Lint
+        run: pnpm lint
+      - name: Unit tests
+        run: pnpm test
+      - name: Migrate
+        run: pnpm db:migrate
+      - name: Build
+        run: pnpm build
+      - name: Smoke test
+        run: |
+          pnpm start -p 3000 &
+          for i in $(seq 1 30); do curl -sf localhost:3000/api/health >/dev/null && break; sleep 2; done
+          curl -sf localhost:3000/api/health
+          test "$(curl -s -o /dev/null -w '%{http_code}' localhost:3000/)" = "200"
