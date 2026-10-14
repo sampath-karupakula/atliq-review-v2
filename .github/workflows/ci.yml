@@ -43,6 +43,8 @@ jobs:
         run: pnpm lint
       - name: Unit tests
         run: pnpm test
+      - name: Input-gate eval (no AI)
+        run: pnpm eval --gate-only
       - name: Migrate and seed
         run: pnpm db:migrate && pnpm seed
       - name: Build
