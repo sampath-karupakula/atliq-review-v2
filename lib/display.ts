@@ -17,7 +17,8 @@ export const docLabel = (t: string) => DOC_LABEL[t] ?? t;
 
 /** "Granite Peak Insurance · Master services agreement" — counterparty first, document kind second. */
 export function displayTitle(c: { counterparty: string; docType: string; title: string }): { primary: string; secondary: string } {
-  const counterparty = c.counterparty.replace(/\s+(Inc\.?|LLC|Ltd\.?|Limited|Pvt\.? Ltd\.?|Private Limited|GmbH|Co\.)$/i, "").trim();
+  // "Harrington Health Systems, Inc." → "Harrington Health Systems" (the comma before the suffix goes too).
+  const counterparty = c.counterparty.replace(/,?\s+(Inc\.?|LLC|Ltd\.?|Limited|Pvt\.? Ltd\.?|Private Limited|GmbH|Co\.)$/i, "").replace(/[,\s]+$/, "").trim();
   return { primary: counterparty, secondary: docLabel(c.docType) };
 }
 

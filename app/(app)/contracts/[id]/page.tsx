@@ -1,24 +1,26 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { eq } from "drizzle-orm";
+import { getDb } from "@/lib/db/client";
+import { contracts } from "@/lib/db/schema";
 import { getReport } from "@/lib/data/report";
-import { countSeverities, scoreOf } from "@/lib/score/score";
 import { daysBetween, formatDate } from "@/lib/checks/dates";
 import { splitClauses } from "@/lib/ingest/clauses";
 import { appToday, reviewHorizonDays } from "@/lib/config";
 import { displayTitle, docLabel } from "@/lib/display";
-import { BandPill, Crumbs, SeverityPill, type PipelineSeverity } from "@/components/ui";
+import { Crumbs } from "@/components/ui";
 import { RunReviewPanel } from "@/components/report/ReviewRunner";
+import { Report, type Tab } from "@/components/report/Report";
 import { INTERRUPTED_MS } from "@/lib/data/driver";
 import { getCurrentUser } from "@/lib/auth/session";
 import { can } from "@/lib/auth/permissions";
 import { deadlineWords } from "@/lib/queue";
 import { money } from "@/lib/format";
-import type { Severity } from "@/lib/pipeline/types";
+import { diffParagraphs } from "@/lib/ux/diff";
+import type { ReportFinding, Sev } from "@/lib/report/model";
 
 export const dynamic = "force-dynamic";
-
-type Tab = "review" | "text" | "ai";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -34,31 +36,63 @@ export default async function ContractPage({ params, searchParams }: { params: P
   const { contract, deal, review, company } = data;
   const me = await getCurrentUser();
   const today = appToday();
-  const tab: Tab = sp.tab === "text" || sp.tab === "ai" ? sp.tab : "review";
   const title = displayTitle(contract);
   const due = deal?.clientDeadline ?? null;
   const daysLeft = due ? daysBetween(today, due) : null;
-
+  const clauses = Math.max(contract.clauseCount, splitClauses(contract.text).sectionCount);
   const done = review?.status === "done";
-  const counts = countSeverities(data.findings.map((f) => ({ severity: f.severity as Severity, dismissed: f.dismissed })));
-  const live = scoreOf(counts);
+  const canRun = can(me, "review.start", { assignee: data.assignment?.reviewer ?? null });
   // A running review is followed live (it runs on the server); one with no progress for 10 minutes was interrupted.
   const runningElsewhere = !!review && (review.status === "running" || review.status === "queued") && Date.now() - (review.progressAt ?? review.startedAt).getTime() < INTERRUPTED_MS;
   const stopped = review && !done && !runningElsewhere ? review : null;
   const last = stopped ? { reviewId: stopped.id, error: stopped.error, resumable: !!(stopped.artifacts as { state?: unknown })?.state } : null;
-  const canRun = can(me, "review.start", { assignee: data.assignment?.reviewer ?? null });
-  const order: PipelineSeverity[] = ["serious", "negotiable", "not_sure", "minor"];
-  const shown = data.findings.filter((f) => !f.dismissed && f.severity !== "info").sort((a, b) => order.indexOf(a.severity as PipelineSeverity) - order.indexOf(b.severity as PipelineSeverity) || a.sort - b.sort);
 
-  const tabs: [Tab, string][] = [
-    ["review", "Review"],
-    ["text", "Contract text"],
-    ["ai", "What the AI saw"],
-  ];
+  const posById = new Map(data.positions.map((x) => [x.id, x]));
+  const findings: ReportFinding[] = data.findings.map((f) => {
+    const rel = (f.related ?? {}) as Record<string, unknown>;
+    return {
+      id: f.id,
+      key: String(rel.key ?? f.id),
+      check: f.check,
+      category: f.category,
+      severity: f.severity as Sev,
+      title: f.title,
+      clause: f.clause,
+      quote: f.quote,
+      quoteVerified: f.quoteVerified,
+      absent: f.absent,
+      whatItMeans: f.whatItMeans,
+      whatItCouldCost: f.whatItCouldCost,
+      howToSoften: f.howToSoften,
+      versionTag: f.versionTag,
+      dismissed: f.dismissed,
+      dismissedBy: f.dismissedBy,
+      dismissReason: f.dismissReason,
+      accepted: f.accepted,
+      acceptNote: f.acceptNote,
+      source: f.source,
+      related: rel,
+      positions: f.pastPositions.map((pid) => posById.get(pid)).filter((x): x is NonNullable<typeof x> => !!x),
+    };
+  });
+
+  let versions: { prevId: string; prevVersion: number; rows: ReturnType<typeof diffParagraphs> } | null = null;
+  if (contract.previousVersionId) {
+    const [prev] = await getDb().select({ id: contracts.id, version: contracts.version, text: contracts.text }).from(contracts).where(eq(contracts.id, contract.previousVersionId));
+    if (prev) versions = { prevId: prev.id, prevVersion: prev.version, rows: diffParagraphs(prev.text, contract.text) };
+  }
+
+  const state = (review?.artifacts as { state?: { extract?: unknown } } | undefined)?.state;
+  const bundleDocs = data.bundle.filter((b) => b.id !== contract.id);
+  const initialTab: Tab = (["findings", "text", "ai", "versions"] as const).includes(sp.tab as Tab) ? (sp.tab as Tab) : "findings";
+
+  const runPanel = (
+    <RunReviewPanel contractId={contract.id} clauses={clauses} last={last} runningId={runningElsewhere ? review!.id : null} daysUntilDue={daysLeft} horizonDays={reviewHorizonDays()} />
+  );
 
   return (
     <section className="wrap page">
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div className="rep-head">
         <Crumbs
           items={[
             { href: "/contracts", label: "Contracts" },
@@ -69,7 +103,7 @@ export default async function ContractPage({ params, searchParams }: { params: P
         <h1 className="display">
           {title.primary} · {docLabel(contract.docType)}
         </h1>
-        <div className="dismiss-row" style={{ fontSize: 13.5, color: "var(--ink-2)", gap: "8px 20px" }}>
+        <div className="rep-meta">
           <span>
             Client deadline <b>{formatDate(due)}</b> ({deadlineWords(daysLeft)})
           </span>
@@ -86,122 +120,75 @@ export default async function ContractPage({ params, searchParams }: { params: P
               First review <b>{data.assignment.reviewer}</b> by {formatDate(data.assignment.reviewDeadline)}
             </span>
           ) : null}
+          <span>
+            Version <b>v{contract.version}</b>
+          </span>
           {contract.direction === "atliq_buyer" ? <span className="tag buyer">AtliQ is the buyer</span> : null}
         </div>
-        <span className="hint" style={{ border: "1px solid var(--rule)", background: "var(--surface)", borderRadius: 6, padding: "6px 10px", alignSelf: "flex-start", fontSize: 13, color: "var(--ink-2)" }}>
-          {done && review?.coverageLine ? `${review.coverageLine} · ` : `${contract.clauseCount} numbered clauses found · `}
-          {data.registerLine}
+        {deal && bundleDocs.length ? (
+          <p className="partof">
+            Part of the deal <b>{deal.name}</b> · {bundleDocs.length + 1} documents
+            <Link className="btn small" href={`/deals/${deal.id}`}>
+              Open the deal
+            </Link>
+          </p>
+        ) : null}
+        <span className="coverage">
+          {done && review?.coverageLine ? review.coverageLine : `${contract.clauseCount} numbered clauses found`} · {data.registerLine}
         </span>
       </div>
 
-      <nav className="tabs" aria-label="Contract sections">
-        {tabs.map(([k, label]) => (
-          <Link key={k} href={`/contracts/${contract.id}${k === "review" ? "" : `?tab=${k}`}`} aria-current={tab === k ? "page" : undefined}>
-            {label}
-          </Link>
-        ))}
-      </nav>
-
-      {tab === "review" ? (
-        done ? (
-          <div className="report-grid">
-            <div className="rep-main">
-              {review?.summary?.length ? (
-                <div className="panel">
-                  <p className="eyebrow">Summary</p>
-                  <ol style={{ margin: 0, paddingLeft: 20, display: "flex", flexDirection: "column", gap: 6 }}>
-                    {review.summary.map((s, i) => (
-                      <li key={i}>{s.text}</li>
-                    ))}
-                  </ol>
-                </div>
-              ) : null}
-              <div className="panel">
-                <div className="sec-head">
-                  <h3>Findings, Serious first</h3>
-                  <span className="hint">The full report layout arrives in P5</span>
-                </div>
-                <ul className="mini-list">
-                  {shown.map((f) => (
-                    <li key={f.id} style={{ alignItems: "flex-start" }}>
-                      <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                        <b>{f.title}</b>
-                        <span className="hint">
-                          {f.clause ? `Clause ${f.clause}` : "Whole document"}
-                          {f.whatItCouldCost ? ` · ${f.whatItCouldCost}` : ""}
-                        </span>
-                      </span>
-                      <SeverityPill severity={f.severity as PipelineSeverity} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <aside className="rail">
-              <div className="score-card">
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 12 }}>
-                  <span className="num" style={{ fontFamily: "var(--f-display)", fontSize: 48, lineHeight: 1 }}>
-                    {live.score}
-                    <small style={{ fontSize: 16, color: "var(--ink-3)" }}>/100</small>
-                  </span>
-                  <BandPill band={live.band} />
-                </div>
-                <p className="hint">Score = 20 per Serious, 10 per Negotiable, 2 per Minor or Not sure. Any Serious item makes a contract High risk.</p>
-                <p className="hint">
-                  Reviewed {review?.finishedAt ? review.finishedAt.toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }) : ""} · {review?.model}
-                </p>
-              </div>
-              {canRun ? (
-                <div className="decide">
-                  <h3>Run again</h3>
-                  <RunReviewPanel contractId={contract.id} clauses={Math.max(contract.clauseCount, splitClauses(contract.text).sectionCount)} last={null} daysUntilDue={daysLeft} horizonDays={reviewHorizonDays()} />
-                </div>
-              ) : null}
-            </aside>
-          </div>
-        ) : canRun ? (
-          <div className="panel" style={{ maxWidth: 720 }}>
+      {done ? (
+        <Report
+          contractId={contract.id}
+          docType={contract.docType}
+          initialTab={initialTab}
+          text={contract.text}
+          maskedText={review?.textMasked ?? null}
+          findings={findings}
+          summary={review?.summary ?? []}
+          baseline={data.baseline.map((b) => ({ term: b.term, usual: b.usual, count: b.count }))}
+          dealValue={deal?.valueUsd ?? null}
+          currency={deal?.currency ?? "USD"}
+          coverageLine={review?.coverageLine ?? ""}
+          registerLine={data.registerLine}
+          extract={state?.extract ?? null}
+          deal={deal ? { deliveredFrom: deal.deliveredFrom, dataTouchers: deal.dataTouchers, personalData: deal.personalData, phi: deal.phi, clientCountry: deal.clientCountry } : null}
+          versions={versions}
+          version={contract.version}
+          reviewedAt={review?.finishedAt?.toISOString() ?? null}
+          model={review?.model ?? null}
+          canDecide={can(me, "decision.set")}
+          rerun={canRun ? { clauses, daysUntilDue: daysLeft, horizonDays: reviewHorizonDays() } : null}
+        />
+      ) : canRun ? (
+        <div className="report-grid">
+          <div className="panel">
             <h3>AI review</h3>
-            <p className="hint">Not reviewed yet. Reading every clause, checking it against AtliQ&apos;s promises, usual terms and the deal, then verifying every quote.</p>
-            <RunReviewPanel
-              contractId={contract.id}
-              clauses={Math.max(contract.clauseCount, splitClauses(contract.text).sectionCount)}
-              last={last}
-              runningId={runningElsewhere ? review!.id : null}
-              daysUntilDue={daysLeft}
-              horizonDays={reviewHorizonDays()}
-            />
+            <p className="hint">Not reviewed yet. Every clause is read, checked against AtliQ&apos;s promises, usual terms and the deal, and every quote is verified word for word.</p>
+            {runPanel}
           </div>
-        ) : (
+          <aside className="side">
+            <div className="panel">
+              <h3>Before the review</h3>
+              <p className="hint">The contract text is already on file. Open it below; nothing is sent to the AI until the review starts.</p>
+              <Link className="btn small" href="#text">
+                Read the contract
+              </Link>
+            </div>
+          </aside>
+          <pre id="text" className="doc" style={{ gridColumn: "1 / -1" }}>
+            {contract.text}
+          </pre>
+        </div>
+      ) : (
+        <>
           <div className="stub">
             <p>{data.assignment ? `This contract is assigned to ${data.assignment.reviewer}; they start its review.` : "Not reviewed yet."}</p>
           </div>
-        )
-      ) : null}
-
-      {tab === "text" ? (
-        <div className="panel" style={{ maxWidth: "80ch" }}>
-          <p className="eyebrow">
-            {contract.title} · v{contract.version}
-          </p>
-          <pre style={{ whiteSpace: "pre-wrap", fontFamily: "var(--f-display)", fontSize: 15.5, lineHeight: 1.7, margin: 0 }}>{contract.text}</pre>
-        </div>
-      ) : null}
-
-      {tab === "ai" ? (
-        review?.textMasked ? (
-          <div className="panel" style={{ maxWidth: "80ch" }}>
-            <p className="hint">
-              Exactly what was sent to the AI. Names, emails, phone numbers, addresses and IDs were replaced with labels before every call; the key that maps them back never leaves AtliQ&apos;s server.
-            </p>
-            <pre style={{ whiteSpace: "pre-wrap", fontFamily: "var(--f-mono)", fontSize: 13, lineHeight: 1.6, margin: 0 }}>{review.textMasked}</pre>
-          </div>
-        ) : (
-          <div className="stub">
-            <p>Nothing has been sent to the AI for this contract yet. Masking happens when a review starts.</p>
-          </div>
-        )
-      ) : null}
+          <pre className="doc">{contract.text}</pre>
+        </>
+      )}
     </section>
   );
 }

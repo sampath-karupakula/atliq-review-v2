@@ -20,7 +20,14 @@ describe("displayLines keeps highlight offsets exact", () => {
   });
 });
 
-import { clauseLabel } from "./display";
+import { clauseLabel, displayTitle } from "./display";
+
+describe("displayTitle", () => {
+  it("drops the legal suffix and the comma before it", () => {
+    expect(displayTitle({ counterparty: "Harrington Health Systems, Inc.", docType: "msa", title: "" }).primary).toBe("Harrington Health Systems");
+    expect(displayTitle({ counterparty: "Gulf Crown Hotels & Resorts Co.", docType: "msa", title: "" }).primary).toBe("Gulf Crown Hotels & Resorts");
+  });
+});
 
 describe("clauseLabel", () => {
   it.each([

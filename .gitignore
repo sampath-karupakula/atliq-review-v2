@@ -39,3 +39,6 @@ next-env.d.ts
 
 # archives of inputs already committed as folders
 Dataset.zip
+
+# scratch files
+*.tmp
