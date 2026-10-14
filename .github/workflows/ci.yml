@@ -71,6 +71,13 @@ jobs:
           curl -s "localhost:3000/contracts?view=open" | grep -q 'All open<b class="num">15</b>'
           curl -s "localhost:3000/register?tab=promises&f=all" | grep -q 'CMT-005'
           curl -s "localhost:3000/register?tab=promises&f=expired" | grep -q 'Orbit Travels'
+          # Memory (P8): clause search, register editing for the admin only, missing signed contracts as placeholders.
+          S=$(curl -s "localhost:3000/register?tab=search&q=45+days&type=payment")
+          echo "$S" | grep -q 'Trustline NBFC' && echo "$S" | grep -q 'Brightwater Insurance'
+          curl -s "localhost:3000/register?tab=promises" | grep -q 'Add a promise'
+          ! curl -s -b atliq_role=counsel "localhost:3000/register?tab=promises" | grep -q 'Add a promise'
+          curl -s localhost:3000/exposure | grep -q 'Signed but not on file'
+          curl -s localhost:3000/exposure | grep -q 'tracker=C-0'
           # Upload (no AI): a contract is stored, a scanned PDF and a duplicate are refused, a viewer is refused,
           # and a bulk signed upload moves coverage from 17 to 18.
           D="-F counterparty=Kaveri -F owner=Dhaval -F domain=retail -F clientCountry=India"

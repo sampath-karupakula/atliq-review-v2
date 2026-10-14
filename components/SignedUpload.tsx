@@ -12,7 +12,7 @@ type Result =
   | { file: string; ok: false; message: string; duplicateOf?: string | null };
 
 // Many signed files at once. Each is read for who, what and when; the coverage meter moves as soon as they land.
-export function SignedUpload({ coverage }: { coverage: { onFile: number; signedInTracker: number } }) {
+export function SignedUpload({ coverage, tracker }: { coverage: { onFile: number; signedInTracker: number }; tracker?: { trackerId: string; label: string } | null }) {
   const router = useRouter();
   const { toast } = useToast();
   const [files, setFiles] = useState<File[]>([]);
@@ -26,6 +26,7 @@ export function SignedUpload({ coverage }: { coverage: { onFile: number; signedI
     setBusy(true);
     const fd = new FormData();
     for (const f of files) fd.append("file", f);
+    if (tracker && files.length === 1) fd.append("tracker", tracker.trackerId);
     try {
       const res = await fetch("/api/contracts/signed", { method: "POST", body: fd });
       const json = await res.json();
@@ -46,6 +47,11 @@ export function SignedUpload({ coverage }: { coverage: { onFile: number; signedI
   return (
     <div className="report-grid">
       <div className="rep-main">
+        {tracker ? (
+          <p className="warnline">
+            Filling tracker row <b>{tracker.trackerId}</b>: {tracker.label}. Choose its one signed file; the signed date and expiry come from the tracker.
+          </p>
+        ) : null}
         <label
           htmlFor="signed-files"
           className="panel"

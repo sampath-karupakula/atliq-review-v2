@@ -330,6 +330,21 @@ async function main() {
   await db.insert(s.appMeta).values([
     { key: "coverage", value: COVERAGE },
     { key: "seeded_at", value: now.toISOString() },
+    {
+      // Every signed row in the tracker; the ones with no file in the app show as placeholders on /exposure.
+      key: "tracker_signed",
+      value: [...tracker.values()]
+        .filter((r) => r.status === "Signed")
+        .map((r) => ({
+          trackerId: r.contract_id,
+          counterparty: r.counterparty,
+          docType: r.doc_type,
+          signedDate: nullIfBlank(r.signed_date),
+          expiry: nullIfBlank(r.expiry_date),
+          valueUsd: r.value_usd ? Number(r.value_usd) : null,
+          notes: r.notes ?? "",
+        })),
+    },
   ]);
 
   const counts = await sql<{ t: string; n: number }[]>`

@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PageHead, SeverityChip, Stub, Tag } from "@/components/ui";
+import { PageHead, SeverityChip, Tag } from "@/components/ui";
 import { getCoverage, getRegister, coverageLine, type RegisterRow } from "@/lib/data/register";
 import { getBaseline, getPositions } from "@/lib/data/reference";
+import { getSearchDocs } from "@/lib/data/memory";
 import { formatDate } from "@/lib/checks/dates";
 import { commitmentTypeLabel, PRECEDENT_LABELS, termLabel } from "@/lib/format";
-import { currentRole } from "@/lib/viewer";
+import { getCurrentUser } from "@/lib/auth/session";
+import { can } from "@/lib/auth/permissions";
+import { AddPromiseButton, LabelSelect, PromiseControls, type PromiseValues } from "@/components/register/RegisterControls";
+import { termStrength } from "@/lib/memory/strength";
+import { CLAUSE_TYPES, normalise, searchClauses, type ClauseType } from "@/lib/memory/search";
 
 export const metadata: Metadata = { title: "Register" };
 export const dynamic = "force-dynamic";
@@ -33,8 +38,43 @@ function StatusChip({ r }: { r: RegisterRow }) {
   return <SeverityChip sev={r.waivers.length ? "medium" : "high"}>{r.waivers.length ? "Live · waiver on file" : "Live"}</SeverityChip>;
 }
 
-export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ tab?: string; f?: string }> }) {
-  const [sp, role] = await Promise.all([searchParams, currentRole()]);
+/** Marks each query word, matching the way search ignores case and punctuation. */
+function Highlight({ text, q }: { text: string; q: string }) {
+  const words = normalise(q)
+    .trim()
+    .split(" ")
+    .filter((w) => w.length > 1)
+    .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  if (!words.length) return <>{text}</>;
+  const parts = text.split(new RegExp(`(${words.join("|")})`, "gi"));
+  return <>{parts.map((part, i) => (i % 2 ? <mark key={i}>{part}</mark> : part))}</>;
+}
+
+const promiseValues = (r: RegisterRow): PromiseValues & { confirmed: boolean; label: string } => ({
+  id: r.id,
+  type: r.type,
+  contract: r.contract,
+  signed: r.signed,
+  entity: r.entity,
+  clauses: r.clauses.join(", "),
+  bindsAffiliates: r.bindsAffiliates,
+  activity: r.activity,
+  forWhom: r.forWhom,
+  territory: r.territory.join(", "),
+  domain: r.domain,
+  starts: r.starts,
+  ends: r.ends ?? "",
+  endRule: r.endRule ?? "",
+  quote: r.quote,
+  confirmed: r.confirmed,
+  label: `${r.id} · ${r.contract}`,
+});
+
+const clauseTypeLabel = (t: ClauseType) => CLAUSE_TYPES.find(([k]) => k === t)?.[1] ?? t;
+
+export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ tab?: string; f?: string; q?: string; type?: string; status?: string }> }) {
+  const [sp, me] = await Promise.all([searchParams, getCurrentUser()]);
+  const canEdit = can(me, "register.edit");
   const tab: Tab = TABS.some(([k]) => k === sp.tab) ? (sp.tab as Tab) : "promises";
   const f: PromiseFilter = (["live", "unconf", "expired", "all"] as const).includes(sp.f as PromiseFilter) ? (sp.f as PromiseFilter) : "live";
   const [register, coverage, baseline, positions] = await Promise.all([getRegister(), getCoverage(), getBaseline(), getPositions()]);
@@ -46,6 +86,12 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
   };
   const tabCount: Record<Tab, number | null> = { promises: register.length, usual: baseline.length, prec: positions.length, search: null };
   const order = ["standard", "deliberate_exception", "waved_through", "unclear"];
+
+  const q = (sp.q ?? "").slice(0, 120);
+  const qType = (CLAUSE_TYPES.some(([k]) => k === sp.type) ? sp.type : "all") as ClauseType | "all";
+  const qStatus = sp.status === "in_force" || sp.status === "expired" ? sp.status : "all";
+  const hits = tab === "search" && q.trim() ? searchClauses(await getSearchDocs(), q, { type: qType, status: qStatus }) : [];
+  const hitContracts = new Set(hits.map((h) => h.contractId)).size;
 
   return (
     <section className="wrap page">
@@ -64,21 +110,24 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
 
       {tab === "promises" ? (
         <>
-          <nav className="chips" aria-label="Filter promises">
-            {(
-              [
-                ["live", "Live"],
-                ["unconf", "Unconfirmed"],
-                ["expired", "Expired"],
-                ["all", "All"],
-              ] as [PromiseFilter, string][]
-            ).map(([k, label]) => (
-              <Link key={k} className="chip" href={`/register?tab=promises&f=${k}`} aria-current={f === k ? "true" : undefined}>
-                {label}
-                <b className="num">{counts[k]}</b>
-              </Link>
-            ))}
-          </nav>
+          <div className="dismiss-row" style={{ justifyContent: "space-between", flexWrap: "wrap" }}>
+            <nav className="chips" aria-label="Filter promises">
+              {(
+                [
+                  ["live", "Live"],
+                  ["unconf", "Unconfirmed"],
+                  ["expired", "Expired"],
+                  ["all", "All"],
+                ] as [PromiseFilter, string][]
+              ).map(([k, label]) => (
+                <Link key={k} className="chip" href={`/register?tab=promises&f=${k}`} aria-current={f === k ? "true" : undefined}>
+                  {label}
+                  <b className="num">{counts[k]}</b>
+                </Link>
+              ))}
+            </nav>
+            {canEdit ? <AddPromiseButton /> : null}
+          </div>
           <div className="tablewrap">
             <table>
               <thead>
@@ -117,7 +166,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
                         ))}
                       </td>
                       <td>{r.territory.length ? r.territory.join(", ") : <span className="muted">—</span>}</td>
-                      <td className="num">{r.ends ? formatDate(r.ends) : r.endRule ?? "No end date"}</td>
+                      <td className="num">{r.ends ? formatDate(r.ends) : (r.endRule ?? "No end date")}</td>
                       <td>
                         <StatusChip r={r} />
                       </td>
@@ -132,6 +181,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
                         ) : (
                           <Tag kind="overdue">Unconfirmed</Tag>
                         )}
+                        {canEdit ? <PromiseControls row={promiseValues(r)} /> : null}
                       </td>
                     </tr>
                   ))}
@@ -139,7 +189,8 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
             </table>
           </div>
           <p className="hint">
-            Live or expired is worked out from today&apos;s date, never by the AI. {role === "ceo" ? "Confirming and correcting promises arrives in P8." : "Only Karandeep can add, correct or confirm promises."}
+            Live or expired is worked out from today&apos;s date, never by the AI.{" "}
+            {canEdit ? "A correction is logged with what it was before; the next review checks against the new wording." : "Only Karandeep can add, correct or confirm promises."}
           </p>
         </>
       ) : null}
@@ -160,32 +211,47 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
                 </tr>
               </thead>
               <tbody>
-                {baseline.map((b) => (
-                  <tr key={b.term}>
-                    <td className="co">{termLabel(b.term)}</td>
-                    <td style={{ maxWidth: 460 }}>
-                      {b.usual}
-                      {b.hardLine ? (
-                        <small className="hint" style={{ display: "block", marginTop: 4 }}>
-                          Hard line: {b.hardLine}
-                        </small>
-                      ) : null}
-                      {b.exceptions.length ? (
-                        <small className="hint" style={{ display: "block", marginTop: 4 }}>
-                          Exceptions: {b.exceptions.join("; ")}
-                        </small>
-                      ) : null}
-                    </td>
-                    <td style={{ maxWidth: 260 }}>
-                      {b.count ?? <span className="muted">—</span>}
-                      {b.source ? (
-                        <small className="hint" style={{ display: "block" }}>
-                          {b.source}
-                        </small>
-                      ) : null}
-                    </td>
-                  </tr>
-                ))}
+                {baseline.map((b) => {
+                  const st = termStrength(b.count, b.source);
+                  return (
+                    <tr key={b.term}>
+                      <td className="co">{termLabel(b.term)}</td>
+                      <td style={{ maxWidth: 460 }}>
+                        {b.usual}
+                        {b.hardLine ? (
+                          <small className="hint" style={{ display: "block", marginTop: 4 }}>
+                            Hard line: {b.hardLine}
+                          </small>
+                        ) : null}
+                        {b.exceptions.length ? (
+                          <small className="hint" style={{ display: "block", marginTop: 4 }}>
+                            Exceptions: {b.exceptions.join("; ")}
+                          </small>
+                        ) : null}
+                      </td>
+                      <td style={{ maxWidth: 280 }}>
+                        <span style={{ display: "flex", alignItems: "center", flexWrap: "wrap" }} title={st.pct !== null ? `${st.pct}% of signed contracts` : undefined}>
+                          <span className="strength" role="img" aria-label={`Strength ${st.level} of 3`}>
+                            {[1, 2, 3].map((n) => (
+                              <i key={n} className={st.level >= n ? "on" : undefined} />
+                            ))}
+                          </span>
+                          <b style={{ fontWeight: 600 }}>{st.label}</b>
+                        </span>
+                        {b.count && !/\d+\s+of\s+\d+/.test(b.count) ? (
+                          <small className="hint" style={{ display: "block", marginTop: 4 }}>
+                            {b.count}
+                          </small>
+                        ) : null}
+                        {b.source ? (
+                          <small className="hint" style={{ display: "block", marginTop: 4 }}>
+                            {b.source}
+                          </small>
+                        ) : null}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -210,7 +276,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
               </thead>
               <tbody>
                 {[...positions]
-                  .sort((a, b) => order.indexOf(a.label) - order.indexOf(b.label))
+                  .sort((a, b) => order.indexOf(a.label) - order.indexOf(b.label) || a.id - b.id)
                   .map((p) => {
                     const l = PRECEDENT_LABELS[p.label] ?? PRECEDENT_LABELS.unclear!;
                     return (
@@ -229,7 +295,16 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
                           ) : null}
                         </td>
                         <td>
-                          <span className={`p ${l.cls}`}>{l.text}</span>
+                          {canEdit ? (
+                            <span className="label-select">
+                              <LabelSelect id={p.id} label={p.label} who={`${p.counterparty} (${p.date})`} />
+                            </span>
+                          ) : (
+                            <span className={`p ${l.cls}`}>{l.text}</span>
+                          )}
+                          <small className="hint" style={{ display: "block", marginTop: 4 }}>
+                            {p.confirmed ? "Confirmed" : "Not confirmed yet"}
+                          </small>
                         </td>
                       </tr>
                     );
@@ -237,11 +312,71 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
               </tbody>
             </table>
           </div>
-          <p className="hint">Relabelling a precedent arrives in P8.</p>
+          <p className="hint">Only a Standard position counts as precedent on a report. Waved through and deliberate exceptions show as warnings, never as something to copy.</p>
         </>
       ) : null}
 
-      {tab === "search" ? <Stub title="Search past contracts" phase="P8 (every clause in the signed contracts on file, expired ones included)" /> : null}
+      {tab === "search" ? (
+        <>
+          <form className="search-form" action="/register" role="search">
+            <input type="hidden" name="tab" value="search" />
+            <input type="search" name="q" defaultValue={q} placeholder="Try 45 days, liquidated damages, non-compete" aria-label="Search signed contracts" />
+            <select name="type" defaultValue={qType} aria-label="Clause type">
+              <option value="all">Any clause</option>
+              {CLAUSE_TYPES.map(([k, l]) => (
+                <option key={k} value={k}>
+                  {l}
+                </option>
+              ))}
+            </select>
+            <select name="status" defaultValue={qStatus} aria-label="Contract status">
+              <option value="all">In force and expired</option>
+              <option value="in_force">In force only</option>
+              <option value="expired">Expired only</option>
+            </select>
+            <button type="submit" className="btn primary">
+              Search
+            </button>
+          </form>
+          {q.trim() ? (
+            <>
+              <p className="hint">
+                {hits.length} clause{hits.length === 1 ? "" : "s"} in {hitContracts} signed contract{hitContracts === 1 ? "" : "s"} · {coverageLine(coverage)}
+              </p>
+              <div className="panel" style={{ padding: "4px 18px" }}>
+                {hits.length ? (
+                  hits.map((h) => (
+                    <div key={`${h.contractId}-${h.clause}`} className="hit">
+                      <span className="dismiss-row" style={{ justifyContent: "space-between", flexWrap: "wrap" }}>
+                        <span>
+                          <Link href={`/contracts/${h.contractId}`}>
+                            <b>{h.title}</b>
+                          </Link>{" "}
+                          <span className="hint">
+                            · {/^\d/.test(h.clause) ? `Clause ${h.clause}` : h.clause}
+                            {h.signedDate ? ` · signed ${formatDate(h.signedDate)}` : ""}
+                          </span>
+                        </span>
+                        <span className="dismiss-row">
+                          {h.type !== "other" ? <Tag>{clauseTypeLabel(h.type)}</Tag> : null}
+                          {h.inForce ? null : <SeverityChip sev="neutral">Expired</SeverityChip>}
+                        </span>
+                      </span>
+                      <p>
+                        <Highlight text={h.text.length > 700 ? `${h.text.slice(0, 700)}…` : h.text} q={q} />
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="hint">No clause has every one of those words. Try fewer words, or a number on its own.</p>
+                )}
+              </div>
+            </>
+          ) : (
+            <p className="hint">Every clause of every signed contract on file, expired ones included. Case and punctuation are ignored.</p>
+          )}
+        </>
+      ) : null}
     </section>
   );
 }

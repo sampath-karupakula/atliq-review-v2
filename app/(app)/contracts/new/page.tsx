@@ -11,13 +11,14 @@ import { Crumbs, PageTitle } from "@/components/ui";
 import { displayTitle } from "@/lib/display";
 import { UploadForm } from "@/components/UploadForm";
 import { SignedUpload } from "@/components/SignedUpload";
+import { getMissingSigned } from "@/lib/data/memory";
 import Link from "next/link";
 
 export const metadata: Metadata = { title: "Upload a contract" };
 export const dynamic = "force-dynamic";
 
-export default async function NewContractPage({ searchParams }: { searchParams: Promise<{ previous?: string; mode?: string }> }) {
-  const { previous: previousId, mode } = await searchParams;
+export default async function NewContractPage({ searchParams }: { searchParams: Promise<{ previous?: string; mode?: string; tracker?: string }> }) {
+  const { previous: previousId, mode, tracker: trackerId } = await searchParams;
   const bulk = mode === "signed" && !previousId;
   const me = await getCurrentUser();
   if (!can(me, "contract.upload")) {
@@ -42,6 +43,7 @@ export default async function NewContractPage({ searchParams }: { searchParams: 
     listPeople({ roles: ["admin", "reviewer"] }),
     getCoverage(),
   ]);
+  const fill = bulk && trackerId ? ((await getMissingSigned()).find((t) => t.trackerId === trackerId) ?? null) : null;
   const [prev] = previousId && /^[0-9a-f-]{36}$/i.test(previousId) ? await db.select().from(contracts).where(eq(contracts.id, previousId)) : [];
   const label = (c: { counterparty: string; docType: string; title: string }) => {
     const t = displayTitle(c);
@@ -70,7 +72,7 @@ export default async function NewContractPage({ searchParams }: { searchParams: 
       <p className="hint" style={{ background: "var(--accent-soft)", borderRadius: 6, padding: "8px 12px", fontSize: 13.5, color: "var(--ink-2)" }}>
         <b>Private by design.</b> Nothing is sent to the AI at upload. When a review runs, names, emails and addresses are replaced with labels first. Checked against {coverage.onFile} of {coverage.signedInTracker} signed contracts on file.
       </p>
-      {bulk ? <SignedUpload coverage={coverage} /> : null}
+      {bulk ? <SignedUpload coverage={coverage} tracker={fill ? { trackerId: fill.trackerId, label: `${fill.counterparty} · ${fill.docType}${fill.signedDate ? ` · signed ${fill.signedDate}` : ""}` } : null} /> : null}
       {bulk ? null : <UploadForm
         deals={allDeals.map((d) => ({ id: d.id, label: d.name }))}
         contracts={unsigned.map((c) => ({ id: c.id, label: `${label(c)} (v${c.version})` }))}

@@ -33,8 +33,10 @@ export async function storeSigned(args: {
   docType: DocType;
   clauses: ClauseMap;
   sourceFile: string;
+  /** The tracker row this file fills (from a placeholder on the signed portfolio), when known. */
+  tracker?: { trackerId: string; signedDate: string | null; expiry: string | null } | null;
 }): Promise<{ contractId: string; signedDate: string | null }> {
-  const signedDate = findSignedDate(args.text);
+  const signedDate = findSignedDate(args.text) ?? args.tracker?.signedDate ?? null;
   const [row] = await getDb()
     .insert(contracts)
     .values({
@@ -44,6 +46,8 @@ export async function storeSigned(args: {
       status: "signed",
       isSigned: true,
       signedDate,
+      trackerId: args.tracker?.trackerId ?? null,
+      ends: args.tracker?.expiry ?? null,
       sourceFile: args.sourceFile,
       text: args.text,
       textHash: args.hash,
