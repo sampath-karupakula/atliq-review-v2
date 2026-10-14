@@ -19,6 +19,7 @@ export type AuditAction =
   | "review.cancel"
   | "review.resume"
   | "signed.upload"
+  | "review.remind"
   | "negotiation.conditions"
   | "negotiation.drop"
   | "pushback.sent"
