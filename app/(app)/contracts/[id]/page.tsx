@@ -18,6 +18,8 @@ import { can, permsFor } from "@/lib/auth/permissions";
 import { getContractStage } from "@/lib/data/stage";
 import { StageTracker } from "@/components/report/StageTracker";
 import { HandoffCards } from "@/components/handoff/HandoffCards";
+import { DeleteContractButton, EditDetailsButton } from "@/components/contract/ContractControls";
+import { listPeople } from "@/lib/data/people";
 import { deadlineWords } from "@/lib/queue";
 import { money } from "@/lib/format";
 import { diffParagraphs } from "@/lib/ux/diff";
@@ -92,6 +94,42 @@ export default async function ContractPage({ params, searchParams }: { params: P
   const bundleDocs = data.bundle.filter((b) => b.id !== contract.id);
   const initialTab: Tab = (["findings", "text", "ai", "versions"] as const).includes(sp.tab as Tab) ? (sp.tab as Tab) : "findings";
 
+  const dealOwner = deal?.owner ?? contract.owner ?? null;
+  const canEdit = can(me, "deal.edit", { dealOwner });
+  const canDelete = can(me, "contract.delete", { dealOwner });
+  const people = canEdit ? (await listPeople({ roles: ["admin", "reviewer"] })).map((p) => p.name) : [];
+  const controls =
+    canEdit || canDelete ? (
+      <span className="dismiss-row" style={{ marginLeft: "auto" }}>
+        {canEdit ? (
+          <EditDetailsButton
+            contractId={contract.id}
+            people={people}
+            canChangeOwner={me.role === "admin"}
+            initial={{
+              title: contract.title,
+              counterparty: contract.counterparty,
+              docType: contract.docType as "msa",
+              deal: deal
+                ? {
+                    clientDeadline: deal.clientDeadline,
+                    deadlineNote: deal.deadlineNote,
+                    valueUsd: deal.valueUsd,
+                    currency: (["USD", "EUR", "GBP", "INR", "AED"].includes(deal.currency) ? deal.currency : "USD") as "USD",
+                    domain: deal.domain,
+                    clientCountry: deal.clientCountry,
+                    personalData: deal.personalData,
+                    phi: deal.phi,
+                    owner: deal.owner,
+                  }
+                : null,
+            }}
+          />
+        ) : null}
+        {canDelete ? <DeleteContractButton contractId={contract.id} title={`${title.primary} · ${docLabel(contract.docType)} v${contract.version}`} signed={contract.isSigned} lastInDeal={!!deal && bundleDocs.length === 0} /> : null}
+      </span>
+    ) : null;
+
   const handoff = (
     <HandoffCards
       contract={{ id: contract.id, title: `${title.primary} · ${docLabel(contract.docType)} v${contract.version}` }}
@@ -101,6 +139,7 @@ export default async function ContractPage({ params, searchParams }: { params: P
       band={done ? (review?.band ?? null) : null}
       decided={!!contract.decision}
       reviewed={done}
+      request={contract.decisionRequestedBy ? { by: contract.decisionRequestedBy, at: contract.decisionRequestedAt, note: contract.decisionRequestNote } : null}
     />
   );
 
@@ -111,6 +150,7 @@ export default async function ContractPage({ params, searchParams }: { params: P
   return (
     <section className="wrap page">
       <div className="rep-head">
+        <div className="dismiss-row" style={{ justifyContent: "space-between", flexWrap: "wrap" }}>
         <Crumbs
           items={[
             { href: "/contracts", label: "Contracts" },
@@ -118,6 +158,8 @@ export default async function ContractPage({ params, searchParams }: { params: P
             { label: `${title.secondary} · v${contract.version}` },
           ]}
         />
+        {controls}
+        </div>
         <h1 className="display">
           {title.primary} · {docLabel(contract.docType)}
         </h1>

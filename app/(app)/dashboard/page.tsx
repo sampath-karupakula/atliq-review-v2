@@ -7,8 +7,8 @@ import { TakeButton } from "@/components/dashboard/TakeButton";
 import { OfferCheck } from "@/components/offer/OfferCheck";
 import { getOfferInputs } from "@/lib/data/offer";
 import { counselQuestionsList, reviewTimes } from "@/lib/data/handoff";
-import { questionStatus, hm } from "@/lib/review/handoff";
-import { TimeBar } from "@/components/handoff/TimeBar";
+import { questionStatus } from "@/lib/review/handoff";
+import { TimePlan } from "@/components/handoff/TimePlan";
 import { StageTracker } from "@/components/report/StageTracker";
 import { currentRole } from "@/lib/viewer";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -96,9 +96,10 @@ async function CeoDashboard({ queue, coverage, today, longDate }: { queue: Queue
         {decide ? (
           <li className="need first">
             <span className="k">
-              Decide by {formatDate(decide.deadline)} · {deadlineWords(decide.deadline ? daysBetween(today, decide.deadline) : null)}
+              {decide.decisionRequestedBy ? `${decide.decisionRequestedBy} asks for a quick decision · ` : ""}Decide by {formatDate(decide.deadline)} · {deadlineWords(decide.deadline ? daysBetween(today, decide.deadline) : null)}
             </span>
             <h3>{name(decide)}</h3>
+            {decide.decisionRequestNote ? <p className="ask">{decide.decisionRequestNote}</p> : null}
             <p>
               {decide.seriousOpen ? `${decide.seriousOpen} Serious item${decide.seriousOpen === 1 ? "" : "s"} open. ` : decide.band ? `${decide.band} risk. ` : ""}
               {decide.liveClash ? "It breaks a promise AtliQ already made. " : decide.topIssue ? `${decide.topIssue}.` : ""}
@@ -148,6 +149,7 @@ async function CeoDashboard({ queue, coverage, today, longDate }: { queue: Queue
           <p className="hint">A flag dismissed as a false alarm counts against it. If the line drops below the target, the rules need tuning before people stop listening.</p>
         </Panel>
       </div>
+      <TimePlan times={await reviewTimes(queue.filter((q) => q.reviewer && !q.decision).map((q) => q.id))} title="Team review time" sub="Open first reviews" href={(t) => `/contracts/${t.contractId}`} showReviewer />
     </section>
   );
 }
@@ -156,8 +158,6 @@ async function ReviewerDashboard({ queue, today, longDate, me }: { queue: QueueR
   const mine = filterQueue(queue.filter((q) => q.reviewer === me && !q.decision), "all", "", today);
   const dueSoon = mine.filter((q) => q.reviewDeadline && daysBetween(today, q.reviewDeadline) <= 2);
   const [deals, finished, offer, times] = await Promise.all([dealsOwnedBy(me), finishedReviewsOf(me), getOfferInputs(), reviewTimes(mine.map((m) => m.id))]);
-  const plan = [...times].sort((a, b) => (a.due ?? "9999").localeCompare(b.due ?? "9999"));
-  const planMax = Math.max(60, ...plan.map((t) => Math.max(t.est, t.spent)));
   const stages = await Promise.all(deals.map((d) => (d.mainContractId ? getContractStage(d.mainContractId) : Promise.resolve(null))));
   const unassigned = toAssign(queue).filter((q) => q.deadline && daysBetween(today, q.deadline) <= 14);
   const onTimeCount = finished.filter((f) => onTime(f.reviewDeadline, f.completedOn) >= 0).length;
@@ -181,34 +181,7 @@ async function ReviewerDashboard({ queue, today, longDate, me }: { queue: QueueR
       </div>
       <div className="today-grid">
         <div className="queue">
-          {plan.length ? (
-            <section className="panel">
-              <div className="sec-head">
-                <h3>Your review time</h3>
-                <span className="hint">
-                  Assigned to you · <b className="num">{hm(plan.reduce((a, t) => a + t.left, 0))}</b> of review left
-                </span>
-              </div>
-              <div className="tplan">
-                {plan.map((t) => (
-                  <Link key={t.contractId} className="tp-row" href={`/mark/${t.contractId}`}>
-                    <span className="tp-name">
-                      <b>{t.title}</b>
-                      <small>
-                        {t.due ? `due ${formatDate(t.due)}` : "no date"} · {t.basis}
-                      </small>
-                    </span>
-                    <span className="tp-num num">
-                      {t.spent ? `${hm(t.spent)} / ` : ""}
-                      {hm(t.est)}
-                      <small>{t.done ? "done" : t.over ? `over by ${hm(t.spent - t.est)}` : `${hm(t.left)} left`}</small>
-                    </span>
-                    <TimeBar est={t.est} spent={t.spent} max={planMax} />
-                  </Link>
-                ))}
-              </div>
-            </section>
-          ) : null}
+          {times.length ? <TimePlan times={times} title="Your review time" sub="Assigned to you" href={(t) => `/mark/${t.contractId}`} /> : null}
           <div className="sec-head">
             <h2>Deals you own</h2>
             <p>From draft to signature</p>
@@ -310,6 +283,7 @@ async function CounselDashboard({ queue, longDate, today }: { queue: QueueRow[];
       <p className="muted" style={{ maxWidth: "68ch" }}>
         Answer the questions shared with you on the Questions page; answers show on the report and in Karandeep&apos;s tracker. These are the High-risk reports waiting for a decision.
       </p>
+      <TimePlan times={await reviewTimes(queue.filter((q) => q.reviewer && !q.decision).map((q) => q.id))} title="Review time" sub="First reviews in progress at AtliQ" href={(t) => `/contracts/${t.contractId}`} showReviewer />
       <div className="cards2" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         {toRead.length ? (
           toRead.map((q) => (

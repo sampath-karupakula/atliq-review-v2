@@ -27,6 +27,7 @@ const KINDS: { key: string; label: string; prefix?: string }[] = [
   { key: "waiver", label: "Waivers", prefix: "waiver." },
   { key: "precedent", label: "Precedents", prefix: "precedent." },
   { key: "deal", label: "Deals", prefix: "deal." },
+  { key: "contract", label: "Contract edits", prefix: "contract." },
 ];
 
 const ACTION_LABEL: Record<string, { label: string; cls: string }> = {
@@ -43,6 +44,13 @@ const ACTION_LABEL: Record<string, { label: string; cls: string }> = {
   "review.cancel": { label: "Review stopped", cls: "bg-surface-2 text-muted" },
   "review.resume": { label: "Review resumed", cls: "bg-info-bg text-info" },
   "deal.edit": { label: "Deal edited", cls: "bg-surface-2 text-fg" },
+  "contract.edit": { label: "Contract edited", cls: "bg-surface-2 text-fg" },
+  "contract.delete": { label: "Contract deleted", cls: "bg-serious-bg text-serious" },
+  "decision.request": { label: "Quick decision asked", cls: "bg-info-bg text-info" },
+  "review.second": { label: "Second review", cls: "bg-surface-2 text-fg" },
+  "counsel.ask": { label: "Counsel asked", cls: "bg-info-bg text-info" },
+  "counsel.answer": { label: "Counsel answered", cls: "bg-ok-bg text-ok" },
+  "counsel.nudge": { label: "Counsel nudged", cls: "bg-surface-2 text-fg" },
   "commitment.confirm": { label: "Register", cls: "bg-surface-2 text-fg" },
   "commitment.add": { label: "Register", cls: "bg-surface-2 text-fg" },
   "commitment.edit": { label: "Register", cls: "bg-surface-2 text-fg" },

@@ -29,7 +29,7 @@ export async function rejectAsWritten(contractId: string, conditions: string[]):
   const [c] = await db.select().from(contracts).where(eq(contracts.id, contractId));
   if (!c) return { ok: false, error: "Contract not found." };
   await db.insert(negotiationConditions).values(lines.map((text) => ({ contractId, round: c.version, text, createdBy: who })));
-  await db.update(contracts).set({ decision: null, decisionNote: null, status: "negotiating" }).where(eq(contracts.id, contractId));
+  await db.update(contracts).set({ decision: null, decisionNote: null, decisionRequestedBy: null, decisionRequestedAt: null, decisionRequestNote: null, status: "negotiating" }).where(eq(contracts.id, contractId));
   await logEvent({ actor: who, action: "negotiation.conditions", contractId, text: `Rejected v${c.version} as written, open to negotiate · ${lines.length} condition${lines.length === 1 ? "" : "s"}`, detail: { conditions: lines } });
   if (c.owner && c.owner !== who) await notify({ recipient: c.owner, kind: "decision", contractId, text: `${who} rejected ${c.title} as written and set ${lines.length} condition${lines.length === 1 ? "" : "s"} to negotiate.` });
   revalidatePath(`/contracts/${contractId}`);

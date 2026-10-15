@@ -28,6 +28,8 @@ type Raw = {
   reviewer: string | null;
   review_deadline: string | null;
   decision: string | null;
+  decision_requested_by: string | null;
+  decision_request_note: string | null;
 };
 
 const BANDS: BandName[] = ["High", "Medium", "Low"];
@@ -53,7 +55,7 @@ export async function getQueueRows(): Promise<QueueRow[]> {
            d.deadline_note, d.value_usd::text as value_usd, d.currency,
            r.status as review_status, r.band, r.score,
            coalesce(f.serious_open, 0)::int as serious_open, coalesce(f.live_clash, false) as live_clash, f.top_issue,
-           a.reviewer, to_char(a.review_deadline, 'YYYY-MM-DD') as review_deadline, c.decision
+           a.reviewer, to_char(a.review_deadline, 'YYYY-MM-DD') as review_deadline, c.decision, c.decision_requested_by, c.decision_request_note
     from contracts c
     left join deals d on d.id = c.deal_id
     left join companies co on co.id = c.company_id
@@ -100,5 +102,7 @@ export async function getQueueRows(): Promise<QueueRow[]> {
     reviewer: r.reviewer,
     reviewDeadline: r.review_deadline,
     decision: r.decision === "sign_intended" || r.decision === "reject" ? r.decision : null,
+    decisionRequestedBy: r.decision_requested_by,
+    decisionRequestNote: r.decision_request_note,
   }));
 }

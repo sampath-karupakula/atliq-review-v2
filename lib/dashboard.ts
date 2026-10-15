@@ -12,6 +12,8 @@ const open = (r: QueueRow) => !r.decision;
 export function decideCard(rows: QueueRow[]): QueueRow | null {
   const c = rows.filter((r) => open(r) && r.reviewState === "done");
   c.sort((a, b) => {
+    // A deal owner who asked for a quick decision goes first.
+    if (!!a.decisionRequestedBy !== !!b.decisionRequestedBy) return a.decisionRequestedBy ? -1 : 1;
     if (a.deadline !== b.deadline) {
       if (!a.deadline) return 1;
       if (!b.deadline) return -1;

@@ -15,8 +15,9 @@ import { defaultReviewBy, hm, questionStatus } from "@/lib/review/handoff";
 import { AssignButton } from "./AssignDialog";
 import { CounselPackButton, NotThisTimeButton } from "./Counsel";
 import { TimeBar } from "./TimeBar";
+import { QuickDecisionButton, WithdrawQuickDecision } from "@/components/contract/ContractControls";
 
-export async function HandoffCards({ contract, me, dealOwner, clientDeadline, band, decided, reviewed }: { contract: { id: string; title: string }; me: CurrentUser; dealOwner: string | null; clientDeadline: string | null; band: string | null; decided: boolean; reviewed: boolean }) {
+export async function HandoffCards({ contract, me, dealOwner, clientDeadline, band, decided, reviewed, request }: { contract: { id: string; title: string }; me: CurrentUser; dealOwner: string | null; clientDeadline: string | null; band: string | null; decided: boolean; reviewed: boolean; request: { by: string; at: Date | null; note: string | null } | null }) {
   const today = appToday();
   const db = getDb();
   const [assignment, [lastFirst], second, questions, [time], marks, people, openRows, files] = await Promise.all([
@@ -37,9 +38,35 @@ export async function HandoffCards({ contract, me, dealOwner, clientDeadline, ba
   const firstMarks = lastFirst ? marks.filter((m) => m.reviewer === lastFirst.reviewer) : [];
   const count = (k: string) => firstMarks.filter((m) => m.mark === k).length;
   const showSecond = admin && dealOwner === me.name && band === "High" && !decided;
+  // The deal owner (not Karandeep himself) can ask for a quick decision once the first review is done.
+  const firstDone = !assignment && lastFirst?.status === "done";
+  const canAsk = !admin && can(me, "decision.request", { dealOwner }) && reviewed && !decided;
 
   return (
     <>
+      {request && !decided ? (
+        <div className="score-card second">
+          <h3>Quick decision asked</h3>
+          <p style={{ fontSize: 14, margin: 0 }}>
+            <b>{request.by}</b> asked {admin ? "you" : "Karandeep"} to decide{request.at ? ` on ${formatDate(toAppDay(request.at))}` : ""}.
+            {request.note ? <span className="ask" style={{ display: "block", marginTop: 8 }}>{request.note}</span> : null}
+          </p>
+          {admin ? <p className="hint" style={{ margin: 0 }}>Record the decision in the panel below; that answers the request.</p> : null}
+          {canAsk ? (
+            <span className="dismiss-row">
+              <WithdrawQuickDecision contractId={contract.id} />
+            </span>
+          ) : null}
+        </div>
+      ) : canAsk ? (
+        <div className="score-card">
+          <h3>Ready to sign soon?</h3>
+          <p style={{ fontSize: 14, margin: 0 }}>{firstDone ? `${lastFirst!.reviewer} finished the first review.` : lastFirst || assignment ? "The first review isn't done yet." : "No first review is assigned."} If the client wants to move quickly, ask Karandeep to decide now.</p>
+          <span className="dismiss-row">
+            {firstDone || !lastFirst ? <QuickDecisionButton contractId={contract.id} clientDeadline={clientDeadline} /> : <span className="hint">Available once {assignment?.reviewer ?? "the reviewer"} marks the review done.</span>}
+          </span>
+        </div>
+      ) : null}
       <div className="score-card">
         <h3>First review</h3>
         {assignment ? (
@@ -130,7 +157,7 @@ export async function HandoffCards({ contract, me, dealOwner, clientDeadline, ba
         </div>
       ) : null}
 
-      {time && reviewed ? (
+      {time && (reviewed || assignment) ? (
         <div className="score-card">
           <h3>Review time</h3>
           <div className="tgrid">

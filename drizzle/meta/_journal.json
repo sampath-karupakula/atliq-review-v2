@@ -29,6 +29,13 @@
       "when": 1792030443754,
       "tag": "0003_normal_harpoon",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792032235646,
+      "tag": "0004_jazzy_deadpool",
+      "breakpoints": true
     }
   ]
 }

@@ -221,7 +221,8 @@ export async function setDecision(contractId: string, decision: "sign_intended" 
   }
   const [c] = await db
     .update(contracts)
-    .set({ decision, decisionNote: note.trim() || null, status: decision === "reject" ? "rejected" : decision === "sign_intended" ? "decided" : "reviewed" })
+    // Deciding answers any quick-decision request.
+    .set({ decision, decisionNote: note.trim() || null, ...(decision ? { decisionRequestedBy: null, decisionRequestedAt: null, decisionRequestNote: null } : {}), status: decision === "reject" ? "rejected" : decision === "sign_intended" ? "decided" : "reviewed" })
     .where(eq(contracts.id, contractId))
     .returning();
   if (c?.owner && c.owner !== viewer && decision) {

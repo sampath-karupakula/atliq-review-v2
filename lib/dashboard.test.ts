@@ -27,6 +27,8 @@ function row(p: Partial<QueueRow> & { id: string }): QueueRow {
     reviewer: null,
     reviewDeadline: null,
     decision: null,
+    decisionRequestedBy: null,
+    decisionRequestNote: null,
     ...p,
   };
 }
@@ -44,6 +46,11 @@ const rows = [
 describe("dashboard", () => {
   it("puts the soonest undecided reviewed contract in the decide card, riskiest on a tie", () => {
     expect(decideCard(rows)?.id).toBe("harr");
+  });
+
+  it("puts a contract whose owner asked for a quick decision first", () => {
+    const later = row({ id: "later", deadline: "2026-11-30", reviewState: "done", band: "Low", decisionRequestedBy: "Bhavin" });
+    expect(decideCard([...rows, later])?.id).toBe("later");
   });
 
   it("chases reviews that are overdue or due tomorrow, most overdue first", () => {
