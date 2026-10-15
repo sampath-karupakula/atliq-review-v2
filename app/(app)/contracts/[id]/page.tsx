@@ -17,6 +17,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { can, permsFor } from "@/lib/auth/permissions";
 import { getContractStage } from "@/lib/data/stage";
 import { StageTracker } from "@/components/report/StageTracker";
+import { HandoffCards } from "@/components/handoff/HandoffCards";
 import { deadlineWords } from "@/lib/queue";
 import { money } from "@/lib/format";
 import { diffParagraphs } from "@/lib/ux/diff";
@@ -90,6 +91,18 @@ export default async function ContractPage({ params, searchParams }: { params: P
   const negotiating = st && st.stage.key === "negotiating" ? st : null;
   const bundleDocs = data.bundle.filter((b) => b.id !== contract.id);
   const initialTab: Tab = (["findings", "text", "ai", "versions"] as const).includes(sp.tab as Tab) ? (sp.tab as Tab) : "findings";
+
+  const handoff = (
+    <HandoffCards
+      contract={{ id: contract.id, title: `${title.primary} · ${docLabel(contract.docType)} v${contract.version}` }}
+      me={me}
+      dealOwner={deal?.owner ?? contract.owner ?? null}
+      clientDeadline={due}
+      band={done ? (review?.band ?? null) : null}
+      decided={!!contract.decision}
+      reviewed={done}
+    />
+  );
 
   const runPanel = (
     <RunReviewPanel contractId={contract.id} clauses={clauses} last={last} runningId={runningElsewhere ? review!.id : null} daysUntilDue={daysLeft} horizonDays={reviewHorizonDays()} />
@@ -181,6 +194,7 @@ export default async function ContractPage({ params, searchParams }: { params: P
           }
           history={st?.history ?? []}
           rerun={canRun ? { clauses, daysUntilDue: daysLeft, horizonDays: reviewHorizonDays() } : null}
+          handoff={handoff}
         />
       ) : canRun ? (
         <div className="report-grid">
@@ -197,6 +211,7 @@ export default async function ContractPage({ params, searchParams }: { params: P
                 Read the contract
               </Link>
             </div>
+            {handoff}
           </aside>
           <pre id="text" className="doc" style={{ gridColumn: "1 / -1" }}>
             {contract.text}
@@ -204,8 +219,11 @@ export default async function ContractPage({ params, searchParams }: { params: P
         </div>
       ) : (
         <>
-          <div className="stub">
-            <p>{data.assignment ? `This contract is assigned to ${data.assignment.reviewer}; they start its review.` : "Not reviewed yet."}</p>
+          <div className="report-grid">
+            <div className="stub">
+              <p>{data.assignment ? `This contract is assigned to ${data.assignment.reviewer}; they start its review.` : "Not reviewed yet."}</p>
+            </div>
+            <aside className="side">{handoff}</aside>
           </div>
           <pre className="doc">{contract.text}</pre>
         </>

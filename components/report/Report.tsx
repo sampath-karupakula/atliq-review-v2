@@ -67,6 +67,8 @@ export type ReportProps = {
   history: { at: string; text: string }[];
   /** Set when the viewer may run the review again. */
   rerun: { clauses: number; daysUntilDue: number | null; horizonDays: number } | null;
+  /** Server-rendered hand-off cards (first review, second reviewer, counsel, review time), shown under the score. */
+  handoff?: ReactNode;
 };
 
 const SYMBOL: Record<string, string> = { USD: "$", EUR: "€", GBP: "£", INR: "₹" };
@@ -795,6 +797,7 @@ export function Report(p: ReportProps) {
           })}
         </div>
       </div>
+      {p.handoff}
 
       {expo.length ? (
         <div className="score-card">

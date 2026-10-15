@@ -85,6 +85,10 @@ jobs:
           HH=$(echo "$DL" | grep -o '/deals/[0-9a-f-]\{36\}' | head -1)
           test "$(curl -s -o /dev/null -w '%{http_code}' "localhost:3000$HH")" = "200"
           curl -s localhost:3000/offer | grep -q 'Type the term'
+          # Hand-off (P10): the counsel tracker for Karandeep, the questions page for counsel.
+          curl -s localhost:3000/counsel | grep -q 'What we&#x27;ve asked counsel'
+          curl -s -b atliq_role=counsel localhost:3000/counsel | grep -q 'Questions from AtliQ'
+          curl -s -b atliq_role=counsel localhost:3000/dashboard | grep -q 'Questions waiting for you'
           # Upload (no AI): a contract is stored, a scanned PDF and a duplicate are refused, a viewer is refused,
           # and a bulk signed upload moves coverage from 17 to 18.
           D="-F counterparty=Kaveri -F owner=Dhaval -F domain=retail -F clientCountry=India"

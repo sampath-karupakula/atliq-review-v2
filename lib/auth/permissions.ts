@@ -30,6 +30,9 @@ export type Action =
   | "deal.edit"
   | "deal.note"
   | "offer.record"
+  | "review.mark"
+  | "counsel.ask"
+  | "counsel.answer"
   | "register.edit"
   | "demo.reset"
   | "users.manage"
@@ -38,11 +41,13 @@ export type Action =
 export type Actor = { name: string; role: Role };
 export type Context = { dealOwner?: string | null; assignee?: string | null; severity?: string | null };
 
-const ADMIN_ONLY: Action[] = ["finding.dismiss_serious", "finding.accept", "decision.set", "review.assign", "register.edit", "demo.reset", "users.manage"];
+const ADMIN_ONLY: Action[] = ["finding.dismiss_serious", "finding.accept", "decision.set", "review.assign", "register.edit", "demo.reset", "users.manage", "counsel.ask"];
 const REVIEWER: Action[] = ["contract.upload", "review.start", "finding.comment", "finding.dismiss", "activity.view", "deal.note", "offer.record"];
 
 export function can(user: Actor | null | undefined, action: Action, ctx: Context = {}): boolean {
   if (!user) return false;
+  // Outside counsel (a viewer) answers the questions shared with them; nobody else answers for counsel, admins included.
+  if (action === "counsel.answer") return user.role === "viewer";
   if (user.role === "admin") return true;
   if (ADMIN_ONLY.includes(action)) return false;
   if (action === "activity.view") return true; // everyone signed in can read the log
@@ -54,7 +59,7 @@ export function can(user: Actor | null | undefined, action: Action, ctx: Context
   // A reviewer can take an unassigned contract for themselves.
   if (action === "review.take") return !ctx.assignee;
   if (action === "deal.edit") return !!ctx.dealOwner && ctx.dealOwner === user.name;
-  if (action === "assignment.complete") return !!ctx.assignee && ctx.assignee === user.name;
+  if (action === "assignment.complete" || action === "review.mark") return !!ctx.assignee && ctx.assignee === user.name;
   return REVIEWER.includes(action);
 }
 
@@ -84,6 +89,12 @@ export function refusal(action: Action, ctx: Context = {}): string {
       return "Only an admin can reset the demo.";
     case "users.manage":
       return "Only an admin manages users.";
+    case "review.mark":
+      return `Only ${ctx.assignee ?? "the assigned reviewer"} or an admin can mark this review.`;
+    case "counsel.ask":
+      return "Only an admin shares questions with counsel.";
+    case "counsel.answer":
+      return "Only counsel answers counsel questions.";
     default:
       return "Your role can't do this. Ask an admin if you need access.";
   }

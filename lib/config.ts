@@ -8,6 +8,14 @@ export function appToday(): string {
   return v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : DEFAULT_TODAY;
 }
 
+/** A real timestamp placed on the app's calendar: shifted by the gap between APP_TODAY and the real date, so a
+ * question asked and answered today lines up with answer-by dates that are set against APP_TODAY. */
+export function toAppDay(d: Date, now = new Date()): string {
+  const realToday = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const offset = Date.parse(appToday() + "T00:00:00Z") - realToday;
+  return new Date(d.getTime() + offset).toISOString().slice(0, 10);
+}
+
 export type AiProvider = "anthropic" | "groq";
 export type Effort = "low" | "medium" | "high" | "xhigh" | "max";
 
