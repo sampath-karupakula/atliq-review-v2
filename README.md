@@ -39,6 +39,13 @@ accounts: karandeep@, bhavin@, dhaval@, jay@, pranav@ and counsel@atliq.test):
 pnpm seed           # demo data + accounts; pnpm seed:users adds only the accounts and keeps the data
 ```
 
+Re-seeding never changes an existing account's password. After changing `SEED_USER_PASSWORD`, set the six demo
+accounts to it (this also unlocks them and signs them out):
+
+```bash
+pnpm seed:users --reset-passwords
+```
+
 ### Signing in
 With `DEMO_MODE=1` (the default in `.env.example`) nobody needs to sign in: the "Viewing as" switch in the top bar
 picks Karandeep (admin), Bhavin (reviewer) or Counsel (read-only), and the sign-in page offers the same choice. A real
