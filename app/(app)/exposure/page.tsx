@@ -25,7 +25,7 @@ export default async function ExposurePage() {
   const data = exposure as unknown as { generatedAt: string | null; model: string | null; entries: Entry[] };
   const [signed, register, coverage, missing, me] = await Promise.all([getSignedContracts(), getRegister(), getCoverage(), getMissingSigned(), getCurrentUser()]);
   const today = appToday();
-  const canUpload = can(me, "contract.upload");
+  const canUpload = can(me, "signed.upload");
   const byFile = new Map(signed.map((s) => [s.sourceFile?.split("/").pop() ?? "", s]));
 
   const rows = data.entries

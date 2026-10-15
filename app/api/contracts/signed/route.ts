@@ -21,7 +21,7 @@ type Outcome =
   | { file: string; ok: false; message: string; duplicateOf?: string | null };
 
 export async function POST(req: Request) {
-  const { user, response } = await routeUser("contract.upload");
+  const { user, response } = await routeUser("signed.upload");
   if (response || !user) return response!;
   const limit = rateLimit(`signed:${clientIp(req)}`, 10, 60 * 60_000);
   if (!limit.ok) return tooMany(limit.retryAfterSec, "uploads");

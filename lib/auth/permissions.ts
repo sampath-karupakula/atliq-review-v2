@@ -29,6 +29,7 @@ export type Action =
   | "assignment.complete"
   | "deal.edit"
   | "contract.delete"
+  | "signed.upload"
   | "contract.delete_request"
   | "decision.request"
   | "deal.note"
@@ -44,7 +45,7 @@ export type Action =
 export type Actor = { name: string; role: Role };
 export type Context = { dealOwner?: string | null; assignee?: string | null; severity?: string | null };
 
-const ADMIN_ONLY: Action[] = ["contract.delete", "finding.dismiss_serious", "finding.accept", "decision.set", "review.assign", "register.edit", "demo.reset", "users.manage", "counsel.ask"];
+const ADMIN_ONLY: Action[] = ["contract.delete", "signed.upload", "finding.dismiss_serious", "finding.accept", "decision.set", "review.assign", "register.edit", "demo.reset", "users.manage", "counsel.ask"];
 const REVIEWER: Action[] = ["contract.upload", "review.start", "finding.comment", "finding.dismiss", "activity.view", "deal.note", "offer.record"];
 
 export function can(user: Actor | null | undefined, action: Action, ctx: Context = {}): boolean {
@@ -87,6 +88,8 @@ export function refusal(action: Action, ctx: Context = {}): string {
       return `Only ${ctx.assignee ?? "the assigned reviewer"} or an admin can mark this review done.`;
     case "deal.edit":
       return `Only ${ctx.dealOwner ?? "the deal owner"} or an admin can edit this deal.`;
+    case "signed.upload":
+      return "Only an admin adds signed contracts: they become what every review is checked against.";
     case "contract.delete":
       return "Only an admin deletes a contract. The deal owner can ask for it to be deleted.";
     case "contract.delete_request":

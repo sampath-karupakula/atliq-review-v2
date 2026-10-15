@@ -19,8 +19,10 @@ export const dynamic = "force-dynamic";
 
 export default async function NewContractPage({ searchParams }: { searchParams: Promise<{ previous?: string; mode?: string; tracker?: string }> }) {
   const { previous: previousId, mode, tracker: trackerId } = await searchParams;
-  const bulk = mode === "signed" && !previousId;
   const me = await getCurrentUser();
+  const signedOk = can(me, "signed.upload");
+  // Signed contracts feed every review's clash check, so only an admin adds them.
+  const bulk = mode === "signed" && !previousId && signedOk;
   if (!can(me, "contract.upload")) {
     return (
       <section className="wrap page">
@@ -57,7 +59,7 @@ export default async function NewContractPage({ searchParams }: { searchParams: 
         title={prev ? "Upload a new version" : bulk ? "Add signed contracts to the register" : "Add a contract to review"}
         subtitle={bulk ? "Signed contracts are what every review is checked against. The more are on file, the fewer clashes go unseen." : "The whole document is read, clause by clause. Nothing is signed, sent or edited."}
         actions={
-          prev ? null : (
+          prev || !signedOk ? null : (
             <nav className="vswitch big" aria-label="What are you uploading?">
               <Link href="/contracts/new" aria-current={!bulk ? "true" : undefined}>
                 A contract to review

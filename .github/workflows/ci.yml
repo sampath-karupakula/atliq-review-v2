@@ -104,8 +104,13 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' -F file=@test_contracts/contracts/TC01_kaveri_retail_msa.md $D localhost:3000/api/contracts)" = "409"
           test "$(curl -s -o /dev/null -w '%{http_code}' -F file=@test_contracts/formats/TC47_konkan_ports_msa_scanned.pdf $D localhost:3000/api/contracts)" = "422"
           test "$(curl -s -o /dev/null -w '%{http_code}' -b atliq_role=counsel -F file=@test_contracts/contracts/TC02_maplecrest_outdoor_msa.md $D localhost:3000/api/contracts)" = "403"
+          # Signed contracts feed every clash check: a reviewer is refused, an admin adds them.
+          test "$(curl -s -o /dev/null -w '%{http_code}' -b atliq_role=reviewer -F file=@test_contracts/contracts/TC03_sahyadri_agritech_nda.md localhost:3000/api/contracts/signed)" = "403"
           test "$(curl -s -o /dev/null -w '%{http_code}' -F file=@test_contracts/contracts/TC03_sahyadri_agritech_nda.md localhost:3000/api/contracts/signed)" = "201"
           curl -s localhost:3000/register | grep -q 'Checked against 18 of 30'
+          # Everyone sees the coverage card; only the admin gets upload buttons for the missing contracts.
+          curl -s localhost:3000/contracts | grep -q 'mode=signed&amp;tracker=C-0'
+          curl -s -b atliq_role=reviewer localhost:3000/contracts | grep -q 'Only Karandeep adds signed contracts'
       - name: Sign-in smoke test (demo mode off)
         run: |
           pnpm start -p 3001 &

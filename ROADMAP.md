@@ -13,7 +13,8 @@ Next.js 15 (App Router) · TypeScript strict · Tailwind 4 with the prototype's 
 Postgres 16 in Docker locally, Neon on Vercel · `@anthropic-ai/sdk` with `output_config` JSON schema + zod ·
 mammoth + unpdf · vitest · GitHub Actions CI · Vercel Hobby (functions ≤ 300 s, bodies ≤ 4.5 MB).
 
-`APP_TODAY=2026-09-28` is the dataset's "today". The prototype's example dates are illustrative only.
+The app uses today's real date; `APP_TODAY=2026-09-28` (the dataset's "today") replays the dataset as delivered and is
+pinned in CI. The prototype's example dates are illustrative only.
 
 ## Phases
 
