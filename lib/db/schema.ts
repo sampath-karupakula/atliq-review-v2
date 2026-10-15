@@ -468,3 +468,20 @@ export const pushbacks = pgTable(
   },
   (t) => [index("pushbacks_contract_idx").on(t.contractId)],
 );
+
+// ---------- Deals (P9) ----------
+
+/** A "Can I offer this?" check someone recorded, so the same question isn't asked or remembered twice. */
+export const offerChecks = pgTable(
+  "offer_checks",
+  {
+    id: serial("id").primaryKey(),
+    actor: text("actor").notNull(),
+    query: text("query").notNull(),
+    verdict: text("verdict").notNull(), // stop | warn | ok
+    head: text("head").notNull(),
+    source: text("source").notNull(),
+    createdAt: createdAt(),
+  },
+  (t) => [index("offer_checks_actor_idx").on(t.actor)],
+);

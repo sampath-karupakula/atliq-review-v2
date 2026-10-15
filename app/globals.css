@@ -401,3 +401,22 @@ dialog.dialog::backdrop { background: rgba(10, 14, 20, 0.45); }
 .hit p { margin: 6px 0 0; max-width: 80ch; }
 .hit mark { background: var(--nego-soft); color: inherit; border-radius: 2px; padding: 0 1px; }
 .label-select select { border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); padding: 6px 8px; min-height: 36px; max-width: 240px; }
+
+/* ---------- deals and offer check (P9) ---------- */
+.cards2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.offer { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: clamp(18px, 3vw, 32px); display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shadow); }
+.offer input[type="text"] { font-size: 18px; min-height: 56px; padding: 12px 16px; }
+.answers { display: flex; flex-direction: column; gap: 10px; }
+.answer { border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; background: var(--surface); }
+.answer.stop { border-color: var(--serious); background: var(--serious-soft); }
+.answer.warn { border-color: var(--nego); background: var(--nego-soft); }
+.answer.ok { border-color: var(--ok); background: var(--ok-soft); }
+.answer .h { font-weight: 600; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.answer p { margin: 0; font-size: 14px; }
+.answer .src { font-size: 12.5px; color: var(--ink-2); }
+.conflict { border: 1px solid var(--nego); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.conflict h3 { padding: 12px 18px; background: var(--nego-soft); font-size: 16px; margin: 0; }
+.conflict.serious { border-color: var(--serious); }
+.conflict.serious h3 { background: var(--serious-soft); }
+.mk.c { color: var(--accent); }
+@media (max-width: 760px) { .cards2 { grid-template-columns: minmax(0, 1fr); } }

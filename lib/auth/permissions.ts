@@ -28,6 +28,8 @@ export type Action =
   | "review.assign"
   | "assignment.complete"
   | "deal.edit"
+  | "deal.note"
+  | "offer.record"
   | "register.edit"
   | "demo.reset"
   | "users.manage"
@@ -37,7 +39,7 @@ export type Actor = { name: string; role: Role };
 export type Context = { dealOwner?: string | null; assignee?: string | null; severity?: string | null };
 
 const ADMIN_ONLY: Action[] = ["finding.dismiss_serious", "finding.accept", "decision.set", "review.assign", "register.edit", "demo.reset", "users.manage"];
-const REVIEWER: Action[] = ["contract.upload", "review.start", "finding.comment", "finding.dismiss", "activity.view"];
+const REVIEWER: Action[] = ["contract.upload", "review.start", "finding.comment", "finding.dismiss", "activity.view", "deal.note", "offer.record"];
 
 export function can(user: Actor | null | undefined, action: Action, ctx: Context = {}): boolean {
   if (!user) return false;
