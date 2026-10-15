@@ -59,6 +59,20 @@ export function checkReferences(extract: Extract, map: ClauseMap, linkedTitles: 
       // Serious only when the missing document governs personal data (a DPA, a BAA, data-processing terms);
       // external security or IT policies "as updated from time to time" are a bounded, negotiable point.
       const data = d.governs === "data" || (d.governs === "security" && /\b(data processing|personal data|business associate|BAA|DPA|PHI|transfer)\b/i.test(d.name));
+      // A partner portal or published product documentation is an online resource, not a document a contract
+      // attaches; worth knowing, not a gap (TC16).
+      if (!data && /\b(portal|website|web site|online|published documentation|product documentation|knowledge base|help cent(?:re|er))\b/i.test(d.name)) {
+        out.push({
+          check: "bundle_missing", category: "other", severity: "minor", basis: "clarity",
+          title: `${d.name} is referred to (an online resource)`,
+          clause: d.clause, quote: d.quote, absent: false,
+          whatItMeans: `The contract points to ${d.name}. It is an online resource rather than terms attached to the contract.`,
+          whatItCouldCost: "Little, unless it is later used to add obligations.",
+          howToSoften: `Check that ${d.name} cannot add obligations without AtliQ agreeing in writing.`,
+          source: "code",
+        });
+        continue;
+      }
       out.push({
         check: "bundle_missing", category: data ? "data" : "other", severity: data ? "serious" : "negotiable", basis: data ? "irreversible" : "bounded",
         title: `${d.name} is referred to but missing`,

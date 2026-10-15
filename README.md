@@ -115,6 +115,23 @@ The answer key lists, per case, what must be caught (check, severity, clause, qu
 Each run prints must-catch, must-not violations, band matches, Serious precision, verified quotes, and its token
 use and cost; results are saved in `eval-results/`.
 
+**Latest full run** (`pnpm eval --all`, Claude Sonnet 5.5, 15 Oct 2026, USD 5.36 for 50 cases):
+
+| Measure | Target | Result |
+|---|---|---|
+| Must-catch | ≥ 90 % (aim 100 %) | 53 / 56 (95 %) |
+| Quotes verbatim | 100 % | 290 / 290 |
+| Must-not violations | 0 on controls | 2, both on TC16, fixed since (a partner appointment's territory was read as a new restriction; re-run: Low, no Serious) |
+| Bands | | 44 / 50 |
+| Serious precision | | 81 % |
+
+After those fixes, a confirmation run on the 10 quick cases plus TC16 and TC25: must-catch 16/17, must-not
+violations 0, quotes 100 % verbatim, call-note gaps (TC44) 2/2, USD 1.37.
+
+Known near-misses: TC17 (PipeKit clash judged "Not sure" rather than Serious: scope unclear), TC42 (the data
+pass-down gap is found but quoted from the confidentiality clause instead of the schedule line), TC25 (90-day
+payment proposed as Minor: code now floors any payment term past 45 days at Negotiable).
+
 ## Cost and limits
 - **Cost per review**: about USD 0.10 on Claude Sonnet 5.5 (measured: 10 eval cases, 133k input and 70k output tokens, USD 0.97);
   about USD 0.20 on Opus 5.5. Set the model with `ANTHROPIC_MODEL`.

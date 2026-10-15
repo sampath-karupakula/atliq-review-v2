@@ -29,7 +29,7 @@ import { checkEntityLaw } from "@/lib/checks/entityLaw";
 import { checkTerms } from "@/lib/checks/baseline";
 import { checkInjection, checkReferences, checkUnreadable } from "@/lib/checks/document";
 import { verifyQuote } from "@/lib/verify/quotes";
-import { buyerSideSeverity, decideSeverity } from "@/lib/verify/severity";
+import { buyerSideSeverity, decideSeverity, paymentFloor } from "@/lib/verify/severity";
 import { mergeFindings } from "@/lib/verify/merge";
 import { coverage, registerLine } from "@/lib/verify/coverage";
 import { countSeverities, scoreOf } from "@/lib/score/score";
@@ -630,7 +630,7 @@ export async function finalizeStep(
       whatItMeans: masker.unmask(f.whatItMeans),
       whatItCouldCost: masker.unmask(f.whatItCouldCost),
       howToSoften: masker.unmask(f.howToSoften),
-      severity: buyerSideSeverity(f, decision.severity, state.deal.direction),
+      severity: paymentFloor(f, buyerSideSeverity(f, decision.severity, state.deal.direction), state.deal.direction),
       quoteVerified: verified,
       foundIn: check?.verified ? check.clauseId : null,
       highlight: check?.verified ? { start: check.start, end: check.end } : null,

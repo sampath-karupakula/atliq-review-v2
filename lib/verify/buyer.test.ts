@@ -21,3 +21,14 @@ describe("buyer-side mirror severity (TC36)", () => {
     expect(buyerSideSeverity({ check: "fairness", category: "payment", title: "" }, "not_sure", "atliq_buyer")).toBe("not_sure");
   });
 });
+
+describe("payment floor (TC25)", () => {
+  it("lifts a Minor payment finding past 45 days to Negotiable, from the quote's own numbers", async () => {
+    const { paymentFloor } = await import("./severity");
+    const f = { category: "payment", title: "Payment terms are 90 days, not 30", quote: "within ninety (90) days of receipt" };
+    expect(paymentFloor(f, "minor", "atliq_supplier")).toBe("negotiable");
+    expect(paymentFloor({ ...f, quote: "within thirty (30) days of receipt" }, "minor", "atliq_supplier")).toBe("minor");
+    expect(paymentFloor(f, "minor", "atliq_buyer")).toBe("minor");
+    expect(paymentFloor({ category: "fairness", title: "Payment is 60 days after invoice", quote: "within 60 days" }, "minor", "atliq_supplier")).toBe("negotiable");
+  });
+});
