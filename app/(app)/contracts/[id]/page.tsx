@@ -7,7 +7,7 @@ import { contracts } from "@/lib/db/schema";
 import { getReport } from "@/lib/data/report";
 import { daysBetween, formatDate } from "@/lib/checks/dates";
 import { splitClauses } from "@/lib/ingest/clauses";
-import { appToday, reviewHorizonDays } from "@/lib/config";
+import { appToday, reviewHorizonDays, toAppDay } from "@/lib/config";
 import { displayTitle, docLabel } from "@/lib/display";
 import { Crumbs } from "@/components/ui";
 import { RunReviewPanel } from "@/components/report/ReviewRunner";
@@ -18,8 +18,7 @@ import { can, permsFor } from "@/lib/auth/permissions";
 import { getContractStage } from "@/lib/data/stage";
 import { StageTracker } from "@/components/report/StageTracker";
 import { HandoffCards } from "@/components/handoff/HandoffCards";
-import { DeleteContractButton, EditDetailsButton } from "@/components/contract/ContractControls";
-import { listPeople } from "@/lib/data/people";
+import { DeleteContractButton, EditDeadlineButton, RequestDeletionButton, WithdrawDeletion } from "@/components/contract/ContractControls";
 import { deadlineWords } from "@/lib/queue";
 import { money } from "@/lib/format";
 import { diffParagraphs } from "@/lib/ux/diff";
@@ -97,37 +96,37 @@ export default async function ContractPage({ params, searchParams }: { params: P
   const dealOwner = deal?.owner ?? contract.owner ?? null;
   const canEdit = can(me, "deal.edit", { dealOwner });
   const canDelete = can(me, "contract.delete", { dealOwner });
-  const people = canEdit ? (await listPeople({ roles: ["admin", "reviewer"] })).map((p) => p.name) : [];
+  const canAskDelete = !canDelete && can(me, "contract.delete_request", { dealOwner });
+  const fullTitle = `${title.primary} · ${docLabel(contract.docType)} v${contract.version}`;
+  const delRequest = contract.deletionRequestedBy ? { by: contract.deletionRequestedBy, reason: contract.deletionReason } : null;
   const controls =
-    canEdit || canDelete ? (
+    (canEdit && deal) || canDelete || canAskDelete ? (
       <span className="dismiss-row" style={{ marginLeft: "auto" }}>
-        {canEdit ? (
-          <EditDetailsButton
-            contractId={contract.id}
-            people={people}
-            canChangeOwner={me.role === "admin"}
-            initial={{
-              title: contract.title,
-              counterparty: contract.counterparty,
-              docType: contract.docType as "msa",
-              deal: deal
-                ? {
-                    clientDeadline: deal.clientDeadline,
-                    deadlineNote: deal.deadlineNote,
-                    valueUsd: deal.valueUsd,
-                    currency: (["USD", "EUR", "GBP", "INR", "AED"].includes(deal.currency) ? deal.currency : "USD") as "USD",
-                    domain: deal.domain,
-                    clientCountry: deal.clientCountry,
-                    personalData: deal.personalData,
-                    phi: deal.phi,
-                    owner: deal.owner,
-                  }
-                : null,
-            }}
-          />
+        {canEdit && deal ? <EditDeadlineButton contractId={contract.id} clientDeadline={deal.clientDeadline} /> : null}
+        {canDelete && !delRequest ? <DeleteContractButton contractId={contract.id} title={fullTitle} signed={contract.isSigned} lastInDeal={!!deal && bundleDocs.length === 0} request={null} /> : null}
+        {canAskDelete ? (
+          delRequest ? (
+            <>
+              <span className="tag overdue">Deletion asked · waiting for an admin</span>
+              <WithdrawDeletion contractId={contract.id} />
+            </>
+          ) : (
+            <RequestDeletionButton contractId={contract.id} title={fullTitle} />
+          )
         ) : null}
-        {canDelete ? <DeleteContractButton contractId={contract.id} title={`${title.primary} · ${docLabel(contract.docType)} v${contract.version}`} signed={contract.isSigned} lastInDeal={!!deal && bundleDocs.length === 0} /> : null}
       </span>
+    ) : null;
+  // An admin sees a pending deletion request as a banner with Approve / Decline.
+  const deletionBanner =
+    delRequest && canDelete ? (
+      <div className="warnline" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
+        <span>
+          <b>{delRequest.by}</b> asked to delete this contract{contract.deletionRequestedAt ? ` on ${formatDate(toAppDay(contract.deletionRequestedAt))}` : ""}: {delRequest.reason}
+        </span>
+        <span className="dismiss-row">
+          <DeleteContractButton contractId={contract.id} title={fullTitle} signed={contract.isSigned} lastInDeal={!!deal && bundleDocs.length === 0} request={delRequest} />
+        </span>
+      </div>
     ) : null;
 
   const handoff = (
@@ -160,6 +159,7 @@ export default async function ContractPage({ params, searchParams }: { params: P
         />
         {controls}
         </div>
+        {deletionBanner}
         <h1 className="display">
           {title.primary} · {docLabel(contract.docType)}
         </h1>

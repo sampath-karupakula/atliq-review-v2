@@ -14,10 +14,10 @@ import { hm } from "@/lib/review/handoff";
 import { StageTracker } from "@/components/report/StageTracker";
 import { currentRole } from "@/lib/viewer";
 import { getCurrentUser } from "@/lib/auth/session";
-import { appToday } from "@/lib/config";
+import { appToday, toAppDay } from "@/lib/config";
 import { getQueueRows } from "@/lib/data/queue";
 import { getCoverage } from "@/lib/data/register";
-import { dealsOwnedBy, finishedReviewsOf, seriousFlagHistory } from "@/lib/data/dashboard";
+import { dealsOwnedBy, deletionRequests, finishedReviewsOf, seriousFlagHistory } from "@/lib/data/dashboard";
 import { getContractStage } from "@/lib/data/stage";
 import { listPeople } from "@/lib/data/people";
 import { decideCard, decideList, firstReviews, dueByWeek, onTime, reviewsToChase, seriousTrend, toAssign, workload } from "@/lib/dashboard";
@@ -62,6 +62,17 @@ async function CeoDashboard({ queue, coverage, today, longDate }: { queue: Queue
   const things = [decide, chase[0], assign[0]].filter(Boolean).length;
   const missing = coverage.signedInTracker - coverage.onFile;
 
+  const deletions = await deletionRequests();
+  const deletionItems: CarouselItem[] = deletions.map((d) => ({
+    id: d.id,
+    kicker: `${d.by} asks to delete · ${formatDate(toAppDay(d.at))}`,
+    title: d.title,
+    note: d.reason,
+    body: "Nothing is deleted until you approve. Open the contract to approve or decline.",
+    href: `/contracts/${d.id}`,
+    open: { label: "Review the request", primary: true },
+    urgent: true,
+  }));
   const decisions = decideList(queue);
   const firsts = firstReviews(queue);
   const teamTimes = await reviewTimes(firsts.map((q) => q.id));
@@ -116,6 +127,7 @@ async function CeoDashboard({ queue, coverage, today, longDate }: { queue: Queue
         <Carousel label="First reviews" items={firstItems} empty={{ kicker: "First reviews", title: "No first reviews are open", body: "Assign a contract to start one." }} />
         <Carousel label="Contracts to assign" items={assignItems} empty={{ kicker: "No reviewer yet", title: "Every contract has a reviewer", body: "Nothing to assign." }} />
         <TimeNeededCard times={teamTimes} who="team" planHref="#time-plan" />
+        {deletionItems.length ? <Carousel label="Deletion requests" items={deletionItems} empty={{ kicker: "", title: "", body: "" }} /> : null}
       </ol>
 
       <div className="kpis">

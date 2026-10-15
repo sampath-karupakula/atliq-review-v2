@@ -29,6 +29,7 @@ export type Action =
   | "assignment.complete"
   | "deal.edit"
   | "contract.delete"
+  | "contract.delete_request"
   | "decision.request"
   | "deal.note"
   | "offer.record"
@@ -43,7 +44,7 @@ export type Action =
 export type Actor = { name: string; role: Role };
 export type Context = { dealOwner?: string | null; assignee?: string | null; severity?: string | null };
 
-const ADMIN_ONLY: Action[] = ["finding.dismiss_serious", "finding.accept", "decision.set", "review.assign", "register.edit", "demo.reset", "users.manage", "counsel.ask"];
+const ADMIN_ONLY: Action[] = ["contract.delete", "finding.dismiss_serious", "finding.accept", "decision.set", "review.assign", "register.edit", "demo.reset", "users.manage", "counsel.ask"];
 const REVIEWER: Action[] = ["contract.upload", "review.start", "finding.comment", "finding.dismiss", "activity.view", "deal.note", "offer.record"];
 
 export function can(user: Actor | null | undefined, action: Action, ctx: Context = {}): boolean {
@@ -61,7 +62,7 @@ export function can(user: Actor | null | undefined, action: Action, ctx: Context
   // A reviewer can take an unassigned contract for themselves.
   if (action === "review.take") return !ctx.assignee;
   // The deal owner edits the deal and its contracts, deletes them, and can ask Karandeep for a quick decision.
-  if (action === "deal.edit" || action === "contract.delete" || action === "decision.request") return !!ctx.dealOwner && ctx.dealOwner === user.name;
+  if (action === "deal.edit" || action === "contract.delete_request" || action === "decision.request") return !!ctx.dealOwner && ctx.dealOwner === user.name;
   if (action === "assignment.complete" || action === "review.mark") return !!ctx.assignee && ctx.assignee === user.name;
   return REVIEWER.includes(action);
 }
@@ -87,7 +88,9 @@ export function refusal(action: Action, ctx: Context = {}): string {
     case "deal.edit":
       return `Only ${ctx.dealOwner ?? "the deal owner"} or an admin can edit this deal.`;
     case "contract.delete":
-      return `Only ${ctx.dealOwner ?? "the deal owner"} or an admin can delete this contract.`;
+      return "Only an admin deletes a contract. The deal owner can ask for it to be deleted.";
+    case "contract.delete_request":
+      return `Only ${ctx.dealOwner ?? "the deal owner"} can ask for this contract to be deleted.`;
     case "decision.request":
       return `Only ${ctx.dealOwner ?? "the deal owner"} can ask for a quick decision.`;
     case "register.edit":
