@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHead, SeverityChip, Tag } from "@/components/ui";
 import { getCoverage, getRegister, coverageLine, type RegisterRow } from "@/lib/data/register";
-import { getBaseline, getPositions } from "@/lib/data/reference";
+import { getBaseline, getPositions, getSignedRefs } from "@/lib/data/reference";
+import { sourceContract } from "@/lib/memory/precedent";
+import { HashMark } from "@/components/register/HashMark";
 import { getSearchDocs } from "@/lib/data/memory";
 import { formatDate } from "@/lib/checks/dates";
 import { commitmentTypeLabel, PRECEDENT_LABELS, termLabel } from "@/lib/format";
@@ -81,7 +83,8 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
   const canEdit = can(me, "register.edit");
   const tab: Tab = TABS.some(([k]) => k === sp.tab) ? (sp.tab as Tab) : "promises";
   const f: PromiseFilter = (["live", "unconf", "expired", "all"] as const).includes(sp.f as PromiseFilter) ? (sp.f as PromiseFilter) : "live";
-  const [register, coverage, baseline, positions, fixes] = await Promise.all([getRegister(), getCoverage(), getBaseline(), getPositions(), getDb().select().from(templateFixes).orderBy(desc(templateFixes.approvedAt))]);
+  const [register, coverage, baseline, rawPositions, signedRefs, fixes] = await Promise.all([getRegister(), getCoverage(), getBaseline(), getPositions(), getSignedRefs(), getDb().select().from(templateFixes).orderBy(desc(templateFixes.approvedAt))]);
+  const positions = rawPositions.map((p) => ({ ...p, contractId: sourceContract(p, signedRefs)?.id ?? null }));
   const counts: Record<PromiseFilter, number> = {
     live: register.filter((r) => matches(r, "live")).length,
     unconf: register.filter((r) => matches(r, "unconf")).length,
@@ -99,6 +102,7 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
 
   return (
     <section className="wrap page">
+      <HashMark />
       <PageHead eyebrow="AtliQ's memory" title="Register" aside={<span className="hint">{coverageLine(coverage)} · {coverage.signedInTracker - coverage.onFile} not on file</span>} />
       <p className="muted" style={{ maxWidth: "68ch", fontSize: 15 }}>
         What AtliQ has already signed that shapes the next contract: promises it must keep, terms it usually agrees, and why past exceptions were made.
@@ -151,6 +155,11 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
                     <tr key={r.id} id={r.id}>
                       <td className="co">
                         {r.contract}
+                        {r.sourceContractId ? (
+                          <Link className="src" href={`/contracts/${r.sourceContractId}?tab=text`} style={{ display: "block" }}>
+                            Signed contract
+                          </Link>
+                        ) : null}
                         <small>
                           {r.id} · {commitmentTypeLabel(r.type)} · Clause{r.clauses.length > 1 ? "s" : ""} {r.clauses.join(", ")}
                           <br />
@@ -284,10 +293,17 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
                   .map((p) => {
                     const l = PRECEDENT_LABELS[p.label] ?? PRECEDENT_LABELS.unclear!;
                     return (
-                      <tr key={p.id}>
+                      <tr key={p.id} id={`pos-${p.id}`}>
                         <td className="co">
                           {p.counterparty}
                           <small>{p.date}</small>
+                          {p.contractId ? (
+                            <Link className="src" href={`/contracts/${p.contractId}?tab=text`}>
+                              Signed contract
+                            </Link>
+                          ) : (
+                            <small>Signed contract not on file</small>
+                          )}
                         </td>
                         <td style={{ maxWidth: 260 }}>{p.term}</td>
                         <td style={{ maxWidth: 380 }}>

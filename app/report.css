@@ -47,6 +47,10 @@
 .tile span { font-size: 12px; color: var(--ink-3); }
 .usual { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13.5px; padding: 8px 12px; border: 1px dashed var(--rule); border-radius: 6px; }
 .prec { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--ink-3); }
+.prec-item { display: inline-flex; gap: 6px; align-items: center; }
+.prec a.p { text-decoration: none; }
+.prec a.p:hover, .prec a.p:focus-visible { background: var(--accent-soft); }
+.prec-src { font-size: 12px; color: var(--accent); }
 .evid { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--ink-2); border-top: 1px dashed var(--rule); padding-top: 10px; }
 .evid b { color: var(--ink); font-weight: 600; }
 .evid svg { color: var(--ok); flex-shrink: 0; margin-top: 2px; }

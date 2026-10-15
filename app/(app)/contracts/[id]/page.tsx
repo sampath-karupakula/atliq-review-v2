@@ -5,6 +5,8 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { contracts, templateFixes } from "@/lib/db/schema";
 import { getReport } from "@/lib/data/report";
+import { getSignedRefs } from "@/lib/data/reference";
+import { sourceContract } from "@/lib/memory/precedent";
 import { daysBetween, formatDate } from "@/lib/checks/dates";
 import { splitClauses } from "@/lib/ingest/clauses";
 import { appToday, reviewHorizonDays, toAppDay } from "@/lib/config";
@@ -53,7 +55,8 @@ export default async function ContractPage({ params, searchParams }: { params: P
   const stopped = review && !done && !runningElsewhere ? review : null;
   const last = stopped ? { reviewId: stopped.id, error: stopped.error, resumable: !!(stopped.artifacts as { state?: unknown })?.state } : null;
 
-  const posById = new Map(data.positions.map((x) => [x.id, x]));
+  const signedRefs = data.positions.length ? await getSignedRefs() : [];
+  const posById = new Map(data.positions.map((x) => [x.id, { ...x, contractId: sourceContract(x, signedRefs)?.id ?? null }]));
   const findings: ReportFinding[] = data.findings.map((f) => {
     const rel = (f.related ?? {}) as Record<string, unknown>;
     return {
