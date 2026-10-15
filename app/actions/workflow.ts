@@ -9,7 +9,7 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/lib/db/client";
 import { assignments, commitments, contracts, findings, reviews } from "@/lib/db/schema";
-import { authorize, getCurrentUser, PermissionError, type CurrentUser } from "@/lib/auth/session";
+import { authorize, getSessionUser, PermissionError, type CurrentUser } from "@/lib/auth/session";
 import type { Action, Context } from "@/lib/auth/permissions";
 import { adminNames, isActiveUser } from "@/lib/data/people";
 import { createAssignment, currentAssignment } from "@/lib/data/assignments";
@@ -254,7 +254,7 @@ export async function confirmCommitment(commitmentId: string, confirmed: boolean
 
 /** Mark the viewer's notifications read (all, or just the given ones). */
 export async function markNotificationsRead(ids?: string[]): Promise<ActionResult> {
-  const me = await getCurrentUser();
+  const me = await getSessionUser();
   if (!me) return fail("Sign in again.");
   const viewer = me.name;
   const { notifications } = await import("@/lib/db/schema");
@@ -266,7 +266,7 @@ export async function markNotificationsRead(ids?: string[]): Promise<ActionResul
 
 /** Toggle one notification read/unread (heuristic 3). */
 export async function setNotificationRead(id: string, read: boolean): Promise<ActionResult> {
-  const me = await getCurrentUser();
+  const me = await getSessionUser();
   if (!me) return fail("Sign in again.");
   const viewer = me.name;
   const { notifications } = await import("@/lib/db/schema");

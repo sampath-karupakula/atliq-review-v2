@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import type { Role } from "@/lib/roles";
 import { ROLE_ORDER, ROLES } from "@/lib/roles";
 import { setViewingAs } from "@/app/actions/viewer";
+import { signOut } from "@/app/actions/auth";
 import { setTheme, type Theme } from "./theme";
 
 // Ctrl K: every screen, role and action is one search away. Jump commands come from the role's nav plus the
 // screens every role may open; later phases add contracts and companies by name.
 type Cmd = { label: string; kind: string; run: () => void };
 
-export function CommandPalette({ role, onKeys }: { role: Role; onKeys: () => void }) {
+export function CommandPalette({ role, onKeys, demo, admin }: { role: Role; onKeys: () => void; demo: boolean; admin: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -28,7 +29,10 @@ export function CommandPalette({ role, onKeys }: { role: Role; onKeys: () => voi
     list.push(go("/counsel", "Counsel tracker"));
     list.push(go("/insights", "Insights"));
     list.push(go("/activity", "Activity log"));
-    for (const r of ROLE_ORDER) {
+    list.push(go("/account", "Account"));
+    if (admin) list.push(go("/admin/users", "Users", "Admin"));
+    if (!demo) list.push({ label: "Sign out", kind: "Account", run: () => void signOut() });
+    for (const r of demo ? ROLE_ORDER : []) {
       list.push({
         label: `View as ${ROLES[r].name} (${ROLES[r].title})`,
         kind: "Switch role",
@@ -44,7 +48,7 @@ export function CommandPalette({ role, onKeys }: { role: Role; onKeys: () => voi
     }
     list.push({ label: "Keyboard shortcuts", kind: "Help", run: onKeys });
     return list;
-  }, [role, router, onKeys]);
+  }, [role, router, onKeys, demo, admin]);
 
   const items = useMemo(() => {
     const s = q.trim().toLowerCase();

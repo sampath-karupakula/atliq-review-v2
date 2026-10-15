@@ -32,6 +32,19 @@ pnpm db:migrate
 pnpm dev
 ```
 
+Seed the demo data and accounts once (`SEED_USER_PASSWORD` in `.env.local` sets the password of the six demo
+accounts: karandeep@, bhavin@, dhaval@, jay@, pranav@ and counsel@atliq.test):
+
+```bash
+pnpm seed           # demo data + accounts; pnpm seed:users adds only the accounts and keeps the data
+```
+
+### Signing in
+With `DEMO_MODE=1` (the default in `.env.example`) nobody needs to sign in: the "Viewing as" switch in the top bar
+picks Karandeep (admin), Bhavin (reviewer) or Counsel (read-only), and the sign-in page offers the same choice. A real
+sign-in always wins over the switch. Leave `DEMO_MODE` unset on a real deployment: every page, action and API route
+then needs an account, five wrong passwords lock an account for 15 minutes, and admins manage people at `/admin/users`.
+
 To try the production image (the same build Vercel runs):
 
 ```bash
@@ -50,8 +63,9 @@ CI runs the same on every pull request, plus migrations, a production build and 
 ## Deploy
 
 Production runs on Vercel (Hobby) with Neon Postgres. The repo is connected to Vercel; every merge to `main` deploys.
-Set these in the Vercel project: `DATABASE_URL` (the Neon pooled connection string), `APP_TODAY`, and from P3
-`ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL`. Apply migrations with `pnpm db:migrate` from a machine holding the Neon URL.
+Set these in the Vercel project: `DATABASE_URL` (the Neon pooled connection string), `APP_TODAY`,
+`ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`, and either `DEMO_MODE=1` (a public demo) or `SEED_USER_PASSWORD` with
+`SEED_FORCE_PASSWORD_CHANGE=1` (real accounts). Apply migrations with `pnpm db:migrate` from a machine holding the Neon URL.
 
 ## Status
 

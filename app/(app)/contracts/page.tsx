@@ -12,7 +12,7 @@ import { getCoverage } from "@/lib/data/register";
 import { filterCounts, filterQueue, isQueueFilter, QUEUE_FILTERS, type QueueFilter } from "@/lib/queue";
 import { appToday } from "@/lib/config";
 import { currentRole } from "@/lib/viewer";
-import { ROLES } from "@/lib/roles";
+import { getCurrentUser } from "@/lib/auth/session";
 
 export const metadata: Metadata = { title: "Contracts" };
 export const dynamic = "force-dynamic";
@@ -36,7 +36,7 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
   const view: View = VIEWS.includes(sp.view as View) ? (sp.view as View) : sp.filter ? "open" : "company";
   const q = sp.q?.trim() ?? "";
   const today = appToday();
-  const me = ROLES[role].name;
+  const me = (await getCurrentUser()).name;
 
   const [queue, signed, companies, coverage] = await Promise.all([getQueueRows(), getSignedContracts(), getCompanies(), getCoverage()]);
   const counts = filterCounts(queue, today);

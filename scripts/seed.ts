@@ -11,6 +11,7 @@ import * as s from "@/lib/db/schema";
 import { textHash, normaliseText } from "@/lib/ingest/hash";
 import { countNumberedClauses, countScheduleItems } from "@/lib/ingest/clauses";
 import { parseCsv } from "./lib/csv";
+import { seedUsers } from "./seed-users";
 import { assignCompanies } from "@/lib/data/companies";
 import { companyKey } from "@/lib/companies";
 
@@ -189,7 +190,7 @@ async function main() {
   console.log("Truncating…");
   await db.execute(dsql`TRUNCATE notifications, assignments, ai_calls, masking_keys, findings, reviews,
     deal_notes, contract_links, deal_documents, contracts, deals, waivers, commitments, entities, entity_rules,
-    clients, baseline_terms, positions, deal_rules, app_meta, audit_events, companies RESTART IDENTITY CASCADE`);
+    clients, baseline_terms, positions, deal_rules, app_meta, audit_events, companies, offer_checks RESTART IDENTITY CASCADE`);
   // Accounts and sessions are kept: re-seeding the demo data never locks anyone out.
 
   // --- Reference data ---
@@ -362,6 +363,7 @@ async function main() {
   const co = await assignCompanies(new Map([...tracker.values()].filter((r) => r.client_country).map((r) => [companyKey(r.counterparty), r.client_country])));
   console.log(`Companies: ${co.companies} (every contract assigned).`);
   // Demo accounts arrive with sign-in (P11).
+  await seedUsers(db);
   await sql.end();
 }
 
