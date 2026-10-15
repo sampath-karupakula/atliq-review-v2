@@ -31,8 +31,18 @@ const TERM_OF: Record<string, string> = {
 };
 
 export function mirrorItems(findings: MirrorFinding[], baseline: BaselineTerm[]): MirrorItem[] {
+  // The code rule and the AI's full read can flag the same topic; one item per topic is enough (the first, which
+  // is the code rule's when there is one).
+  const seen = new Set<string>();
   return findings
     .filter((f) => f.check === "fairness" && !f.dismissed)
+    .filter((f) => {
+      const t = topicOf(f.category, f.title);
+      if (t === "other" || t === "fairness") return true;
+      if (seen.has(t)) return false;
+      seen.add(t);
+      return true;
+    })
     .map((f) => {
       const category = topicOf(f.category, f.title);
       const usual = baseline.find((b) => b.term === TERM_OF[category])?.usual ?? null;

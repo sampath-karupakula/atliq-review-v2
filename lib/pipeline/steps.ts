@@ -377,6 +377,22 @@ function passDownExcerpt(maskedText: string, budgetTokens: number): string {
   return lines.join("\n\n");
 }
 
+/** Every clause, tagged with its id, up to the budget: a call note can be about anything (payment, penalties,
+ * scope), so the comparison needs the whole contract, not a topic excerpt. */
+function fullTagged(maskedText: string, budgetTokens: number): string {
+  const lines: string[] = [];
+  let used = 0;
+  for (const s of splitClauses(maskedText).segments) {
+    if (s.kind === "heading") continue;
+    const line = s.kind === "title" ? s.text : `[${s.id}] ${s.text}`;
+    const t = estimateTokens(line);
+    if (used + t > budgetTokens) break;
+    lines.push(line);
+    used += t;
+  }
+  return lines.join("\n\n");
+}
+
 /** Step 6 (AI-4): pass-down gaps and conflicts with linked subcontract/freelancer documents. */
 export async function bundleStep(state: ReviewState, ref: Reference, opts: StepOptions = {}): Promise<void> {
   if (state.bundle) return;
@@ -540,7 +556,7 @@ export async function finalizeStep(
     const res = await callStructured({
       step: "notes",
       system: NOTES_SYSTEM,
-      user: notesUser(state.deal, state.notes.map((n) => ({ id: n.id, label: n.label, text: n.maskedText })), passDownExcerpt(state.maskedText, Math.max(2000, cfg.maxInputTokens - overhead))),
+      user: notesUser(state.deal, state.notes.map((n) => ({ id: n.id, label: n.label, text: n.maskedText })), fullTagged(state.maskedText, Math.max(2000, cfg.maxInputTokens - overhead))),
       schemaName: "notes",
       schema: NotesSchema,
       maxTokens: cfg.provider === "groq" ? 2500 : 12000,

@@ -37,8 +37,9 @@ export function buyerSideSeverity(f: Pick<FindingDraft, "check" | "category" | "
 }
 
 const TOPIC_WORDS: [string, RegExp][] = [
-  ["payment", /\b(pay|paid|payment|invoice|pay-when-paid|days? (?:to|after))\b/i],
+  // Termination first: "no pay for work in progress" is about termination, not payment terms.
   ["termination", /\b(terminat\w*|exit|notice period|work in progress|wip)\b/i],
+  ["payment", /\b(pay|paid|payment|invoice|pay-when-paid|days? (?:to|after))\b/i],
   ["liability", /\b(liabilit\w*|uncapped|unlimited|cap)\b/i],
   ["delay_penalty", /\b(penalt\w*|liquidated|delay)\b/i],
   ["confidentiality", /\b(confidential\w*)\b/i],
