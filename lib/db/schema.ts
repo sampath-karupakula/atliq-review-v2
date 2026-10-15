@@ -160,6 +160,10 @@ export const contracts = pgTable(
     status: text("status").notNull().default("received"), // received|in_review|reviewed|negotiating|signed|rejected
     decision: text("decision"), // sign_intended | reject (manual, Karandeep only)
     decisionNote: text("decision_note"),
+    /** The deal owner asked Karandeep for a quick decision after the first review (cleared when he decides). */
+    decisionRequestedBy: text("decision_requested_by"),
+    decisionRequestedAt: timestamp("decision_requested_at", { withTimezone: true }),
+    decisionRequestNote: text("decision_request_note"),
     isSigned: boolean("is_signed").notNull().default(false),
     signedDate: date("signed_date"),
     ends: date("ends"),

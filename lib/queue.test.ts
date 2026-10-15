@@ -26,6 +26,8 @@ function row(p: Partial<QueueRow> & { id: string }): QueueRow {
     reviewer: null,
     reviewDeadline: null,
     decision: null,
+    decisionRequestedBy: null,
+    decisionRequestNote: null,
     ...p,
   };
 }

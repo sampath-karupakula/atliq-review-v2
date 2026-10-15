@@ -30,11 +30,14 @@ describe("permissions", () => {
   it("reviewers edit only their own deals and complete only their own assignments", () => {
     expect(can(dhaval, "deal.edit", { dealOwner: "Dhaval" })).toBe(true);
     expect(can(dhaval, "deal.edit", { dealOwner: "Jay" })).toBe(false);
+    expect(can(dhaval, "contract.delete", { dealOwner: "Dhaval" })).toBe(true);
+    expect(can(dhaval, "contract.delete", { dealOwner: "Jay" })).toBe(false);
+    expect(can(dhaval, "decision.request", { dealOwner: "Dhaval" })).toBe(true);
     expect(can(dhaval, "assignment.complete", { assignee: "Dhaval" })).toBe(true);
     expect(can(dhaval, "assignment.complete", { assignee: "Jay" })).toBe(false);
   });
   it("viewers are read-only", () => {
-    for (const a of ["contract.upload", "review.start", "finding.comment", "finding.dismiss", "deal.edit", "assignment.complete"] as Action[]) {
+    for (const a of ["contract.upload", "review.start", "finding.comment", "finding.dismiss", "deal.edit", "contract.delete", "decision.request", "assignment.complete"] as Action[]) {
       expect(can(counsel, a, { dealOwner: "Counsel", assignee: "Counsel" })).toBe(false);
     }
     expect(can(counsel, "activity.view")).toBe(true);

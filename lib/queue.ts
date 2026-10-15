@@ -29,6 +29,9 @@ export type QueueRow = {
   reviewDeadline: string | null;
   /** Karandeep's recorded decision, if any. */
   decision: "sign_intended" | "reject" | null;
+  /** Who asked Karandeep for a quick decision, if anyone. */
+  decisionRequestedBy: string | null;
+  decisionRequestNote: string | null;
 };
 
 export const QUEUE_FILTERS = [

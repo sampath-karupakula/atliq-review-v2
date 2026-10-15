@@ -28,6 +28,8 @@ export type Action =
   | "review.assign"
   | "assignment.complete"
   | "deal.edit"
+  | "contract.delete"
+  | "decision.request"
   | "deal.note"
   | "offer.record"
   | "review.mark"
@@ -58,7 +60,8 @@ export function can(user: Actor | null | undefined, action: Action, ctx: Context
   if (action === "review.start") return !ctx.assignee || ctx.assignee === user.name;
   // A reviewer can take an unassigned contract for themselves.
   if (action === "review.take") return !ctx.assignee;
-  if (action === "deal.edit") return !!ctx.dealOwner && ctx.dealOwner === user.name;
+  // The deal owner edits the deal and its contracts, deletes them, and can ask Karandeep for a quick decision.
+  if (action === "deal.edit" || action === "contract.delete" || action === "decision.request") return !!ctx.dealOwner && ctx.dealOwner === user.name;
   if (action === "assignment.complete" || action === "review.mark") return !!ctx.assignee && ctx.assignee === user.name;
   return REVIEWER.includes(action);
 }
@@ -83,6 +86,10 @@ export function refusal(action: Action, ctx: Context = {}): string {
       return `Only ${ctx.assignee ?? "the assigned reviewer"} or an admin can mark this review done.`;
     case "deal.edit":
       return `Only ${ctx.dealOwner ?? "the deal owner"} or an admin can edit this deal.`;
+    case "contract.delete":
+      return `Only ${ctx.dealOwner ?? "the deal owner"} or an admin can delete this contract.`;
+    case "decision.request":
+      return `Only ${ctx.dealOwner ?? "the deal owner"} can ask for a quick decision.`;
     case "register.edit":
       return "Only an admin changes the register.";
     case "demo.reset":
