@@ -5,6 +5,8 @@ import { QueueTable } from "@/components/contracts/QueueTable";
 import { CompanyTable } from "@/components/contracts/CompanyTable";
 import { SignedTable } from "@/components/contracts/SignedTable";
 import { CoveragePanel } from "@/components/contracts/CoveragePanel";
+import { getMissingSigned } from "@/lib/data/memory";
+import { can } from "@/lib/auth/permissions";
 import { getQueueRows } from "@/lib/data/queue";
 import { getSignedContracts } from "@/lib/data/portfolio";
 import { getCompanies, sortCompanies } from "@/lib/data/companyView";
@@ -36,7 +38,8 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
   const view: View = VIEWS.includes(sp.view as View) ? (sp.view as View) : sp.filter ? "open" : "company";
   const q = sp.q?.trim() ?? "";
   const today = appToday();
-  const me = (await getCurrentUser()).name;
+  const user = await getCurrentUser();
+  const me = user.name;
 
   const [queue, signed, companies, coverage] = await Promise.all([getQueueRows(), getSignedContracts(), getCompanies(), getCoverage()]);
   const counts = filterCounts(queue, today);
@@ -57,7 +60,7 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
         title="Contracts"
         aside={role !== "counsel" ? <Link className="btn" href="/contracts/new">Upload a contract</Link> : null}
       />
-      <div className={role === "ceo" && view === "company" ? "today-grid" : undefined}>
+      <div className={view === "company" || view === "signed" ? "today-grid" : undefined}>
         <section className="queue">
           <div className="panel">
             <nav className="vswitch big" aria-label="View" style={{ alignSelf: "flex-start", flexWrap: "wrap" }}>
@@ -121,7 +124,7 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
                 today={today}
                 empty={
                   <div className="stub">
-                    <p>Nothing is assigned to {me} right now. Assigning reviews arrives in P10.</p>
+                    <p>Nothing is assigned to {me} right now. Take an unassigned contract from your dashboard, or ask Karandeep to assign one.</p>
                   </div>
                 }
               />
@@ -132,16 +135,16 @@ export default async function ContractsPage({ searchParams }: { searchParams: Pr
               <div className="sec-head">
                 <h2>Signed portfolio</h2>
                 <p>
-                  {signed.length} signed documents on file · exposures inside them are found by the portfolio scan (P8)
+                  {signed.length} signed documents on file · the risks inside them are on the Signed portfolio page
                 </p>
               </div>
               <SignedTable rows={signed} />
             </>
           ) : null}
         </section>
-        {role === "ceo" && view === "company" ? (
+        {view === "company" || view === "signed" ? (
           <aside className="side">
-            <CoveragePanel coverage={coverage} />
+            <CoveragePanel coverage={coverage} missing={await getMissingSigned()} canUpload={can(user, "signed.upload")} />
           </aside>
         ) : null}
       </div>

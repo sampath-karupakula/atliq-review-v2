@@ -1,18 +1,26 @@
 // Runtime configuration from environment variables. Secrets live only in .env.local / Vercel env vars.
 
-export const DEFAULT_TODAY = "2026-09-28";
+/** The dataset's own "today", for replaying it exactly as delivered: set APP_TODAY=2026-09-28 (CI does). */
+export const DATASET_TODAY = "2026-09-28";
 
-// The dataset's "today". All live/expired date maths uses this, never the wall clock.
-export function appToday(): string {
-  const v = process.env.APP_TODAY?.trim();
-  return v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : DEFAULT_TODAY;
+/** Today's date where AtliQ works (Pune), as YYYY-MM-DD. */
+export function realToday(now = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kolkata", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
 }
 
-/** A real timestamp placed on the app's calendar: shifted by the gap between APP_TODAY and the real date, so a
- * question asked and answered today lines up with answer-by dates that are set against APP_TODAY. */
+// "Today" for every deadline, live/expired and overdue calculation: today's real date, unless APP_TODAY pins a date
+// (CI pins the dataset's date so its checks are repeatable). The AI never decides dates.
+export function appToday(): string {
+  const v = process.env.APP_TODAY?.trim();
+  return v && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : realToday();
+}
+
+/** A real timestamp as a day on the app's calendar. Normally that is just its date in Pune; when APP_TODAY pins a
+ * date, it is shifted by the same gap, so something asked and answered today lines up with dates set against it. */
 export function toAppDay(d: Date, now = new Date()): string {
-  const realToday = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-  const offset = Date.parse(appToday() + "T00:00:00Z") - realToday;
+  if (appToday() === realToday(now)) return realToday(d);
+  const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const offset = Date.parse(appToday() + "T00:00:00Z") - todayUtc;
   return new Date(d.getTime() + offset).toISOString().slice(0, 10);
 }
 

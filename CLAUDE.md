@@ -27,7 +27,8 @@ S1 (dashboards) … S9 (mirror check) as in the feature list in `ROADMAP.md`.
 - Keep `lib/` pure (no Next or DB imports) so the API routes, scripts and evals share one pipeline. `lib/data/` is the only place that touches the database and is `server-only`.
 - TypeScript strict, zod on every AI response, small files, plain names. Comments explain why, not what.
 - Secrets live only in `.env.local` and Vercel env vars: `DATABASE_URL`, `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`, `APP_TODAY`, later `SEED_USER_PASSWORD`, `REVIEWS_PER_DAY`.
-- `APP_TODAY` defaults to `2026-09-28`, the dataset's "today". All date maths uses `appToday()` from `lib/config.ts`.
+- All date maths uses `appToday()` from `lib/config.ts`: today's real date (India time), or `APP_TODAY` when set
+  (`2026-09-28` replays the dataset as delivered; CI pins it).
 - Before changing a prompt or rule, run `pnpm eval --quick`; after, run it again and report the diff (from P3).
 
 ## Commands

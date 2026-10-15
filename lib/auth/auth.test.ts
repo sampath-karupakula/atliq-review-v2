@@ -34,6 +34,9 @@ describe("permissions", () => {
     expect(can(dhaval, "contract.delete", { dealOwner: "Dhaval" })).toBe(false);
     expect(can(dhaval, "contract.delete_request", { dealOwner: "Dhaval" })).toBe(true);
     expect(can(dhaval, "contract.delete_request", { dealOwner: "Jay" })).toBe(false);
+    // Signed contracts feed every clash check, so only an admin adds them.
+    expect(can(dhaval, "signed.upload")).toBe(false);
+    expect(can({ name: "Karandeep", role: "admin" }, "signed.upload")).toBe(true);
     expect(can(dhaval, "decision.request", { dealOwner: "Dhaval" })).toBe(true);
     expect(can(dhaval, "assignment.complete", { assignee: "Dhaval" })).toBe(true);
     expect(can(dhaval, "assignment.complete", { assignee: "Jay" })).toBe(false);
