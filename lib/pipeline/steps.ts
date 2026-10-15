@@ -3,13 +3,16 @@
 //   (verify quotes → merge → P7 severity → score → AI-5 summary). Clash (AI-2) and bundle (AI-4) join in P4.
 // Every AI call goes through callStructured with the leak guard (G2). Pure: no DB access here.
 import { aiConfig, appToday, type AiConfig } from "@/lib/config";
-import { BundleSchema, ClashSchema, type Bundle, type Clash } from "@/lib/ai/schemas";
-import { BUNDLE_SYSTEM, bundleUser, CLASH_SYSTEM, clashUser } from "@/lib/ai/prompts";
+import { BundleSchema, ClashSchema, NotesSchema, type Bundle, type Clash, type NotesCheck } from "@/lib/ai/schemas";
+import { BUNDLE_SYSTEM, bundleUser, CLASH_SYSTEM, clashUser, NOTES_SYSTEM, notesUser } from "@/lib/ai/prompts";
 import { candidateCommitments, clashFindings, liveClients, rateCardClash } from "@/lib/checks/register";
 import { checkBundle, type LinkedDoc } from "@/lib/checks/bundle";
 import type { Segment } from "@/lib/ingest/clauses";
 
 export type MaskedLinkedDoc = { id: string; title: string; docType: string; role: string; maskedText: string };
+/** A call note on the deal: what someone wrote down was said or agreed. Outside the contract. */
+export type CallNote = { id: string; label: string; text: string };
+export type MaskedNote = { id: string; label: string; maskedText: string };
 import { callStructured, estimateTokens, type AiCallRecord } from "@/lib/ai/client";
 import { toStrictJsonSchema } from "@/lib/ai/jsonSchema";
 import { chunkContract, type ContractPart } from "@/lib/ai/chunk";
@@ -26,7 +29,7 @@ import { checkEntityLaw } from "@/lib/checks/entityLaw";
 import { checkTerms } from "@/lib/checks/baseline";
 import { checkInjection, checkReferences, checkUnreadable } from "@/lib/checks/document";
 import { verifyQuote } from "@/lib/verify/quotes";
-import { decideSeverity } from "@/lib/verify/severity";
+import { buyerSideSeverity, decideSeverity } from "@/lib/verify/severity";
 import { mergeFindings } from "@/lib/verify/merge";
 import { coverage, registerLine } from "@/lib/verify/coverage";
 import { countSeverities, scoreOf } from "@/lib/score/score";
@@ -56,6 +59,10 @@ export type ReviewState = {
   clash: Clash | "skipped" | null;
   /** AI-4 result, or "skipped" when no linked subcontract/freelancer document needs a pass-down check. */
   bundle: Bundle | "skipped" | null;
+  /** Call notes on the deal, masked with the same labels (absent in states saved before notes were compared). */
+  notes?: MaskedNote[];
+  /** AI-6 result, or "skipped" when the deal has no call notes. */
+  noteCheck?: NotesCheck | "skipped" | null;
   tokensIn: number;
   tokensOut: number;
   model: string | null;
@@ -102,6 +109,8 @@ export function startReview(args: {
   linkedTitles?: string[];
   /** Other documents in the deal bundle (original text); masked here with the same labels. */
   linked?: LinkedDoc[];
+  /** Call notes on the deal (compared with the contract in the final step). */
+  notes?: CallNote[];
   config?: AiConfig;
 }): ReviewState {
   const cfg = args.config ?? aiConfig();
@@ -114,10 +123,13 @@ export function startReview(args: {
   masker.mask(referenceMaskText(args.ref));
   masker.mask(args.text);
   for (const d of args.linked ?? []) masker.mask(d.text);
+  for (const n of args.notes ?? []) masker.mask(`${n.label}\n${n.text}`);
   const maskedText = masker.mask(args.text);
   const linked = (args.linked ?? []).map((d) => ({ id: d.id, title: d.title, docType: d.docType, role: d.role, maskedText: masker.mask(d.text) }));
+  const notes = (args.notes ?? []).map((n) => ({ id: n.id, label: masker.mask(n.label), maskedText: masker.mask(n.text) }));
   assertNoLeak(maskedText, masker);
   for (const d of linked) assertNoLeak(d.maskedText, masker);
+  for (const n of notes) assertNoLeak(`${n.label}\n${n.maskedText}`, masker);
 
   // Each part must fit the provider's per-request budget alongside the rules and reference data.
   // Overhead per request: rules, reference data, deal block — and the response schema, which Groq counts.
@@ -155,6 +167,8 @@ export function startReview(args: {
     today: appToday(),
     clash: null,
     bundle: null,
+    notes,
+    noteCheck: notes.length ? null : "skipped",
     tokensIn: 0,
     tokensOut: 0,
     model: null,
@@ -363,6 +377,22 @@ function passDownExcerpt(maskedText: string, budgetTokens: number): string {
   return lines.join("\n\n");
 }
 
+/** Every clause, tagged with its id, up to the budget: a call note can be about anything (payment, penalties,
+ * scope), so the comparison needs the whole contract, not a topic excerpt. */
+function fullTagged(maskedText: string, budgetTokens: number): string {
+  const lines: string[] = [];
+  let used = 0;
+  for (const s of splitClauses(maskedText).segments) {
+    if (s.kind === "heading") continue;
+    const line = s.kind === "title" ? s.text : `[${s.id}] ${s.text}`;
+    const t = estimateTokens(line);
+    if (used + t > budgetTokens) break;
+    lines.push(line);
+    used += t;
+  }
+  return lines.join("\n\n");
+}
+
 /** Step 6 (AI-4): pass-down gaps and conflicts with linked subcontract/freelancer documents. */
 export async function bundleStep(state: ReviewState, ref: Reference, opts: StepOptions = {}): Promise<void> {
   if (state.bundle) return;
@@ -423,7 +453,7 @@ function bundleToDrafts(b: Bundle, state: ReviewState): FindingDraft[] {
       whatItCouldCost: g.type === "pass_down" ? "AtliQ would owe the client obligations it cannot pass on to the party actually doing the work." : "The documents cannot both be complied with.",
       howToSoften: g.type === "pass_down" ? "Add matching confidentiality, IP and data-protection terms to the subcontract before work starts." : "Align the two documents before signing either.",
       source: "ai",
-      related: { docB: other.doc.replace(/^THIS DOCUMENT\s*/i, ""), clauseB: cleanClause(other.clause), quoteB: other.quote, absentInB: g.absent_in_b, dataMustNotMoveUntil: g.data_must_not_move_until, linkedDocs: state.linked.map((d) => d.title) },
+      related: { docB: other.doc.replace(/^THIS DOCUMENT\s*/i, ""), clauseB: cleanClause(other.clause), quoteB: other.quote, absentInB: g.absent_in_b, dataMustNotMoveUntil: g.data_must_not_move_until, flowDown: g.type === "pass_down" ? g.flow_down : null, linkedDocs: state.linked.map((d) => d.title) },
     } satisfies FindingDraft;
   });
 }
@@ -519,7 +549,29 @@ export async function finalizeStep(
   const extract = state.extract!;
   const candidates = candidateCommitments({ ref, extract, deal: state.deal, docType: state.docType, maskedText: state.maskedText, today: state.today });
   const clash = state.clash && state.clash !== "skipped" ? state.clash : { judgements: [], new_restrictions_hitting_clients: [] };
+  // AI-6: call notes compared with the contract (only when the deal has notes).
+  if (state.notes?.length && !state.noteCheck) {
+    const cfg = opts.config ?? aiConfig();
+    const overhead = estimateTokens(NOTES_SYSTEM + dealBlock(state.deal) + state.notes.map((n) => n.maskedText).join("\n")) + 800;
+    const res = await callStructured({
+      step: "notes",
+      system: NOTES_SYSTEM,
+      user: notesUser(state.deal, state.notes.map((n) => ({ id: n.id, label: n.label, text: n.maskedText })), fullTagged(state.maskedText, Math.max(2000, cfg.maxInputTokens - overhead))),
+      schemaName: "notes",
+      schema: NotesSchema,
+      maxTokens: cfg.provider === "groq" ? 2500 : 12000,
+      guard: (s) => assertNoLeak(s, masker),
+      onCall: opts.onCall,
+      config: cfg,
+    });
+    const ids = new Set(state.notes.map((n) => n.id));
+    state.noteCheck = { notes: res.data.notes.filter((n) => ids.has(n.note_id)) };
+    state.tokensIn += res.inputTokens;
+    state.tokensOut += res.outputTokens;
+  }
+  const noteCheck = state.noteCheck && state.noteCheck !== "skipped" ? state.noteCheck : null;
   const extra = [
+    ...(noteCheck ? noteDrafts(noteCheck) : []),
     ...registerAndBundleCode(state, ref),
     ...clashFindings({
       candidates: candidates.filter((c) => !(c.type === "best_price" && extract.rate_card.length)),
@@ -559,12 +611,16 @@ export async function finalizeStep(
     const positions = ref.positions.filter((p) => POSITION_TOPICS[f.category]?.test(p.term)).map((p) => p.id);
     // A quote from the other document in the bundle is verified against that document.
     const related = f.related ? { ...f.related } : undefined;
+    // The other document's title went to the AI masked (titles often name the client): restore it before using it
+    // to find that document, or its quote can't be verified.
+    if (related?.docB && typeof related.docB === "string") related.docB = masker.unmask(related.docB);
     if (related?.quoteB && typeof related.quoteB === "string") {
       related.quoteB = masker.unmask(related.quoteB);
       const docText = [...linkedOriginal.entries()].find(([t]) => String(related.docB ?? "").includes(t) || t.includes(String(related.docB ?? "")))?.[1];
       related.quoteBVerified = docText ? verifyQuote(docText, related.quoteB as string).verified : false;
     }
     if (related?.quote && typeof related.quote === "string") related.quote = masker.unmask(related.quote);
+    if (related?.flowDown && typeof related.flowDown === "string") related.flowDown = masker.unmask(related.flowDown);
     return {
       ...f,
       related,
@@ -574,7 +630,7 @@ export async function finalizeStep(
       whatItMeans: masker.unmask(f.whatItMeans),
       whatItCouldCost: masker.unmask(f.whatItCouldCost),
       howToSoften: masker.unmask(f.howToSoften),
-      severity: decision.severity,
+      severity: buyerSideSeverity(f, decision.severity, state.deal.direction),
       quoteVerified: verified,
       foundIn: check?.verified ? check.clauseId : null,
       highlight: check?.verified ? { start: check.start, end: check.end } : null,
@@ -624,7 +680,15 @@ export async function finalizeStep(
   }
   if (!summary.length) summary = codeSummary(finals);
 
+  // One verdict per point in each note, with the contract quote checked word for word.
+  const noteChecks = noteCheck?.notes.map((n) => {
+    const quote = n.quote ? masker.unmask(n.quote) : null;
+    const v = quote ? verifyQuote(originalText, quote, originalMap) : null;
+    return { noteId: n.note_id, verdict: n.verdict, topic: masker.unmask(n.topic), clause: cleanClause(n.clause), quote, quoteVerified: !!v?.verified, explanation: masker.unmask(n.explanation) };
+  });
+
   return {
+    noteChecks,
     status: "done",
     score,
     band,
@@ -653,4 +717,30 @@ export function codeSummary(findings: FinalFinding[]): { text: string; findingId
   else if (negotiable.length) out.push({ text: `Negotiable points only — fine to proceed after raising them.`, findingIds: negotiable.map((f) => f.id) });
   else out.push({ text: "Matches AtliQ's usual terms; nothing serious found.", findingIds: [] });
   return out;
+}
+
+/** Note gaps (AI-6): a call promise the contract contradicts or leaves out. Always labelled as outside the contract. */
+function noteDrafts(nc: NotesCheck): FindingDraft[] {
+  return nc.notes
+    .filter((n) => n.verdict === "clashes" || n.verdict === "check")
+    .map((n) => {
+      const clashes = n.verdict === "clashes";
+      return {
+        check: "note_gap",
+        category: "notes",
+        severity: "negotiable",
+        basis: "bounded",
+        title: clashes ? `Differs from the call note: ${n.topic}` : `Agreed on a call, not in the contract: ${n.topic}`,
+        clause: cleanClause(n.clause),
+        quote: n.quote,
+        absent: !n.quote,
+        whatItMeans: `Outside the contract: ${n.explanation}`,
+        whatItCouldCost: "What was said on a call doesn't bind the client; only the signed contract does.",
+        howToSoften: clashes
+          ? "Ask for the contract to say what was agreed on the call, or confirm in writing which one stands."
+          : "Write what was agreed on the call into the contract before signing.",
+        source: "ai",
+        related: { noteId: n.note_id, verdict: n.verdict, outsideContract: true },
+      } satisfies FindingDraft;
+    });
 }

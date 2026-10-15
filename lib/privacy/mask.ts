@@ -5,7 +5,7 @@
 // numbered variant (CLIENT_A, CLIENT_A_2 for "KAVERI RETAIL PRIVATE LIMITED" vs "Kaveri"), so the model sees
 // one party while unmasking restores the exact original text — which quote verification depends on.
 import { detectPii, isAllowed, type PiiKind } from "./patterns";
-import { ATLIQ_PEOPLE, definedShortNames, harvestOrgs, harvestPeople, orgVariants, peopleFromEmails, stripOrgSuffix } from "./names";
+import { ATLIQ_PEOPLE, definedShortNames, harvestOrgs, harvestPeople, orgVariants, peopleFromEmails, STOPWORDS, stripOrgSuffix } from "./names";
 
 export type TokenKind = "CLIENT" | "PARTY" | "PERSON" | PiiKind;
 
@@ -81,7 +81,7 @@ export class Masker {
 
   private addDict(value: string, entity: string, caseSensitive: boolean) {
     const v = value.trim();
-    if (v.length < 3) return;
+    if (v.length < 3 || STOPWORDS.has(norm(v))) return;
     if (this.dict.some((d) => norm(d.value) === norm(v))) return;
     this.dict.push({ value: v, entity, caseSensitive });
   }

@@ -141,6 +141,7 @@ export const BundleSchema = z.object({
       absent_in_b: z.boolean(),
       why: z.string(),
       data_must_not_move_until: z.string().nullable(),
+      flow_down: z.string().nullable(),
     }),
   ),
 });
@@ -150,3 +151,18 @@ export const SummarySchema = z.object({
   sentences: z.array(z.object({ text: z.string(), finding_ids: z.array(z.string()) })),
 });
 export type Summary = z.infer<typeof SummarySchema>;
+
+/** AI-6: call notes compared with the contract (verdict per note; quotes verified by code). */
+export const NotesSchema = z.object({
+  notes: z.array(
+    z.object({
+      note_id: z.string(),
+      verdict: z.enum(["clashes", "check", "matches", "not_in_contract"]),
+      topic: z.string(),
+      clause: clause,
+      quote: quote,
+      explanation: z.string(),
+    }),
+  ),
+});
+export type NotesCheck = z.infer<typeof NotesSchema>;

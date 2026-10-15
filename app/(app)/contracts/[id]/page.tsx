@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
-import { contracts } from "@/lib/db/schema";
+import { contracts, templateFixes } from "@/lib/db/schema";
 import { getReport } from "@/lib/data/report";
 import { daysBetween, formatDate } from "@/lib/checks/dates";
 import { splitClauses } from "@/lib/ingest/clauses";
@@ -18,6 +18,8 @@ import { can, permsFor } from "@/lib/auth/permissions";
 import { getContractStage } from "@/lib/data/stage";
 import { StageTracker } from "@/components/report/StageTracker";
 import { HandoffCards } from "@/components/handoff/HandoffCards";
+import { MirrorCheck } from "@/components/report/MirrorCheck";
+import { mirrorItems } from "@/lib/report/mirror";
 import { DeleteContractButton, EditDeadlineButton, RequestDeletionButton, WithdrawDeletion } from "@/components/contract/ContractControls";
 import { deadlineWords } from "@/lib/queue";
 import { money } from "@/lib/format";
@@ -128,6 +130,18 @@ export default async function ContractPage({ params, searchParams }: { params: P
         </span>
       </div>
     ) : null;
+
+  // Mirror check: AtliQ's own buyer-side paper, read as if a client had sent it.
+  const mirror =
+    done && contract.direction === "atliq_buyer"
+      ? {
+          items: mirrorItems(
+            data.findings.map((f) => ({ id: f.id, check: f.check, category: f.category, title: f.title, clause: f.clause, quote: f.quote, howToSoften: f.howToSoften, dismissed: f.dismissed })),
+            data.baseline,
+          ),
+          approved: (await getDb().select({ category: templateFixes.category }).from(templateFixes).where(eq(templateFixes.status, "approved"))).map((r) => r.category),
+        }
+      : null;
 
   const handoff = (
     <HandoffCards
@@ -270,6 +284,7 @@ export default async function ContractPage({ params, searchParams }: { params: P
           <pre className="doc">{contract.text}</pre>
         </>
       )}
+      {mirror ? <MirrorCheck contractId={contract.id} items={mirror.items} approved={mirror.approved} canApprove={can(me, "register.edit")} /> : null}
     </section>
   );
 }

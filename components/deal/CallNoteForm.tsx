@@ -23,7 +23,7 @@ export function CallNoteForm({ dealId, today }: { dealId: string; today: string 
             if (!r.ok) return toast(r.error, { tone: "error" });
             setText("");
             router.refresh();
-            toast("Call note added. It's compared with the draft when the AI features arrive (P12).");
+            toast("Call note added. It's compared with the contract the next time it's reviewed.");
           });
         }}
       >

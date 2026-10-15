@@ -88,6 +88,9 @@ jobs:
           HH=$(echo "$DL" | grep -o '/deals/[0-9a-f-]\{36\}' | head -1)
           test "$(curl -s -o /dev/null -w '%{http_code}' "localhost:3000$HH")" = "200"
           curl -s localhost:3000/offer | grep -q 'Type the term'
+          # AI features' pages (P12): template fixes, the pass-down tab before any contractor review.
+          curl -s "localhost:3000/register?tab=templates" | grep -q 'Template fixes'
+          curl -s "localhost:3000$HH?tab=pass" | grep -q 'Does the contractor promise what we promised the client'
           # Hand-off (P10): the counsel tracker for Karandeep, the questions page for counsel.
           curl -s localhost:3000/counsel | grep -q 'What we&#x27;ve asked counsel'
           curl -s -b atliq_role=counsel localhost:3000/counsel | grep -q 'Questions from AtliQ'

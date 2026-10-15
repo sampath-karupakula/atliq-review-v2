@@ -64,4 +64,16 @@ export type ReviewReport = {
   tokensIn: number;
   tokensOut: number;
   error?: string;
+  /** Call notes compared with the contract (AI-6), one item per point in a note. Outside the contract. */
+  noteChecks?: NoteCheckResult[];
+};
+
+export type NoteCheckResult = {
+  noteId: string;
+  verdict: "clashes" | "check" | "matches" | "not_in_contract";
+  topic: string;
+  clause: string | null;
+  quote: string | null;
+  quoteVerified: boolean;
+  explanation: string;
 };

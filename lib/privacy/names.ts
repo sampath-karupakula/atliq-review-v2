@@ -96,9 +96,11 @@ export function harvestOrgs(text: string): string[] {
       .replace(/[,;:]+$/, "")
       .trim();
     if (/atliq/i.test(name)) continue;
-    // A real name has at least one distinctive word before the legal suffix ("Company" alone is a defined term).
+    // A defined term ("the Company", "this Agreement") is not a name, however it is formatted.
+    if (/^(?:the|this|such|each|any|said)\s/i.test(name)) continue;
+    // A real name has at least one distinctive, capitalised word before the legal suffix ("Company" alone is a defined term).
     const base = stripOrgSuffix(name);
-    if (ORG_SUFFIX.test(name) && base.length >= 2 && base.split(/\s+/).some((w) => !NOT_NAME.has(w))) out.add(name);
+    if (ORG_SUFFIX.test(name) && base.length >= 2 && base.split(/\s+/).some((w) => /^[A-Z0-9]/.test(w) && !NOT_NAME.has(w))) out.add(name);
   }
   return [...out];
 }
@@ -144,7 +146,10 @@ export function orgVariants(name: string): string[] {
   // The first two words of a longer name are often used alone, e.g. in property or product names
   // ("Gulf Crown Riyadh Olaya" for "Gulf Crown Hotels & Resorts Co.").
   if (words.length >= 3 && !NOT_NAME.has(words[0]) && !NOT_NAME.has(words[1])) out.add(words.slice(0, 2).join(" "));
-  return [...out].filter((v) => v.length >= 3);
+  return [...out].filter((v) => v.length >= 3 && !STOPWORDS.has(v.toLowerCase()));
 }
+
+/** Words that must never become a mask entry: masking them would hide (and the leak check would flag) ordinary text. */
+export const STOPWORDS = new Set(["the", "and", "for", "this", "that", "such", "each", "any", "its", "our", "your", "their", "with", "from", "company", "client", "party", "parties"]);
 
 export const ATLIQ_PEOPLE = ["Karandeep", "Bhavin", "Dhaval", "Jay", "Pranav"];

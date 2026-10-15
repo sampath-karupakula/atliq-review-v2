@@ -1,6 +1,10 @@
 // Evaluation harness (ROADMAP §11). Reads test_contracts/expected_results.json (read-only).
 //   pnpm eval --gate-only   ingest + gate + masking checks for every case, edge fixture and format variant (no AI, no DB)
-// Later phases add --quick, --all, --dataset and --repeat N, which run the full review pipeline.
+//   pnpm eval --quick       the full pipeline on 10 representative cases (run before and after a prompt or rule change)
+//   pnpm eval --all         every case in the answer key
+//   pnpm eval --cases TC19,TC44 [--repeat 3]   chosen cases; --repeat shows how stable each must-catch is
+//   pnpm eval --dataset     the 15 incoming drafts in Dataset/incoming with their deals and linked documents (no answer key)
+// Costs real money (about USD 0.10 a case on Sonnet 5.5); each run prints its token use and cost at the end.
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
@@ -153,6 +157,12 @@ function printVerdict(v: CaseVerdict) {
   for (const m of v.mustNotViolations) console.log(`    MUST-NOT  ${m}`);
 }
 
+// USD per million tokens (input, output), for the cost line. Update when prices change.
+const PRICE: Record<string, [number, number]> = { "claude-sonnet-5-5": [2, 10], "claude-opus-5-5": [4, 20], default: [4, 20] };
+
+/** Representative cases: a control, penalties, a returned version (TC23 → TC49), an NDA, AtliQ as buyer, bundles, call notes, PII. */
+const QUICK = ["TC01", "TC19", "TC23", "TC49", "TC33", "TC36", "TC38", "TC42", "TC44", "TC46"];
+
 async function runCases(ids: string[]): Promise<CaseVerdict[]> {
   const expected: ExpectedResults = JSON.parse(readFileSync(TC("expected_results.json"), "utf8"));
   const ref = referenceFromSeed();
@@ -182,11 +192,14 @@ async function runCases(ids: string[]): Promise<CaseVerdict[]> {
         findings: prevReport.findings.map((f) => ({ key: f.id, check: f.check, category: f.category, clause: f.foundIn ?? f.clause, title: f.title, quote: f.quote })),
       };
     }
+    // Call notes attached to the deal (TC44), compared with the contract by AI-6.
+    const notes = ((c.deal as { notes?: string[] }).notes ?? []).map((rel, i) => ({ id: `N${i + 1}`, label: `Call note ${i + 1}`, text: readFileSync(TC(rel), "utf8") }));
     const r = await runReview({
       text: readFileSync(TC(c.file), "utf8"),
       deal: dealFromCase(c),
       ref,
       linked,
+      notes,
       previous,
       linkedToDeal: Boolean(c.deal.linked?.length),
       onProgress: (step, detail) => process.stdout.write(`\r  ${id}: ${step} ${detail ?? ""}        `),
@@ -206,6 +219,11 @@ async function runCases(ids: string[]): Promise<CaseVerdict[]> {
   const viol = verdicts.flatMap((v) => v.mustNotViolations).length;
   const sT = verdicts.reduce((a, v) => a + v.seriousTotal, 0);
   const sM = verdicts.reduce((a, v) => a + v.seriousMatched, 0);
+  const reps = Object.values(results).map((x) => (x as { report: ReviewReport }).report);
+  const tin = reps.reduce((a, r) => a + (r.tokensIn ?? 0), 0);
+  const tout = reps.reduce((a, r) => a + (r.tokensOut ?? 0), 0);
+  const price = PRICE[reps[0]?.model ?? ""] ?? PRICE.default!;
+  console.log(`Tokens ${tin.toLocaleString()} in / ${tout.toLocaleString()} out · about USD ${((tin * price[0] + tout * price[1]) / 1e6).toFixed(2)}`);
   console.log(`\nTOTAL must-catch ${caught}/${total} · must-not violations ${viol} · bands ${verdicts.filter((v) => v.bandOk).length}/${verdicts.length} · serious precision ${sT ? Math.round((sM / sT) * 100) : 100}% · saved ${path.relative(ROOT, out)}`);
   return verdicts;
 }
@@ -234,14 +252,106 @@ async function runFile(file: string) {
   printReport(path.basename(file), r);
 }
 
+// The incoming drafts with the deal facts and bundles seeded for them (scripts/seed.ts).
+type DatasetDeal = { valueUsd: number | null; currency?: string; domain: string; country: string; touchers: string[]; personal?: boolean; phi?: boolean };
+const D = {
+  harrington: { valueUsd: 210000, domain: "healthcare analytics", country: "USA", touchers: ["AtliQ Pune team", "Daniel Ortiz (US freelancer)"], personal: true, phi: true },
+  travelhub: { valueUsd: 52000, domain: "travel technology", country: "UAE", touchers: ["AtliQ Pune team"] },
+  gulfcrown: { valueUsd: 140000, domain: "hospitality analytics", country: "Saudi Arabia", touchers: ["AtliQ Pune team"] },
+  lakeshore: { valueUsd: 64000, domain: "retail data engineering / BI", country: "USA", touchers: ["AtliQ Pune team"] },
+  blueorchid: { valueUsd: 38000, domain: "hospitality analytics", country: "India", touchers: ["AtliQ Pune team"] },
+  rheinwerk: { valueUsd: 96000, currency: "EUR", domain: "industrial analytics", country: "Germany", touchers: ["AtliQ Pune team", "Kriti Data Labs (agency)"], personal: true },
+  sunrise: { valueUsd: 45000, domain: "food supply-chain analytics", country: "India", touchers: ["AtliQ Pune team"] },
+  datavane: { valueUsd: null, domain: "data platform partnerships", country: "USA", touchers: [] },
+  finserve: { valueUsd: null, domain: "lending / fintech analytics", country: "India", touchers: ["AtliQ Pune team"] },
+  loopmart: { valueUsd: null, domain: "retail analytics", country: "India", touchers: [] },
+  freelance: { valueUsd: null, domain: "analytics delivery", country: "USA", touchers: [] },
+} satisfies Record<string, DatasetDeal>;
+const IN = (f: string) => `Dataset/incoming/${f}`;
+const SIGNED_DIR = (f: string) => `Dataset/signed_contracts/${f}`;
+const DATASET: { file: string; counterparty: string; deal: DatasetDeal; buyer?: boolean; linked?: { file: string; docType: string; role: string }[] }[] = [
+  { file: IN("2026-09-10_harrington_health_msa_draft.md"), counterparty: "Harrington Health Systems, Inc.", deal: D.harrington, linked: [{ file: IN("2026-09-16_harrington_health_baa_draft.md"), docType: "baa", role: "baa" }, { file: SIGNED_DIR("2026-08-20_harrington_health_mutual_nda.md"), docType: "nda", role: "nda" }] },
+  { file: IN("2026-09-16_harrington_health_baa_draft.md"), counterparty: "Harrington Health Systems, Inc.", deal: D.harrington, linked: [{ file: IN("2026-09-10_harrington_health_msa_draft.md"), docType: "msa", role: "client_contract" }] },
+  { file: IN("2026-09-27_daniel_ortiz_contractor_agreement_draft.md"), counterparty: "Daniel Ortiz", deal: D.harrington, buyer: true, linked: [{ file: IN("2026-09-10_harrington_health_msa_draft.md"), docType: "msa", role: "client_contract" }, { file: IN("2026-09-16_harrington_health_baa_draft.md"), docType: "baa", role: "baa" }] },
+  { file: IN("2026-09-27_daniel_ortiz_nda_draft.md"), counterparty: "Daniel Ortiz", deal: D.harrington, buyer: true },
+  { file: IN("2026-09-15_travelhub_services_agreement_draft.md"), counterparty: "TravelHub FZ-LLC", deal: D.travelhub },
+  { file: IN("2026-09-18_gulf_crown_hotels_msa_draft.md"), counterparty: "Gulf Crown Hotels & Resorts Co.", deal: D.gulfcrown },
+  { file: IN("2026-09-19_lakeshore_grocers_msa_draft.md"), counterparty: "Lakeshore Grocers Inc.", deal: D.lakeshore },
+  { file: IN("2026-09-21_blueorchid_hotels_pilot_agreement_draft.md"), counterparty: "BlueOrchid Hotels Pvt Ltd", deal: D.blueorchid },
+  { file: IN("2026-09-23_rheinwerk_analytics_services_agreement_draft.md"), counterparty: "Rheinwerk Analytics GmbH", deal: D.rheinwerk, linked: [{ file: IN("2026-09-26_kriti_data_labs_subcontractor_agreement_draft.md"), docType: "subcontract", role: "subcontract" }] },
+  { file: IN("2026-09-26_kriti_data_labs_subcontractor_agreement_draft.md"), counterparty: "Kriti Data Labs", deal: D.rheinwerk, buyer: true, linked: [{ file: IN("2026-09-23_rheinwerk_analytics_services_agreement_draft.md"), docType: "msa", role: "client_contract" }] },
+  { file: IN("2026-09-24_sunrise_foods_sow2_draft.md"), counterparty: "Sunrise Foods Pvt Ltd", deal: D.sunrise, linked: [{ file: SIGNED_DIR("2025-04-18_sunrise_foods_msa.md"), docType: "msa", role: "parent_msa" }] },
+  { file: IN("2026-09-24_datavane_strategic_partnership_agreement_draft.md"), counterparty: "Datavane, Inc.", deal: D.datavane },
+  { file: IN("2026-09-25_finserve_capital_mutual_nda_draft.md"), counterparty: "FinServe Capital Private Limited", deal: D.finserve },
+  { file: IN("2026-09-27_loopmart_mutual_nda_draft.md"), counterparty: "LoopMart Retail Private Limited", deal: D.loopmart },
+  { file: IN("2026-09-27_marcus_reed_contractor_agreement_draft.md"), counterparty: "Marcus Reed", deal: D.freelance, buyer: true },
+];
+
+async function runDataset() {
+  const ref = referenceFromSeed();
+  const rows: string[] = [];
+  let tin = 0;
+  let tout = 0;
+  for (const d of DATASET) {
+    const started = Date.now();
+    const r = await runReview({
+      text: readFileSync(path.join(ROOT, d.file), "utf8"),
+      deal: {
+        counterparty: d.counterparty, valueUsd: d.deal.valueUsd, currency: d.deal.currency ?? "USD", domain: d.deal.domain, clientCountry: d.deal.country,
+        deliveredFrom: "Pune, India", dataTouchers: d.deal.touchers, direction: d.buyer ? "atliq_buyer" : "atliq_supplier", personalData: d.deal.personal ?? null, phi: d.deal.phi ?? null,
+      },
+      ref,
+      linkedToDeal: true,
+      linked: (d.linked ?? []).map((l) => ({ id: l.file, title: path.basename(l.file, ".md"), docType: l.docType, role: l.role, text: readFileSync(path.join(ROOT, l.file), "utf8") })),
+      onProgress: (step, detail) => process.stdout.write(`\r  ${path.basename(d.file)}: ${step} ${detail ?? ""}        `),
+    });
+    process.stdout.write("\n");
+    printReport(`${path.basename(d.file)} (${Math.round((Date.now() - started) / 1000)}s)`, r);
+    tin += r.tokensIn;
+    tout += r.tokensOut;
+    const unverified = r.findings.filter((f) => f.quote && !f.quoteVerified).length;
+    rows.push(`${path.basename(d.file).padEnd(62)} ${r.status.padEnd(7)} ${(r.band ?? "—").padEnd(6)} ${String(r.score ?? "—").padStart(3)} · ${r.counts.serious} Serious · ${r.counts.negotiable} Negotiable · ${unverified} unverified quote${unverified === 1 ? "" : "s"}`);
+  }
+  console.log(`\nDATASET` + "\n" + rows.join("\n"));
+  const price = PRICE.default!;
+  console.log(`Tokens ${tin.toLocaleString()} in / ${tout.toLocaleString()} out · about USD ${((tin * (PRICE["claude-sonnet-5-5"] ?? price)[0] + tout * (PRICE["claude-sonnet-5-5"] ?? price)[1]) / 1e6).toFixed(2)} on Sonnet 5.5`);
+}
+
 async function main() {
   if (args.has("--gate-only")) return report(await gateOnly());
-  const cases = argValue("--cases");
-  if (cases) return void (await runCases(cases.split(",").map((s) => s.trim().toUpperCase())));
+  if (args.has("--dataset")) return runDataset();
+  const expected: ExpectedResults = JSON.parse(readFileSync(TC("expected_results.json"), "utf8"));
+  const cases = args.has("--quick") ? QUICK : args.has("--all") ? expected.cases.map((c) => c.id) : argValue("--cases")?.split(",").map((s) => s.trim().toUpperCase());
+  if (cases) {
+    const repeat = Math.max(1, Math.min(5, Number(argValue("--repeat") ?? 1)));
+    const runs: CaseVerdict[][] = [];
+    for (let i = 0; i < repeat; i++) {
+      if (repeat > 1) console.log(`\n##### Run ${i + 1} of ${repeat}`);
+      runs.push(await runCases(cases));
+    }
+    if (repeat > 1) stability(runs);
+    return;
+  }
   const file = argValue("--file");
   if (file) return runFile(file);
-  console.error("Usage: pnpm eval --gate-only | --cases TC01,TC19 | --file <path> [--value N --country X --domain D --counterparty C --buyer]");
+  console.error("Usage: pnpm eval --gate-only | --quick | --all | --cases TC01,TC19 [--repeat N] | --file <path> [--value N --country X --domain D --counterparty C --buyer]");
   process.exitCode = 2;
+}
+
+/** How often each must-catch was caught across repeated runs: anything caught in some runs but not all is flaky. */
+function stability(runs: CaseVerdict[][]) {
+  const tally = new Map<string, number>();
+  for (const run of runs)
+    for (const v of run)
+      for (const c of v.catches) {
+        const k = `${v.id} ${c.check}/${c.severity} @${c.clause}`;
+        tally.set(k, (tally.get(k) ?? 0) + (c.found ? 1 : 0));
+      }
+  const flaky = [...tally].filter(([, n]) => n > 0 && n < runs.length);
+  const never = [...tally].filter(([, n]) => n === 0);
+  console.log(`\nSTABILITY over ${runs.length} runs: ${tally.size - flaky.length - never.length} always caught · ${flaky.length} flaky · ${never.length} never`);
+  for (const [k, n] of flaky) console.log(`  FLAKY ${n}/${runs.length}  ${k}`);
+  for (const [k] of never) console.log(`  NEVER       ${k}`);
 }
 
 main();

@@ -3,10 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Crumbs, SeverityChip, Tag } from "@/components/ui";
 import { CallNoteForm } from "@/components/deal/CallNoteForm";
+import { CopyButton } from "@/components/CopyButton";
 import { getDeal } from "@/lib/data/deals";
 import { getCurrentUser } from "@/lib/auth/session";
 import { can } from "@/lib/auth/permissions";
-import { appToday } from "@/lib/config";
+import { appToday, toAppDay } from "@/lib/config";
 import { daysBetween, formatDate } from "@/lib/checks/dates";
 import { isUS } from "@/lib/checks/entityLaw";
 import { clauseLabel, docLabel } from "@/lib/display";
@@ -25,6 +26,7 @@ const STATE: Record<CheckState, [string, string]> = {
   missing: ["n", "Missing"],
   check: ["c", "Check"],
 };
+const NOTE_VERDICT: Record<string, string> = { clashes: "Clashes", check: "Not in writing", matches: "Matches", not_in_contract: "Not a contract point" };
 const left = (d: number) => (d < 0 ? `${-d} day${d === -1 ? "" : "s"} late` : d === 0 ? "today" : `${d} day${d === 1 ? "" : "s"} left`);
 
 export default async function DealPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ tab?: string }> }) {
@@ -240,17 +242,77 @@ export default async function DealPage({ params, searchParams }: { params: Promi
                       </li>
                     ))}
                   </ul>
-                  {passFindings.map((f) => (
-                    <div key={f.id} className="answer warn">
-                      <span className="h">
-                        <SeverityChip sev={f.severity === "serious" ? "serious" : "negotiable"}>Gap</SeverityChip>
-                        {f.title}
-                      </span>
-                      {f.whatItMeans ? <p>{f.whatItMeans}</p> : null}
-                      {f.howToSoften ? <span className="src">Flow-down: {f.howToSoften}</span> : null}
+                  {passFindings.length ? (
+                    <div className="tablewrap">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Term</th>
+                            <th>AtliQ promised the client</th>
+                            <th>The contractor promises AtliQ</th>
+                            <th>Match</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {passFindings.map((f) => (
+                            <tr key={f.id}>
+                              <td className="co">
+                                {f.title}
+                                <small>{f.contractTitle}</small>
+                              </td>
+                              <td style={{ maxWidth: 320 }}>
+                                {f.quoteB ? <span className="quote" style={{ display: "block", padding: "4px 8px" }}>{f.quoteB}</span> : <span className="muted">—</span>}
+                                <small className="hint">
+                                  {f.docB}
+                                  {f.clauseB ? ` · ${clauseLabel(f.clauseB)}` : ""}
+                                  {f.quoteB && !f.quoteBVerified ? " · quote not verified" : ""}
+                                </small>
+                              </td>
+                              <td style={{ maxWidth: 320 }}>
+                                {f.absent || !f.quote ? (
+                                  <>
+                                    <span className="muted">Nothing on this, after reading every clause</span>
+                                    {f.quote ? (
+                                      <small className="hint" style={{ display: "block", marginTop: 4 }}>
+                                        Why it matters: &ldquo;{f.quote}&rdquo; ({clauseLabel(f.clause) || "schedule"})
+                                      </small>
+                                    ) : null}
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="quote" style={{ display: "block", padding: "4px 8px" }}>{f.quote}</span>
+                                    <small className="hint">
+                                      {clauseLabel(f.clause)}
+                                      {f.quoteVerified ? "" : " · quote not verified"}
+                                    </small>
+                                  </>
+                                )}
+                              </td>
+                              <td style={{ maxWidth: 300 }}>
+                                <span className={`mk ${f.absent ? "n" : "w"}`} style={{ fontWeight: 600 }}>
+                                  {f.absent ? "Gap" : "Weaker"}
+                                </span>
+                                {f.whatItMeans ? <small className="hint" style={{ display: "block" }}>{f.whatItMeans}</small> : null}
+                                {f.flowDown ? (
+                                  <span style={{ display: "block", marginTop: 6 }}>
+                                    <span className="quote" style={{ display: "block", padding: "4px 8px", marginBottom: 4 }}>{f.flowDown}</span>
+                                    <CopyButton text={f.flowDown} />
+                                  </span>
+                                ) : null}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                  ))}
-                  <p className="hint">The term-by-term table (client promise vs contractor promise, with flow-down wording to copy) reads both contracts with the AI. It arrives with the AI features in P12.</p>
+                  ) : (
+                    <p className="hint">
+                      {contractors.some((c) => c.band)
+                        ? "No pass-down gaps in the contractor agreements' reviews: they carry what AtliQ promised the client."
+                        : "Run the AI review of each contractor agreement; it is read against the client contract and every gap shows here, term by term, with wording to copy."}
+                    </p>
+                  )}
+                  <p className="hint">Flow-down wording is a suggestion to copy into the contractor agreement; AtliQ Review never edits a contract.</p>
                 </>
               ) : (
                 <p className="hint">No contractor or agency documents in this deal, so there is nothing to compare. If a freelancer joins, check the IP clause: AtliQ&apos;s freelancer template lets them keep it.</p>
@@ -269,20 +331,41 @@ export default async function DealPage({ params, searchParams }: { params: Promi
                 </div>
                 {notes.length ? (
                   <div className="answers">
-                    {notes.map((n) => (
-                      <div key={n.id} className="answer">
-                        <span className="h">
-                          <SeverityChip sev="neutral">Not compared yet</SeverityChip>
-                          {n.approvedBy ?? "Someone"} · {n.title.replace(/^Call on (\d{4}-\d{2}-\d{2})$/, (_, d: string) => `call on ${formatDate(d)}`)}
-                        </span>
-                        <p>&ldquo;{n.text}&rdquo;</p>
-                      </div>
-                    ))}
+                    {notes.map((n) => {
+                      const checks = n.checks ?? [];
+                      const worst = checks.some((c) => c.verdict === "clashes") ? "stop" : checks.some((c) => c.verdict === "check") ? "warn" : checks.length ? "ok" : "";
+                      const compared = docs.find((d) => d.id === n.comparedContractId);
+                      return (
+                        <div key={n.id} className={`answer ${worst}`}>
+                          <span className="h">
+                            {checks.length ? (
+                              <SeverityChip sev={worst === "stop" ? "serious" : worst === "warn" ? "negotiable" : "okc"}>{worst === "stop" ? "Clashes" : worst === "warn" ? "Check" : "Matches"}</SeverityChip>
+                            ) : (
+                              <SeverityChip sev="neutral">Not compared yet</SeverityChip>
+                            )}
+                            {n.approvedBy ?? "Someone"} · {n.title.replace(/^Call on (\d{4}-\d{2}-\d{2})$/, (_, d: string) => `call on ${formatDate(d)}`)}
+                          </span>
+                          <p>&ldquo;{n.text}&rdquo;</p>
+                          {checks.map((c, i) => (
+                            <span key={i} className="src" style={{ display: "block" }}>
+                              <b>{NOTE_VERDICT[c.verdict] ?? c.verdict}</b> · {c.topic}: {c.explanation}
+                              {c.quote && c.quoteVerified ? <span className="quote" style={{ display: "block", marginTop: 4, padding: "4px 8px" }}>{clauseLabel(c.clause)}: {c.quote}</span> : null}
+                            </span>
+                          ))}
+                          {checks.length ? (
+                            <span className="src">
+                              Compared with {compared ? compared.title : "a contract in this deal"}
+                              {n.comparedAt ? ` on ${formatDate(toAppDay(n.comparedAt))}` : ""}. What was said on a call is outside the contract; only the contract binds.
+                            </span>
+                          ) : null}
+                        </div>
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="hint">No notes yet. Add what was said on a call, so a promise made by phone can&apos;t slip into a signed contract unnoticed.</p>
                 )}
-                <p className="hint">Comparing each note with what the draft says needs the AI, so it arrives in P12. Until then notes are kept here for the reviewer to read.</p>
+                <p className="hint">Each note is compared with the contract the next time one of this deal&apos;s documents is reviewed. A clash shows on that contract&apos;s report too.</p>
               </section>
               {can(me, "deal.note") ? <CallNoteForm dealId={deal.id} today={today} /> : null}
             </>
