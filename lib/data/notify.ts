@@ -8,7 +8,7 @@ import { appToday } from "@/lib/config";
 import { daysBetween, formatDate } from "@/lib/checks/dates";
 import type { Person } from "@/lib/people";
 
-export type NotifyKind = "assigned" | "review_done" | "deadline_soon" | "overdue" | "new_version" | "comment" | "decision";
+export type NotifyKind = "assigned" | "review_done" | "deadline_soon" | "overdue" | "new_version" | "comment" | "decision" | "counsel";
 
 export async function notify(args: { recipient: string; kind: NotifyKind; text: string; contractId?: string | null; reviewId?: string | null; dedupeKey?: string }) {
   await getDb()

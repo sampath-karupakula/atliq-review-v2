@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { appToday, DEFAULT_TODAY } from "./config";
+import { appToday, DEFAULT_TODAY, toAppDay } from "./config";
 
 describe("appToday", () => {
   const original = process.env.APP_TODAY;
@@ -21,5 +21,13 @@ describe("appToday", () => {
   it("ignores a malformed APP_TODAY", () => {
     process.env.APP_TODAY = "14 Oct 2026";
     expect(appToday()).toBe(DEFAULT_TODAY);
+  });
+});
+
+describe("toAppDay", () => {
+  it("moves a real timestamp onto the APP_TODAY calendar", () => {
+    const now = new Date("2026-10-15T10:00:00Z");
+    expect(toAppDay(new Date("2026-10-15T09:00:00Z"), now)).toBe(DEFAULT_TODAY);
+    expect(toAppDay(new Date("2026-10-13T09:00:00Z"), now)).toBe("2026-09-26");
   });
 });

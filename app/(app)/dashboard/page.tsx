@@ -6,6 +6,9 @@ import { DueByWeekChart, Legend, TrendChart, WorkloadBars } from "@/components/d
 import { TakeButton } from "@/components/dashboard/TakeButton";
 import { OfferCheck } from "@/components/offer/OfferCheck";
 import { getOfferInputs } from "@/lib/data/offer";
+import { counselQuestionsList, reviewTimes } from "@/lib/data/handoff";
+import { questionStatus, hm } from "@/lib/review/handoff";
+import { TimeBar } from "@/components/handoff/TimeBar";
 import { StageTracker } from "@/components/report/StageTracker";
 import { ROLES } from "@/lib/roles";
 import { currentRole } from "@/lib/viewer";
@@ -38,7 +41,7 @@ export default async function Dashboard() {
   const [queue, coverage] = await Promise.all([getQueueRows(), getCoverage()]);
   if (role === "ceo") return <CeoDashboard queue={queue} coverage={coverage} today={today} longDate={longDate} />;
   if (role === "reviewer") return <ReviewerDashboard queue={queue} today={today} longDate={longDate} me={r.name} />;
-  return <CounselDashboard queue={queue} longDate={longDate} />;
+  return <CounselDashboard queue={queue} longDate={longDate} today={today} />;
 }
 
 async function CeoDashboard({ queue, coverage, today, longDate }: { queue: QueueRow[]; coverage: { onFile: number; signedInTracker: number }; today: string; longDate: string }) {
@@ -153,7 +156,9 @@ async function CeoDashboard({ queue, coverage, today, longDate }: { queue: Queue
 async function ReviewerDashboard({ queue, today, longDate, me }: { queue: QueueRow[]; today: string; longDate: string; me: string }) {
   const mine = filterQueue(queue.filter((q) => q.reviewer === me && !q.decision), "all", "", today);
   const dueSoon = mine.filter((q) => q.reviewDeadline && daysBetween(today, q.reviewDeadline) <= 2);
-  const [deals, finished, offer] = await Promise.all([dealsOwnedBy(me), finishedReviewsOf(me), getOfferInputs()]);
+  const [deals, finished, offer, times] = await Promise.all([dealsOwnedBy(me), finishedReviewsOf(me), getOfferInputs(), reviewTimes(mine.map((m) => m.id))]);
+  const plan = [...times].sort((a, b) => (a.due ?? "9999").localeCompare(b.due ?? "9999"));
+  const planMax = Math.max(60, ...plan.map((t) => Math.max(t.est, t.spent)));
   const stages = await Promise.all(deals.map((d) => (d.mainContractId ? getContractStage(d.mainContractId) : Promise.resolve(null))));
   const unassigned = toAssign(queue).filter((q) => q.deadline && daysBetween(today, q.deadline) <= 14);
   const onTimeCount = finished.filter((f) => onTime(f.reviewDeadline, f.completedOn) >= 0).length;
@@ -177,6 +182,34 @@ async function ReviewerDashboard({ queue, today, longDate, me }: { queue: QueueR
       </div>
       <div className="today-grid">
         <div className="queue">
+          {plan.length ? (
+            <section className="panel">
+              <div className="sec-head">
+                <h3>Your review time</h3>
+                <span className="hint">
+                  Assigned to you · <b className="num">{hm(plan.reduce((a, t) => a + t.left, 0))}</b> of review left
+                </span>
+              </div>
+              <div className="tplan">
+                {plan.map((t) => (
+                  <Link key={t.contractId} className="tp-row" href={`/mark/${t.contractId}`}>
+                    <span className="tp-name">
+                      <b>{t.title}</b>
+                      <small>
+                        {t.due ? `due ${formatDate(t.due)}` : "no date"} · {t.basis}
+                      </small>
+                    </span>
+                    <span className="tp-num num">
+                      {t.spent ? `${hm(t.spent)} / ` : ""}
+                      {hm(t.est)}
+                      <small>{t.done ? "done" : t.over ? `over by ${hm(t.spent - t.est)}` : `${hm(t.left)} left`}</small>
+                    </span>
+                    <TimeBar est={t.est} spent={t.spent} max={planMax} />
+                  </Link>
+                ))}
+              </div>
+            </section>
+          ) : null}
           <div className="sec-head">
             <h2>Deals you own</h2>
             <p>From draft to signature</p>
@@ -264,13 +297,19 @@ async function ReviewerDashboard({ queue, today, longDate, me }: { queue: QueueR
   );
 }
 
-function CounselDashboard({ queue, longDate }: { queue: QueueRow[]; longDate: string }) {
+async function CounselDashboard({ queue, longDate, today }: { queue: QueueRow[]; longDate: string; today: string }) {
   const toRead = queue.filter((q) => q.reviewState === "done" && q.band === "High" && !q.decision);
+  const waiting = (await counselQuestionsList()).filter((q) => !q.answer);
+  const late = waiting.filter((q) => ["overdue", "soon"].includes(questionStatus({ answerBy: q.answerBy, answeredOn: null }, today).key)).length;
   return (
     <section className="wrap page">
       <PageHead eyebrow={`${longDate} · outside counsel · read-only`} title="Reports to read" />
+      <div className="kpis">
+        <Kpi value={waiting.length} label="Questions waiting for you" sub={late ? `${late} due within 2 days or overdue` : "Nothing urgent"} href="/counsel" alert={late > 0} />
+        <Kpi value={toRead.length} label="High-risk reports" sub="Waiting for Karandeep's decision" />
+      </div>
       <p className="muted" style={{ maxWidth: "68ch" }}>
-        Questions shared with you through a counsel pack appear here with their answer-by dates (they arrive with the counsel pack). Meanwhile, these are the High-risk reports waiting for a decision.
+        Answer the questions shared with you on the Questions page; answers show on the report and in Karandeep&apos;s tracker. These are the High-risk reports waiting for a decision.
       </p>
       <div className="cards2" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         {toRead.length ? (

@@ -3,6 +3,7 @@
 // APP_TODAY. The `seeded_status` column keeps the seeded value for reference only.
 import {
   boolean,
+  uniqueIndex,
   date,
   integer,
   jsonb,
@@ -320,6 +321,8 @@ export const assignments = pgTable("assignments", {
   concerns: text("concerns"),
   status: text("status").notNull().default("assigned"), // assigned | done
   completedAt: timestamp("completed_at", { withTimezone: true }),
+  /** Minutes the reviewer spent on the marking screen (a heartbeat while it is open and in front). */
+  minutesSpent: integer("minutes_spent").notNull().default(0),
   createdAt: createdAt(),
 });
 
@@ -484,4 +487,66 @@ export const offerChecks = pgTable(
     createdAt: createdAt(),
   },
   (t) => [index("offer_checks_actor_idx").on(t.actor)],
+);
+
+// ---------- Review hand-off (P10) ----------
+
+/** A reviewer's view of one finding: agree (push back on it), disagree, or a question for Karandeep. */
+export const findingMarks = pgTable(
+  "finding_marks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    contractId: uuid("contract_id")
+      .notNull()
+      .references(() => contracts.id),
+    findingId: uuid("finding_id")
+      .notNull()
+      .references(() => findings.id),
+    reviewer: text("reviewer").notNull(),
+    mark: text("mark").notNull(), // agree | disagree | question
+    note: text("note"),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("finding_marks_finding_reviewer_idx").on(t.findingId, t.reviewer), index("finding_marks_contract_idx").on(t.contractId)],
+);
+
+/** A second reviewer on the CEO's own High-risk deal: a prompt, not a lock. `declined` records "Not this time". */
+export const secondReviews = pgTable(
+  "second_reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    contractId: uuid("contract_id")
+      .notNull()
+      .references(() => contracts.id),
+    reviewer: text("reviewer"),
+    assignedBy: text("assigned_by").notNull(),
+    reviewDeadline: date("review_deadline"),
+    status: text("status").notNull().default("assigned"), // assigned | done | declined
+    minutesSpent: integer("minutes_spent").notNull().default(0),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("second_reviews_contract_idx").on(t.contractId)],
+);
+
+/** A question to outside counsel, sent as part of a counsel pack. The app shares it in-app only; nothing is emailed. */
+export const counselQuestions = pgTable(
+  "counsel_questions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    packId: uuid("pack_id").notNull(),
+    contractId: uuid("contract_id")
+      .notNull()
+      .references(() => contracts.id),
+    question: text("question").notNull(),
+    files: jsonb("files").$type<string[]>().notNull().default([]),
+    askedBy: text("asked_by").notNull(),
+    answerBy: date("answer_by"),
+    answer: text("answer"),
+    answeredBy: text("answered_by"),
+    answeredAt: timestamp("answered_at", { withTimezone: true }),
+    nudgedAt: timestamp("nudged_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("counsel_questions_contract_idx").on(t.contractId)],
 );

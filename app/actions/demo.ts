@@ -20,6 +20,10 @@ export async function resetDemoState(): Promise<ActionResult> {
   const db = getDb();
   await db.transaction(async (tx) => {
     await tx.execute(sql`update findings set dismissed = false, dismissed_by = null, dismiss_reason = null, dismissed_at = null, accepted = false, accept_note = null, comments = '[]'::jsonb`);
+    await tx.execute(sql`delete from finding_marks`);
+    await tx.execute(sql`delete from second_reviews`);
+    await tx.execute(sql`delete from counsel_questions`);
+    await tx.execute(sql`delete from offer_checks`);
     await tx.execute(sql`delete from assignments`);
     await tx.execute(sql`delete from notifications`);
     await tx.execute(sql`delete from audit_events`);
@@ -31,7 +35,7 @@ export async function resetDemoState(): Promise<ActionResult> {
         status = case when exists (select 1 from reviews r where r.contract_id = c.id and r.status = 'done') then 'reviewed' else 'received' end
       where not c.is_signed`);
   });
-  await logEvent({ actor: viewer, action: "demo.reset", text: "Reset the demo: dismissals, accepted risks, comments, decisions, assignments, notifications and the activity log were cleared. Reviews were kept." });
+  await logEvent({ actor: viewer, action: "demo.reset", text: "Reset the demo: dismissals, accepted risks, comments, decisions, assignments, marks, second reviews, counsel questions, offer checks, notifications and the activity log were cleared. Reviews were kept." });
   revalidatePath("/", "layout");
   return { ok: true };
 }
