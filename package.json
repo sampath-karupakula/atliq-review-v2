@@ -18,7 +18,9 @@
     "seed": "tsx scripts/seed.ts",
     "eval": "tsx scripts/eval.ts",
     "ai:ping": "tsx scripts/ai-ping.ts",
-    "portfolio": "tsx scripts/portfolio.ts"
+    "portfolio": "tsx scripts/portfolio.ts",
+    "seed:users": "tsx scripts/seed-users.ts",
+    "ci:session": "tsx scripts/ci-session.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

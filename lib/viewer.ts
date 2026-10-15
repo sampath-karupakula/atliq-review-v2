@@ -1,10 +1,10 @@
 import "server-only";
-import { cookies } from "next/headers";
-import { isRole, ROLE_COOKIE, type Role } from "./roles";
+import { getCurrentUser } from "@/lib/auth/session";
+import type { Role } from "./roles";
 
-// Who is looking at the page. Until P11 this is the demo "Viewing as" cookie; the default is the CEO.
+const VIEW_OF = { admin: "ceo", reviewer: "reviewer", viewer: "counsel" } as const;
+
+// Which screens someone sees (CEO, reviewer or counsel), from the signed-in account's role (or the demo person).
 export async function currentRole(): Promise<Role> {
-  const jar = await cookies();
-  const v = jar.get(ROLE_COOKIE)?.value;
-  return isRole(v) ? v : "ceo";
+  return VIEW_OF[(await getCurrentUser()).role];
 }

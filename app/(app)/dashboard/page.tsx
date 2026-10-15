@@ -10,8 +10,8 @@ import { counselQuestionsList, reviewTimes } from "@/lib/data/handoff";
 import { questionStatus, hm } from "@/lib/review/handoff";
 import { TimeBar } from "@/components/handoff/TimeBar";
 import { StageTracker } from "@/components/report/StageTracker";
-import { ROLES } from "@/lib/roles";
 import { currentRole } from "@/lib/viewer";
+import { getCurrentUser } from "@/lib/auth/session";
 import { appToday } from "@/lib/config";
 import { getQueueRows } from "@/lib/data/queue";
 import { getCoverage } from "@/lib/data/register";
@@ -34,13 +34,12 @@ const addDays = (iso: string, n: number) => {
 };
 
 export default async function Dashboard() {
-  const role = await currentRole();
-  const r = ROLES[role];
+  const [role, user] = await Promise.all([currentRole(), getCurrentUser()]);
   const today = appToday();
   const longDate = new Date(today + "T00:00:00").toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
   const [queue, coverage] = await Promise.all([getQueueRows(), getCoverage()]);
   if (role === "ceo") return <CeoDashboard queue={queue} coverage={coverage} today={today} longDate={longDate} />;
-  if (role === "reviewer") return <ReviewerDashboard queue={queue} today={today} longDate={longDate} me={r.name} />;
+  if (role === "reviewer") return <ReviewerDashboard queue={queue} today={today} longDate={longDate} me={user.name} />;
   return <CounselDashboard queue={queue} longDate={longDate} today={today} />;
 }
 

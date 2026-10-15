@@ -16,6 +16,10 @@ export function toAppDay(d: Date, now = new Date()): string {
   return new Date(d.getTime() + offset).toISOString().slice(0, 10);
 }
 
+/** Demo mode keeps the "Viewing as" switch: no sign-in needed, the role cookie picks the demo person. Off in a real
+ * deployment, where every page and action needs a signed-in account. */
+export const demoMode = () => process.env.DEMO_MODE === "1";
+
 export type AiProvider = "anthropic" | "groq";
 export type Effort = "low" | "medium" | "high" | "xhigh" | "max";
 

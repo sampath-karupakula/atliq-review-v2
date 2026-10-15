@@ -6,7 +6,7 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/lib/db/client";
 import { assignments, contracts, counselQuestions, findings, negotiationConditions, secondReviews } from "@/lib/db/schema";
-import { authorize, getCurrentUser, PermissionError } from "@/lib/auth/session";
+import { authorize, getSessionUser, PermissionError } from "@/lib/auth/session";
 import type { Action, Context } from "@/lib/auth/permissions";
 import { logEvent } from "@/lib/data/audit";
 import { notify } from "@/lib/data/notify";
@@ -28,7 +28,7 @@ async function who(action: Action, ctx: Context = {}): Promise<string | { error:
 
 /** The reviewer acting on the marking screen: only the open assignee (first or second) marks; Karandeep reads. */
 async function marker(contractId: string): Promise<{ name: string; kind: "first" | "second" } | { error: string }> {
-  const me = await getCurrentUser();
+  const me = await getSessionUser();
   if (!me) return { error: "Sign in first." };
   const role = await reviewerRole(contractId, me.name);
   if (!role) return { error: "Only the assigned reviewer marks this review." };
@@ -95,7 +95,7 @@ export async function finishReview(contractId: string): Promise<ActionResult> {
 // The heartbeat adds a minute at most once a minute per reviewer and contract.
 const lastBeat = new Map<string, number>();
 export async function reviewHeartbeat(contractId: string): Promise<ActionResult> {
-  const me = await getCurrentUser();
+  const me = await getSessionUser();
   if (!me) return { ok: false, error: "Sign in first." };
   const role = await reviewerRole(contractId, me.name);
   if (!role) return { ok: true };

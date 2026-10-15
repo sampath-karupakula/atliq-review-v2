@@ -29,6 +29,8 @@ jobs:
       DATABASE_URL: postgres://atliq:atliq@localhost:5432/atliq
       APP_TODAY: "2026-09-28"
       NEXT_TELEMETRY_DISABLED: "1"
+      # A CI-only password for the seeded demo accounts.
+      SEED_USER_PASSWORD: "ci-Rv7-seven-keys-91"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -51,7 +53,8 @@ jobs:
         run: pnpm build
       - name: Smoke test
         run: |
-          pnpm start -p 3000 &
+          # The page smoke test runs in demo mode ("Viewing as" via the atliq_role cookie); sign-in is tested below.
+          DEMO_MODE=1 pnpm start -p 3000 &
           for i in $(seq 1 30); do curl -sf localhost:3000/api/health >/dev/null && break; sleep 2; done
           curl -sf localhost:3000/api/health
           test "$(curl -s -o /dev/null -w '%{http_code}' localhost:3000/)" = "307"
@@ -98,3 +101,20 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' -b atliq_role=counsel -F file=@test_contracts/contracts/TC02_maplecrest_outdoor_msa.md $D localhost:3000/api/contracts)" = "403"
           test "$(curl -s -o /dev/null -w '%{http_code}' -F file=@test_contracts/contracts/TC03_sahyadri_agritech_nda.md localhost:3000/api/contracts/signed)" = "201"
           curl -s localhost:3000/register | grep -q 'Checked against 18 of 30'
+      - name: Sign-in smoke test (demo mode off)
+        run: |
+          pnpm start -p 3001 &
+          for i in $(seq 1 30); do curl -sf localhost:3001/api/health >/dev/null && break; sleep 2; done
+          # Signed out: pages go to /login, APIs answer 401, and the demo cookie counts for nothing.
+          test "$(curl -s -o /dev/null -w '%{http_code}' localhost:3001/login)" = "200"
+          curl -s -o /dev/null -w '%{redirect_url}' localhost:3001/dashboard | grep -q '/login?next=%2Fdashboard'
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST localhost:3001/api/contracts)" = "401"
+          test "$(curl -s -o /dev/null -w '%{http_code}' -b atliq_role=ceo -X POST localhost:3001/api/contracts)" = "401"
+          # Counsel (a viewer) reads but can't upload; only an admin manages users.
+          C=$(pnpm -s ci:session counsel@atliq.test)
+          curl -s -b "atliq_session=$C" localhost:3001/dashboard | grep -q 'Questions waiting for you'
+          test "$(curl -s -o /dev/null -w '%{http_code}' -b "atliq_session=$C" -F file=@test_contracts/contracts/TC02_maplecrest_outdoor_msa.md localhost:3001/api/contracts)" = "403"
+          curl -s -b "atliq_session=$C" localhost:3001/admin/users | grep -q 'Only an admin manages users.'
+          A=$(pnpm -s ci:session karandeep@atliq.test)
+          curl -s -b "atliq_session=$A" localhost:3001/admin/users | grep -q 'karandeep@atliq.test'
+          curl -s -b "atliq_session=$A" localhost:3001/dashboard | grep -q 'Karandeep'
