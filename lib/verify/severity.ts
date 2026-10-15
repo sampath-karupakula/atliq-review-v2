@@ -53,3 +53,17 @@ export function topicOf(category: string | null | undefined, title: string): str
   if (category && !["fairness", "other", "missing_protection"].includes(category)) return category;
   return TOPIC_WORDS.find(([, re]) => re.test(title))?.[0] ?? category ?? "other";
 }
+
+/** AtliQ's longest acceptable payment term, from the usual terms ("30 days, 45 at most"). */
+export const PAYMENT_MAX_DAYS = 45;
+
+/**
+ * Code's floor on payment terms (TC25): when AtliQ is paid more than 45 days after invoice, the finding is at least
+ * Negotiable, whatever severity the full read proposed. The days come from the verified quote, never the AI.
+ */
+export function paymentFloor(f: Pick<FindingDraft, "category" | "title" | "quote">, severity: Severity, direction: string): Severity {
+  if (direction === "atliq_buyer" || severity !== "minor" || !f.quote) return severity;
+  if (topicOf(f.category, f.title) !== "payment") return severity;
+  const days = [...f.quote.matchAll(/\((\d{2,3})\)\s*(?:calendar\s+|business\s+)?days|\b(\d{2,3})\s*(?:calendar\s+|business\s+)?days\b/gi)].map((m) => Number(m[1] ?? m[2]));
+  return days.some((d) => d > PAYMENT_MAX_DAYS) ? "negotiable" : severity;
+}

@@ -324,6 +324,25 @@ export function checkTerms(extract: Extract, deal: DealContext, docType: string,
       }
       continue;
     }
+    // Where AtliQ may promote or resell the other party's own product is the scope of the appointment, not a
+    // restriction on AtliQ's business (TC16: "shall not promote or implement the Platform for customers in India").
+    // A real exclusivity names competitors ("no competing platform"), and stays Serious.
+    const appointmentOnly =
+      (r.type === "exclusivity" || r.type === "non_compete") &&
+      /\b(promote|market|resell|refer|implement|distribute|sell)\b[^.]{0,80}\bthe (Platform|Product|Products|Software|Solution|Service)\b/i.test(r.quote ?? "") &&
+      !/\bcompet/i.test(`${r.quote} ${r.scope}`);
+    if (appointmentOnly) {
+      out.push(draft({
+        check: "full_read", category: "restriction", severity: "minor", basis: "clarity",
+        title: `Partner appointment limited to a territory${r.territory ? ` (${r.territory})` : ""}`,
+        clause: r.clause, quote: r.quote, absent: false,
+        whatItMeans: "This only limits where AtliQ may promote or implement the other party's platform under this appointment. It does not stop AtliQ's other work.",
+        whatItCouldCost: "Nothing outside this partnership.",
+        howToSoften: "Fine as it is; check it doesn't conflict with any other partner appointment AtliQ holds.",
+        related: { type: r.type, scope: r.scope, territory: r.territory, appointmentOnly: true },
+      }));
+      continue;
+    }
     const label = { non_compete: "non-compete", exclusivity: "exclusivity", best_price: "best-price promise" }[r.type];
     out.push(draft({
       check: "full_read", category: "restriction", severity: "serious", basis: r.type === "best_price" ? "unbounded" : "irreversible",

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { capMultiple, money, penaltyMath } from "./dealValue";
 import { checkEntityLaw, entityOf, isUS, lawKind } from "./entityLaw";
 import { checkTerms, CLIENT_DELAY_EXCLUSION, NOT_SOLE_REMEDY } from "./baseline";
+import { checkReferences } from "./document";
+import { splitClauses } from "@/lib/ingest/clauses";
 import { decideSeverity } from "@/lib/verify/severity";
 import { countSeverities, scoreOf } from "@/lib/score/score";
 import type { Extract, ExtractTerm } from "@/lib/ai/schemas";
@@ -179,6 +181,15 @@ describe("usual terms and missing protections (A2/A3)", () => {
     });
     expect(sev(checkTerms(e, deal(), "msa"))).toEqual(["full_read:serious", "full_read:serious"]);
   });
+  it("TC16: a limit on where AtliQ promotes the other party's platform is the appointment's scope, not a restriction", () => {
+    const appointment = { type: "exclusivity" as const, binds: "atliq" as const, scope: "promotion of the Platform", territory: "EU and UK", duration: null, binds_affiliates: false, clause: "2.2", quote: "shall not promote or implement the Platform for customers in India or any GCC state" };
+    expect(sev(checkTerms(emptyExtract({ restrictions: [appointment] }), deal(), "partnership"))).toEqual(["full_read:minor"]);
+    // A real exclusivity names competitors and stays Serious.
+    const real = { ...appointment, scope: "competing platforms", quote: "shall not promote any competing platform in India or any GCC state" };
+    expect(sev(checkTerms(emptyExtract({ restrictions: [real] }), deal(), "partnership"))).toEqual(["full_read:serious"]);
+    // The AI may file the same clause as a non-compete.
+    expect(sev(checkTerms(emptyExtract({ restrictions: [{ ...appointment, type: "non_compete" as const }] }), deal(), "partnership"))).toEqual(["full_read:minor"]);
+  });
   it("TC36: AtliQ as buyer — the mirror test gives fairness/negotiable, never serious", () => {
     const e = emptyExtract({
       terms: [
@@ -212,5 +223,17 @@ describe("P7 severity and the score", () => {
     expect(scoreOf(countSeverities([{ severity: "negotiable" }, { severity: "negotiable" }, { severity: "negotiable" }]))).toEqual({ score: 30, band: "Medium" });
     expect(scoreOf(countSeverities([{ severity: "serious" }]))).toEqual({ score: 20, band: "High" });
     expect(scoreOf(countSeverities([{ severity: "serious", dismissed: true }]))).toEqual({ score: 0, band: "Low" });
+  });
+});
+
+describe("referenced documents (R-REF)", () => {
+  const ref = (name: string, governs: "data" | "liability" | "price" | "scope" | "security" | "other") => ({ name, present_in_text: false, governs, clause: "3.2", quote: `in accordance with ${name}` });
+  const run = (docs: ReturnType<typeof ref>[]) => checkReferences(emptyExtract({ referenced_documents: docs }), splitClauses("3.2 The Partner shall act in accordance with the referenced material."));
+
+  it("an online portal or published documentation is Minor, not a gap (TC16)", () => {
+    expect(run([ref("the partner portal", "other"), ref("the Platform's published documentation", "scope")]).map((f) => f.severity)).toEqual(["minor", "minor"]);
+  });
+  it("a missing DPA is Serious; a missing policy is Negotiable", () => {
+    expect(run([ref("Annex 4 - Data Processing Agreement", "data"), ref("Client's IT policies", "security")]).map((f) => f.severity)).toEqual(["serious", "negotiable"]);
   });
 });

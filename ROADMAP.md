@@ -18,6 +18,8 @@ pinned in CI. The prototype's example dates are illustrative only.
 
 ## Phases
 
+**Status (15 Oct 2026):** P0–P13 built and merged. Latest `pnpm eval --all`: must-catch 53/56 (95 %), quotes 290/290 verbatim; see README → Evaluation.
+
 Order: every feature that runs without the AI is built first (P9–P11); the AI-dependent pieces wait for P12, then evals and shipping in P13.
 
 | # | Branch | Build | Acceptance at the gate |
