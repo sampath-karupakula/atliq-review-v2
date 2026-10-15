@@ -78,6 +78,13 @@ jobs:
           ! curl -s -b atliq_role=counsel "localhost:3000/register?tab=promises" | grep -q 'Add a promise'
           curl -s localhost:3000/exposure | grep -q 'Signed but not on file'
           curl -s localhost:3000/exposure | grep -q 'tracker=C-0'
+          # Deals (P9): Harrington's data gate is red until the BAA is signed; Gulf Crown needs the Al Noor waiver.
+          DL=$(curl -s localhost:3000/deals)
+          echo "$DL" | grep -q 'Data transfer not allowed'
+          echo "$DL" | grep -q 'Needs a waiver: Al Noor Hospitality Group Clause 12.1'
+          HH=$(echo "$DL" | grep -o '/deals/[0-9a-f-]\{36\}' | head -1)
+          test "$(curl -s -o /dev/null -w '%{http_code}' "localhost:3000$HH")" = "200"
+          curl -s localhost:3000/offer | grep -q 'Type the term'
           # Upload (no AI): a contract is stored, a scanned PDF and a duplicate are refused, a viewer is refused,
           # and a bulk signed upload moves coverage from 17 to 18.
           D="-F counterparty=Kaveri -F owner=Dhaval -F domain=retail -F clientCountry=India"

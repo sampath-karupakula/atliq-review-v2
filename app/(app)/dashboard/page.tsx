@@ -4,6 +4,8 @@ import { Kpi, PageHead, Panel, SeverityChip } from "@/components/ui";
 import { Carousel, type CarouselItem } from "@/components/dashboard/Carousel";
 import { DueByWeekChart, Legend, TrendChart, WorkloadBars } from "@/components/dashboard/Charts";
 import { TakeButton } from "@/components/dashboard/TakeButton";
+import { OfferCheck } from "@/components/offer/OfferCheck";
+import { getOfferInputs } from "@/lib/data/offer";
 import { StageTracker } from "@/components/report/StageTracker";
 import { ROLES } from "@/lib/roles";
 import { currentRole } from "@/lib/viewer";
@@ -151,7 +153,7 @@ async function CeoDashboard({ queue, coverage, today, longDate }: { queue: Queue
 async function ReviewerDashboard({ queue, today, longDate, me }: { queue: QueueRow[]; today: string; longDate: string; me: string }) {
   const mine = filterQueue(queue.filter((q) => q.reviewer === me && !q.decision), "all", "", today);
   const dueSoon = mine.filter((q) => q.reviewDeadline && daysBetween(today, q.reviewDeadline) <= 2);
-  const [deals, finished] = await Promise.all([dealsOwnedBy(me), finishedReviewsOf(me)]);
+  const [deals, finished, offer] = await Promise.all([dealsOwnedBy(me), finishedReviewsOf(me), getOfferInputs()]);
   const stages = await Promise.all(deals.map((d) => (d.mainContractId ? getContractStage(d.mainContractId) : Promise.resolve(null))));
   const unassigned = toAssign(queue).filter((q) => q.deadline && daysBetween(today, q.deadline) <= 14);
   const onTimeCount = finished.filter((f) => onTime(f.reviewDeadline, f.completedOn) >= 0).length;
@@ -189,11 +191,16 @@ async function ReviewerDashboard({ queue, today, longDate, me }: { queue: QueueR
                       {d.docs} document{d.docs === 1 ? "" : "s"} · client deadline {formatDate(d.deadline)}
                     </p>
                   </div>
-                  {d.mainContractId ? (
-                    <Link className="btn small" href={`/contracts/${d.mainContractId}`}>
-                      Open
+                  <span className="dismiss-row">
+                    <Link className="btn small quiet" href={`/deals/${d.dealId}`}>
+                      Deal
                     </Link>
-                  ) : null}
+                    {d.mainContractId ? (
+                      <Link className="btn small" href={`/contracts/${d.mainContractId}`}>
+                        Open
+                      </Link>
+                    ) : null}
+                  </span>
                 </div>
                 {stages[i] ? <StageTracker stage={stages[i]!.stage} round={stages[i]!.facts.round} /> : <p className="hint">Every document in this deal is signed.</p>}
               </article>
@@ -205,6 +212,9 @@ async function ReviewerDashboard({ queue, today, longDate, me }: { queue: QueueR
           )}
         </div>
         <aside className="side">
+          <Panel title="Quick check before a call">
+            <OfferCheck promises={offer.promises} terms={offer.terms} coverage={offer.coverage} compact />
+          </Panel>
           <Panel title="Unassigned, due within 14 days">
             {unassigned.length ? (
               <ul className="mini-list">

@@ -15,6 +15,13 @@
       "when": 1792008794436,
       "tag": "0001_youthful_hardball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792029783953,
+      "tag": "0002_nice_thunderbolt_ross",
+      "breakpoints": true
     }
   ]
 }

@@ -25,6 +25,8 @@ export type AuditAction =
   | "pushback.sent"
   | "pushback.undo"
   | "deal.edit"
+  | "deal.note"
+  | "offer.check"
   | "commitment.confirm"
   | "commitment.add"
   | "commitment.edit"
