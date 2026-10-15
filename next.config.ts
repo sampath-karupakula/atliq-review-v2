@@ -21,6 +21,9 @@ const nextConfig: NextConfig = {
   // `standalone` gives the production Docker image a self-contained server; Vercel ignores it.
   output: process.env.DOCKER_BUILD === "1" ? "standalone" : undefined,
   poweredByHeader: false,
+  // The app has no next/image; turning the optimizer off removes the /_next/image endpoint and keeps sharp (and its
+  // libvips advisories) out of the request path.
+  images: { unoptimized: true },
   async headers() {
     return [
       {
