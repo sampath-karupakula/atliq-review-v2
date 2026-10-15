@@ -1,9 +1,9 @@
 "use server";
-// Contract controls for the deal owner (or an admin): edit the contract and deal details, delete a contract, and ask
-// Karandeep for a quick decision once the first review is done. Deciding stays Karandeep's; nothing is signed or sent.
+// Contract controls. The deal owner (or an admin) changes the client deadline and can ask Karandeep for a quick
+// decision once the first review is done. Deleting always goes through an admin, so every deletion is approved and
+// tracked: the owner asks with a reason, an admin approves (deletes) or declines. Nothing is signed or sent.
 import { revalidatePath } from "next/cache";
 import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
-import { z } from "zod";
 import { getDb } from "@/lib/db/client";
 import {
   aiCalls,
@@ -28,12 +28,12 @@ import { authorize, PermissionError } from "@/lib/auth/session";
 import type { Action } from "@/lib/auth/permissions";
 import { logEvent } from "@/lib/data/audit";
 import { notify } from "@/lib/data/notify";
-import { adminNames, isActiveUser } from "@/lib/data/people";
+import { adminNames } from "@/lib/data/people";
 import { bumpCoverage } from "@/lib/data/signed";
 import { formatDate } from "@/lib/checks/dates";
 import type { ActionResult } from "./workflow";
 
-const DOC_TYPES = ["msa", "sow", "nda", "baa", "dpa", "partnership", "subcontract", "freelancer", "waiver", "other"] as const;
+const ISO = /^\d{4}-\d{2}-\d{2}$/;
 
 async function load(contractId: string) {
   if (!/^[0-9a-f-]{36}$/i.test(contractId)) return null;
@@ -52,102 +52,101 @@ async function actor(action: Action, dealOwner: string | null) {
   }
 }
 
-// ---------- Edit details ----------
-
-const Details = z.object({
-  title: z.string().trim().min(3, "Give the contract a title.").max(200),
-  counterparty: z.string().trim().min(2, "Enter the counterparty's name.").max(200),
-  docType: z.enum(DOC_TYPES),
-  deal: z
-    .object({
-      clientDeadline: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "The client deadline must be a date.").nullable(),
-      deadlineNote: z.string().trim().max(300).nullable(),
-      valueUsd: z.number().nonnegative("The deal value can't be negative.").nullable(),
-      currency: z.enum(["USD", "EUR", "GBP", "INR", "AED"]),
-      domain: z.string().trim().min(2, "Enter the business domain."),
-      clientCountry: z.string().trim().min(2, "Enter the client's country."),
-      personalData: z.boolean().nullable(),
-      phi: z.boolean().nullable(),
-      owner: z.string().trim().min(2),
-    })
-    .nullable(),
-});
-export type DetailsInput = z.input<typeof Details>;
-
-export async function editContractDetails(contractId: string, input: DetailsInput): Promise<ActionResult> {
-  const x = await load(contractId);
-  if (!x) return { ok: false, error: "Contract not found." };
-  const u = await actor("deal.edit", x.owner);
-  if ("error" in u) return { ok: false, error: u.error };
-  const p = Details.safeParse(input);
-  if (!p.success) return { ok: false, error: p.error.issues[0]?.message ?? "Check the details." };
-  const d = p.data;
-  const db = getDb();
-  const changes: string[] = [];
-  const before: Record<string, unknown> = {};
-  const after: Record<string, unknown> = {};
-  const note = (k: string, label: string, a: unknown, b: unknown) => {
-    if (JSON.stringify(a ?? null) === JSON.stringify(b ?? null)) return;
-    changes.push(label);
-    before[k] = a ?? null;
-    after[k] = b ?? null;
-  };
-  note("title", "title", x.c.title, d.title);
-  note("counterparty", "counterparty", x.c.counterparty, d.counterparty);
-  note("docType", "document type", x.c.docType, d.docType);
-  if (x.deal && d.deal) {
-    if (d.deal.owner !== x.deal.owner) {
-      // Only an admin hands a deal to someone else, and only to an active person.
-      if (u.role !== "admin") return { ok: false, error: "Only an admin changes the deal owner." };
-      if (!(await isActiveUser(d.deal.owner, ["admin", "reviewer"]))) return { ok: false, error: `${d.deal.owner} has no active account.` };
-    }
-    note("clientDeadline", "client deadline", x.deal.clientDeadline, d.deal.clientDeadline);
-    note("deadlineNote", "deadline note", x.deal.deadlineNote, d.deal.deadlineNote || null);
-    note("valueUsd", "deal value", x.deal.valueUsd, d.deal.valueUsd);
-    note("currency", "currency", x.deal.currency, d.deal.currency);
-    note("domain", "domain", x.deal.domain, d.deal.domain);
-    note("clientCountry", "client country", x.deal.clientCountry, d.deal.clientCountry);
-    note("personalData", "personal data", x.deal.personalData, d.deal.personalData);
-    note("phi", "patient data", x.deal.phi, d.deal.phi);
-    note("owner", "deal owner", x.deal.owner, d.deal.owner);
-  }
-  if (!changes.length) return { ok: true };
-  await db.update(contracts).set({ title: d.title, counterparty: d.counterparty, docType: d.docType }).where(eq(contracts.id, contractId));
-  if (x.deal && d.deal) {
-    // Facts the review used (value, country, data) mark finished reviews as based on old details.
-    const factsChanged = ["valueUsd", "currency", "domain", "clientCountry", "personalData", "phi"].some((k) => k in after);
-    await db
-      .update(deals)
-      .set({ ...d.deal, deadlineNote: d.deal.deadlineNote || null, ...(factsChanged ? { updatedAt: new Date() } : {}) })
-      .where(eq(deals.id, x.deal.id));
-    if ("owner" in after && d.deal.owner !== u.name) await notify({ recipient: d.deal.owner, kind: "assigned", contractId, text: `${u.name} made you the owner of ${x.deal.name}.` });
-  }
-  const fmt = (v: unknown) => (v ? formatDate(v as string) : "none");
-  const parts = changes.map((c) => (c === "client deadline" ? `client deadline ${fmt(before.clientDeadline)} → ${fmt(after.clientDeadline)}` : c));
-  const text = `Edited ${x.c.title}: ${parts.join(", ")}`;
-  await logEvent({ actor: u.name, action: x.deal && changes.some((c) => !["title", "counterparty", "document type"].includes(c)) ? "deal.edit" : "contract.edit", contractId, dealId: x.deal?.id ?? null, text, detail: { before, after } });
+function refresh(contractId: string, dealId?: string | null) {
   revalidatePath(`/contracts/${contractId}`);
   revalidatePath("/contracts");
   revalidatePath("/dashboard");
-  if (x.deal) revalidatePath(`/deals/${x.deal.id}`);
+  if (dealId) revalidatePath(`/deals/${dealId}`);
+}
+
+// ---------- Client deadline ----------
+
+/** The one field the deal owner edits on a contract page: the deal's client deadline. */
+export async function editClientDeadline(contractId: string, clientDeadline: string | null): Promise<ActionResult> {
+  const x = await load(contractId);
+  if (!x) return { ok: false, error: "Contract not found." };
+  if (!x.deal) return { ok: false, error: "This contract isn't part of a deal, so it has no client deadline." };
+  const u = await actor("deal.edit", x.owner);
+  if ("error" in u) return { ok: false, error: u.error };
+  const next = clientDeadline?.trim() || null;
+  if (next && !ISO.test(next)) return { ok: false, error: "The client deadline must be a date." };
+  if (next === x.deal.clientDeadline) return { ok: true };
+  await getDb().update(deals).set({ clientDeadline: next }).where(eq(deals.id, x.deal.id));
+  const fmt = (v: string | null) => (v ? formatDate(v) : "none");
+  await logEvent({
+    actor: u.name,
+    action: "deal.edit",
+    contractId,
+    dealId: x.deal.id,
+    text: `Changed the client deadline of ${x.deal.name}: ${fmt(x.deal.clientDeadline)} → ${fmt(next)}`,
+    detail: { before: { clientDeadline: x.deal.clientDeadline }, after: { clientDeadline: next } },
+  });
+  refresh(contractId, x.deal.id);
+  revalidatePath("/deadlines");
   return { ok: true };
 }
 
-// ---------- Delete ----------
+// ---------- Deletion: the owner asks, an admin approves or declines ----------
 
-/** Deletes a contract with its reviews, findings, marks and hand-off records. The activity log keeps a line saying
- * who deleted what. Blocked when a later version builds on it or a register promise cites it. */
-export async function deleteContract(contractId: string, typedTitle: string): Promise<ActionResult> {
+export async function requestDeletion(contractId: string, reason: string): Promise<ActionResult> {
+  const x = await load(contractId);
+  if (!x) return { ok: false, error: "Contract not found." };
+  const u = await actor("contract.delete_request", x.owner);
+  if ("error" in u) return { ok: false, error: u.error };
+  const why = reason.trim().slice(0, 500);
+  if (why.length < 10) return { ok: false, error: "Say why it should be deleted, in a sentence. The admin sees it." };
+  if (x.c.deletionRequestedBy) return { ok: false, error: `${x.c.deletionRequestedBy} already asked for it to be deleted.` };
+  await getDb().update(contracts).set({ deletionRequestedBy: u.name, deletionRequestedAt: new Date(), deletionReason: why }).where(eq(contracts.id, contractId));
+  for (const r of await adminNames()) {
+    if (r !== u.name) await notify({ recipient: r, kind: "decision", contractId, text: `${u.name} asks you to delete ${x.c.title}: “${why}”` });
+  }
+  await logEvent({ actor: u.name, action: "contract.delete_request", contractId, text: `Asked an admin to delete ${x.c.title}: ${why}` });
+  refresh(contractId);
+  return { ok: true };
+}
+
+export async function withdrawDeletionRequest(contractId: string): Promise<ActionResult> {
+  const x = await load(contractId);
+  if (!x) return { ok: false, error: "Contract not found." };
+  const u = await actor("contract.delete_request", x.owner);
+  if ("error" in u) return { ok: false, error: u.error };
+  await getDb().update(contracts).set({ deletionRequestedBy: null, deletionRequestedAt: null, deletionReason: null }).where(eq(contracts.id, contractId));
+  await logEvent({ actor: u.name, action: "contract.delete_request", contractId, text: `Withdrew the request to delete ${x.c.title}` });
+  refresh(contractId);
+  return { ok: true };
+}
+
+export async function declineDeletion(contractId: string, note: string): Promise<ActionResult> {
   const x = await load(contractId);
   if (!x) return { ok: false, error: "Contract not found." };
   const u = await actor("contract.delete", x.owner);
   if ("error" in u) return { ok: false, error: u.error };
-  if (typedTitle.trim().toLowerCase() !== "delete") return { ok: false, error: "Type DELETE to confirm." };
+  const who = x.c.deletionRequestedBy;
+  if (!who) return { ok: false, error: "Nobody asked for this contract to be deleted." };
+  const why = note.trim().slice(0, 500);
+  await getDb().update(contracts).set({ deletionRequestedBy: null, deletionRequestedAt: null, deletionReason: null }).where(eq(contracts.id, contractId));
+  if (who !== u.name) await notify({ recipient: who, kind: "decision", contractId, text: `${u.name} kept ${x.c.title} instead of deleting it${why ? `: “${why}”` : "."}` });
+  await logEvent({ actor: u.name, action: "contract.delete_decline", contractId, text: `Declined ${who}’s request to delete ${x.c.title}${why ? `: ${why}` : ""}` });
+  refresh(contractId);
+  return { ok: true };
+}
+
+/** Admins only: approving the owner's request, or on their own with a reason. Deletes a contract with its reviews,
+ * findings, marks and hand-off records; the activity log keeps who asked, who approved and why. Blocked when a later
+ * version builds on it or a register promise cites it. */
+export async function deleteContract(contractId: string, typed: string, reason: string): Promise<ActionResult> {
+  const x = await load(contractId);
+  if (!x) return { ok: false, error: "Contract not found." };
+  const u = await actor("contract.delete", x.owner);
+  if ("error" in u) return { ok: false, error: u.error };
+  if (typed.trim().toLowerCase() !== "delete") return { ok: false, error: "Type DELETE to confirm." };
+  const why = (x.c.deletionReason ?? reason).trim().replace(/\.+$/, "");
+  if (why.length < 10) return { ok: false, error: "Say why it's being deleted, in a sentence. It's kept in the activity log." };
   const db = getDb();
   const [later] = await db.select({ v: contracts.version }).from(contracts).where(eq(contracts.previousVersionId, contractId));
   if (later) return { ok: false, error: `Version ${later.v} builds on this one. Delete the newer version first.` };
   const cited = await db.select({ id: commitments.id }).from(commitments).where(eq(commitments.contractId, contractId));
-  if (cited.length) return { ok: false, error: `The register cites this contract (${cited.map((c) => c.id).join(", ")}). Ask an admin to move those promises first.` };
+  if (cited.length) return { ok: false, error: `The register cites this contract (${cited.map((c) => c.id).join(", ")}). Move those promises first.` };
 
   let dealDeleted = false;
   await db.transaction(async (tx) => {
@@ -180,11 +179,13 @@ export async function deleteContract(contractId: string, typedTitle: string): Pr
     }
   });
   if (x.c.isSigned) await bumpCoverage(-1);
+  const asked = x.c.deletionRequestedBy;
+  if (asked && asked !== u.name) await notify({ recipient: asked, kind: "decision", text: `${u.name} approved your request and deleted ${x.c.title}.` });
   await logEvent({
     actor: u.name,
     action: "contract.delete",
-    text: `Deleted ${x.c.title} (v${x.c.version}${x.c.isSigned ? ", signed" : ""})${dealDeleted && x.deal ? ` and its now-empty deal ${x.deal.name}` : ""}`,
-    detail: { contractId, title: x.c.title, dealId: x.deal?.id ?? null },
+    text: `Deleted ${x.c.title} (v${x.c.version}${x.c.isSigned ? ", signed" : ""})${asked ? `, approving ${asked}’s request` : ""}: ${why}${dealDeleted && x.deal ? `. Its now-empty deal ${x.deal.name} went too` : ""}`,
+    detail: { contractId, title: x.c.title, dealId: x.deal?.id ?? null, requestedBy: asked, approvedBy: u.name, reason: why },
   });
   revalidatePath("/contracts");
   revalidatePath("/dashboard");
@@ -214,8 +215,7 @@ export async function requestQuickDecision(contractId: string, note: string): Pr
     if (r !== u.name) await notify({ recipient: r, kind: "decision", contractId, text: `${u.name} asks for a quick decision on ${x.c.title}.${deadline}${why ? ` “${why}”` : ""}`, dedupeKey: `quick:${contractId}:${new Date().toISOString().slice(0, 13)}` });
   }
   await logEvent({ actor: u.name, action: "decision.request", contractId, text: `Asked for a quick decision on ${x.c.title}${why ? `: ${why}` : ""}` });
-  revalidatePath(`/contracts/${contractId}`);
-  revalidatePath("/dashboard");
+  refresh(contractId);
   return { ok: true };
 }
 
@@ -226,7 +226,6 @@ export async function withdrawQuickDecision(contractId: string): Promise<ActionR
   if ("error" in u) return { ok: false, error: u.error };
   await getDb().update(contracts).set({ decisionRequestedBy: null, decisionRequestedAt: null, decisionRequestNote: null }).where(eq(contracts.id, contractId));
   await logEvent({ actor: u.name, action: "decision.request", contractId, text: `Withdrew the quick-decision request on ${x.c.title}` });
-  revalidatePath(`/contracts/${contractId}`);
-  revalidatePath("/dashboard");
+  refresh(contractId);
   return { ok: true };
 }

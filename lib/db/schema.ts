@@ -164,6 +164,10 @@ export const contracts = pgTable(
     decisionRequestedBy: text("decision_requested_by"),
     decisionRequestedAt: timestamp("decision_requested_at", { withTimezone: true }),
     decisionRequestNote: text("decision_request_note"),
+    /** The deal owner asked to delete this contract; an admin approves (deletes) or declines. */
+    deletionRequestedBy: text("deletion_requested_by"),
+    deletionRequestedAt: timestamp("deletion_requested_at", { withTimezone: true }),
+    deletionReason: text("deletion_reason"),
     isSigned: boolean("is_signed").notNull().default(false),
     signedDate: date("signed_date"),
     ends: date("ends"),

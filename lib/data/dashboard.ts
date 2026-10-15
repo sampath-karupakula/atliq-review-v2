@@ -36,3 +36,11 @@ export async function dealsOwnedBy(person: string): Promise<OwnedDeal[]> {
     order by d.client_deadline nulls last, d.name`;
   return rows.map((r) => ({ dealId: r.id, name: r.name, mainContractId: r.main, deadline: r.deadline, docs: r.docs }));
 }
+
+/** Contracts a deal owner asked an admin to delete, oldest request first. */
+export async function deletionRequests() {
+  const rows = await getSql()<{ id: string; title: string; by: string; reason: string | null; at: string | Date }[]>`
+    select id, title, deletion_requested_by as by, deletion_reason as reason, deletion_requested_at as at
+    from contracts where deletion_requested_by is not null order by deletion_requested_at asc`;
+  return rows.map((r) => ({ ...r, at: new Date(r.at) }));
+}

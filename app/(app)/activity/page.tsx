@@ -46,6 +46,8 @@ const ACTION_LABEL: Record<string, { label: string; cls: string }> = {
   "deal.edit": { label: "Deal edited", cls: "bg-surface-2 text-fg" },
   "contract.edit": { label: "Contract edited", cls: "bg-surface-2 text-fg" },
   "contract.delete": { label: "Contract deleted", cls: "bg-serious-bg text-serious" },
+  "contract.delete_request": { label: "Deletion asked", cls: "bg-negotiable-bg text-negotiable" },
+  "contract.delete_decline": { label: "Deletion declined", cls: "bg-surface-2 text-fg" },
   "decision.request": { label: "Quick decision asked", cls: "bg-info-bg text-info" },
   "review.second": { label: "Second review", cls: "bg-surface-2 text-fg" },
   "counsel.ask": { label: "Counsel asked", cls: "bg-info-bg text-info" },
