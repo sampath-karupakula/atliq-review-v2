@@ -4,7 +4,7 @@
 // Labels: one per entity (CLIENT_A, PARTY_B, PERSON_3 …). Each distinct way the entity is written gets a
 // numbered variant (CLIENT_A, CLIENT_A_2 for "KAVERI RETAIL PRIVATE LIMITED" vs "Kaveri"), so the model sees
 // one party while unmasking restores the exact original text — which quote verification depends on.
-import { detectPii, type PiiKind } from "./patterns";
+import { detectPii, isAllowed, type PiiKind } from "./patterns";
 import { ATLIQ_PEOPLE, definedShortNames, harvestOrgs, harvestPeople, orgVariants, peopleFromEmails, stripOrgSuffix } from "./names";
 
 export type TokenKind = "CLIENT" | "PARTY" | "PERSON" | PiiKind;
@@ -20,7 +20,7 @@ export type MaskerOptions = {
 
 type DictEntry = { value: string; entity: string; caseSensitive: boolean };
 
-export const TOKEN_RE = /\b(?:CLIENT|PARTY)_[A-Z]{1,2}(?:_\d+)?\b|\b(?:PERSON|EMAIL|PHONE|ID|ACCOUNT|ADDRESS)_\d+(?:_\d+)?\b/g;
+export const TOKEN_RE = /\b(?:CLIENT|PARTY)_[A-Z]{1,2}(?:_\d+)?\b|\b(?:PERSON|EMAIL|PHONE|ID|ACCOUNT|ADDRESS|URL|REF)_\d+(?:_\d+)?\b/g;
 
 function letterLabel(n: number): string {
   let s = "";
@@ -37,7 +37,7 @@ const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const norm = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim();
 
 export class Masker {
-  private counters: Record<TokenKind, number> = { CLIENT: 0, PARTY: 0, PERSON: 0, EMAIL: 0, PHONE: 0, ID: 0, ACCOUNT: 0, ADDRESS: 0 };
+  private counters: Record<TokenKind, number> = { CLIENT: 0, PARTY: 0, PERSON: 0, EMAIL: 0, PHONE: 0, ID: 0, ACCOUNT: 0, ADDRESS: 0, URL: 0, REF: 0 };
   private entityByKey = new Map<string, string>(); // kind:normalised name → entity label
   private surfaceToToken = new Map<string, string>(); // exact surface text → token
   private originalByToken = new Map<string, string>(); // token → exact surface text
@@ -133,6 +133,10 @@ export class Masker {
       else this.addOrg(short, "PARTY");
     }
     for (const p of [...harvestPeople(text), ...peopleFromEmails(text, emails)]) this.addPerson(p);
+    // The client's web domain, learned from its email addresses ("harringtonhealth.com"), written on its own.
+    for (const domain of new Set(emails.map((e) => e.split("@")[1]!.toLowerCase()))) {
+      if (!isAllowed(domain) && domain.includes(".")) this.addDict(domain, this.entityFor("URL", domain), false);
+    }
 
     // 2. Regex hits first (so names inside emails go with the email), longest first. Re-scan until clean:
     //    an address can run past its first postcode-like number ("P.O. Box 88214, Riyadh 11662").

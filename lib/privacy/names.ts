@@ -52,7 +52,7 @@ export function harvestPeople(text: string): string[] {
     const name = n.replace(/\s+/g, " ").trim();
     if (looksLikePerson(name)) out.add(name);
   };
-  for (const m of text.matchAll(/^\s*(?:Name|Attn|Attention|Signed by|Signatory|By)\s*:\s*([^,\n_|]+)/gim)) {
+  for (const m of text.matchAll(/^\s*(?:Name|Attn|Attention|Signed by|Signatory|By|Patient(?: [Nn]ame)?)\s*:\s*([^,\n_|]+)/gim)) {
     const raw = m[1].replace(/\*\*/g, "").trim();
     // Single-word names on signature lines (e.g. "Karandeep") are still names.
     if (/^[A-Z][a-z]+$/.test(raw) && !NOT_NAME.has(raw)) out.add(raw);

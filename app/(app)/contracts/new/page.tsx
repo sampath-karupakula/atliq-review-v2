@@ -72,7 +72,7 @@ export default async function NewContractPage({ searchParams }: { searchParams: 
         }
       />
       <p className="hint" style={{ background: "var(--accent-soft)", borderRadius: 6, padding: "8px 12px", fontSize: 13.5, color: "var(--ink-2)" }}>
-        <b>Private by design.</b> Nothing is sent to the AI at upload. When a review runs, names, emails and addresses are replaced with labels first. Checked against {coverage.onFile} of {coverage.signedInTracker} signed contracts on file.
+        <b>Private by design.</b> Nothing is sent to the AI at upload. When a review runs, names, emails, phone numbers, IDs, bank details, web addresses, reference numbers and street addresses are replaced with labels first (cities and countries stay, the checks need them). Checked against {coverage.onFile} of {coverage.signedInTracker} signed contracts on file.
       </p>
       {bulk ? <SignedUpload coverage={coverage} tracker={fill ? { trackerId: fill.trackerId, label: `${fill.counterparty} · ${fill.docType}${fill.signedDate ? ` · signed ${fill.signedDate}` : ""}` } : null} /> : null}
       {bulk ? null : <UploadForm
