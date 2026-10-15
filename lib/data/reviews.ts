@@ -2,10 +2,10 @@ import "server-only";
 // Persists the review pipeline between API requests. Each step loads the state, runs within a time budget,
 // and saves it back, so no single request comes near Vercel's 300 s limit. The masking key lives only in
 // masking_keys (never in the saved state, never logged, never sent to the AI).
-import { and, desc, eq, inArray, ne } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, ne } from "drizzle-orm";
 // review status: running | queued (masked, waiting for a background slot) | done | failed
 import { getDb } from "@/lib/db/client";
-import { aiCalls, assignments, contracts, dealDocuments, deals, findings, maskingKeys, reviews } from "@/lib/db/schema";
+import { aiCalls, assignments, contracts, dealDocuments, dealNotes, deals, findings, maskingKeys, reviews } from "@/lib/db/schema";
 import { aiConfig } from "@/lib/config";
 import { findAtliqNames } from "@/lib/ingest/doctype";
 import { referenceFromDb } from "@/lib/reference/db";
@@ -128,6 +128,8 @@ export async function createReview(contractId: string): Promise<{ reviewId: stri
     .returning({ id: reviews.id });
   try {
     const ref = await referenceFromDb();
+    // Call notes on the deal are compared with this contract in the final step (AI-6).
+    const notes = deal ? await db.select().from(dealNotes).where(eq(dealNotes.dealId, deal.id)).orderBy(asc(dealNotes.createdAt)) : [];
     const state = startReview({
       text: contract.text,
       deal: dealContext(contract, deal),
@@ -136,6 +138,7 @@ export async function createReview(contractId: string): Promise<{ reviewId: stri
       atliqNames: findAtliqNames(contract.text),
       ref,
       linked: siblings.map((s) => ({ id: s.id, title: s.title, docType: s.docType, role: s.role, text: s.text })),
+      notes: notes.map((n) => ({ id: n.id, label: `${n.title} (by ${n.approvedBy ?? "AtliQ"})`, text: n.text })),
     });
     if (state.maskKey.length) await db.insert(maskingKeys).values(state.maskKey.map((k) => ({ reviewId: review.id, ...k })));
     await db.update(reviews).set({ textMasked: state.maskedText, clausesFound: contract.clauseCount }).where(eq(reviews.id, review.id));
@@ -275,6 +278,11 @@ export async function runFinalize(reviewId: string): Promise<ReviewReport> {
         })
         .where(eq(reviews.id, reviewId));
       await tx.update(contracts).set({ status: "reviewed" }).where(eq(contracts.id, review.contractId));
+      // Each call note keeps the verdicts from the latest review that compared it.
+      for (const id of new Set((report.noteChecks ?? []).map((n) => n.noteId))) {
+        const checks = report.noteChecks!.filter((n) => n.noteId === id).map(({ noteId: _n, ...rest }) => (void _n, rest));
+        await tx.update(dealNotes).set({ checks, comparedContractId: contract.id, comparedAt: new Date() }).where(eq(dealNotes.id, id));
+      }
     });
     const text = `Review finished: ${contract.title} — ${report.band} (${report.score}), ${report.counts.serious} Serious, ${report.counts.negotiable} Negotiable.`;
     // The owner, the person assigned to review it, and the admins.

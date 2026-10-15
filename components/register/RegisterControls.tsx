@@ -8,6 +8,7 @@ import { Dialog } from "@/components/Dialog";
 import { useToast } from "@/components/Toast";
 import { addCommitment, addWaiver, confirmCommitment, editCommitment, labelPosition, type CommitmentInput, type WaiverInput } from "@/app/actions/register";
 import { PRECEDENT_LABELS } from "@/lib/format";
+import { markTemplateFixDone } from "@/app/actions/templates";
 
 export type PromiseValues = CommitmentInput & { id: string };
 
@@ -236,5 +237,14 @@ export function LabelSelect({ id, label, who }: { id: number; label: string; who
         </option>
       ))}
     </select>
+  );
+}
+
+export function MarkTemplateDone({ id }: { id: string }) {
+  const { busy, run } = useRun();
+  return (
+    <button type="button" className="btn small" disabled={busy} onClick={() => run(() => markTemplateFixDone(id), "Marked done. The template now carries the fair version.")}>
+      Mark done
+    </button>
   );
 }

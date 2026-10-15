@@ -221,6 +221,10 @@ export const dealNotes = pgTable("deal_notes", {
   text: text("text").notNull(),
   approvedBy: text("approved_by"),
   createdAt: createdAt(),
+  /** The last review that compared this note with a contract (AI-6): one verdict per point in the note. */
+  checks: jsonb("checks").$type<{ verdict: string; topic: string; clause: string | null; quote: string | null; quoteVerified: boolean; explanation: string }[]>(),
+  comparedContractId: uuid("compared_contract_id"),
+  comparedAt: timestamp("compared_at", { withTimezone: true }),
 });
 
 // ---------- Reviews ----------
@@ -557,4 +561,27 @@ export const counselQuestions = pgTable(
     createdAt: createdAt(),
   },
   (t) => [index("counsel_questions_contract_idx").on(t.contractId)],
+);
+
+// ---------- Mirror check (P12) ----------
+
+/** A clause in AtliQ's own buyer-side paper that Karandeep approved fixing, so the next agency doesn't receive it. */
+export const templateFixes = pgTable(
+  "template_fixes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    contractId: uuid("contract_id"), // the agreement it was spotted in (kept as text history if that contract is deleted)
+    contractTitle: text("contract_title").notNull(),
+    category: text("category").notNull(),
+    title: text("title").notNull(),
+    clause: text("clause"),
+    quote: text("quote"),
+    fairVersion: text("fair_version").notNull(),
+    approvedBy: text("approved_by").notNull(),
+    approvedAt: timestamp("approved_at", { withTimezone: true }).defaultNow().notNull(),
+    status: text("status").notNull().default("approved"), // approved | done
+    doneBy: text("done_by"),
+    doneAt: timestamp("done_at", { withTimezone: true }),
+  },
+  (t) => [index("template_fixes_contract_idx").on(t.contractId)],
 );

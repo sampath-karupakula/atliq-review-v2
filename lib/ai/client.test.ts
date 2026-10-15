@@ -37,9 +37,9 @@ describe("strict JSON schema", () => {
 describe("Anthropic structured-output limit", () => {
   it("counts nullable fields; the extraction schema is over the limit, scan/clash/bundle are within it", async () => {
     const { countUnions, ANTHROPIC_UNION_LIMIT } = await import("./client");
-    const { ExtractSchema, ScanSchema, ClashSchema, BundleSchema, SummarySchema } = await import("./schemas");
+    const { ExtractSchema, ScanSchema, ClashSchema, BundleSchema, SummarySchema, NotesSchema } = await import("./schemas");
     expect(countUnions(toStrictJsonSchema(ExtractSchema))).toBeGreaterThan(ANTHROPIC_UNION_LIMIT);
-    for (const s of [ScanSchema, ClashSchema, BundleSchema, SummarySchema]) expect(countUnions(toStrictJsonSchema(s))).toBeLessThanOrEqual(ANTHROPIC_UNION_LIMIT);
+    for (const s of [ScanSchema, ClashSchema, BundleSchema, SummarySchema, NotesSchema]) expect(countUnions(toStrictJsonSchema(s))).toBeLessThanOrEqual(ANTHROPIC_UNION_LIMIT);
   });
 });
 

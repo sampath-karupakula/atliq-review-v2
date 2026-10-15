@@ -102,9 +102,10 @@ Check, between the client contract and each subcontract/freelancer agreement:
 - IP: if the client owns the deliverables, the subcontractor must assign its work product to AtliQ (not keep it or only license it);
 - data protection: if personal data or PHI is involved, matching data-protection terms;
 - conflicts: terms in one document that make the other impossible to perform.
-For each gap give doc_a = the document that creates the obligation and doc_b = the one that should carry it, using the titles given. Quote both exactly; if the needed term is missing from doc_b, set absent_in_b=true and quote_b=null ("not found after reading all clauses given").
+For each gap give doc_a = the document that creates the obligation and doc_b = the one that should carry it, using the titles given. Quote both exactly; if the needed term is missing from doc_b, set absent_in_b=true ("not found after reading all clauses given") and, as quote_b and clause_b, quote the words in doc_b that show why the term is needed (e.g. where the subcontractor receives, hosts or processes the client's data, such as "on the Vendor's own platform"); use null only if doc_b has no such words.
 severity: "serious" for a pass-down gap on data or IP; "negotiable" for other bounded gaps; "not_sure" if unclear.
-data_must_not_move_until: the condition before any data may be shared, or null.`;
+data_must_not_move_until: the condition before any data may be shared, or null.
+flow_down: for a "pass_down" gap only, one or two sentences AtliQ could add to doc_b so it carries what doc_a requires, in plain contract language and with the same masked labels; null for other gap types. It is a suggestion the user copies, never an edit to either document.`;
 
 export function bundleUser(deal: DealContext, thisIsSubcontract: boolean, thisDoc: { title: string; text: string }, others: { title: string; text: string }[]): string {
   const role = thisIsSubcontract ? "the subcontract/freelancer agreement" : "the client contract";
@@ -121,4 +122,21 @@ Names are masked as CLIENT_A, PERSON_1 and similar; keep the labels.`;
 
 export function summaryUser(findings: { id: string; severity: string; title: string; clause: string | null; cost: string }[]): string {
   return `<findings>\n${findings.map((f) => `${f.id} [${f.severity}] ${f.title} (clause ${f.clause ?? "—"}). Cost: ${f.cost}`).join("\n")}\n</findings>`;
+}
+
+export const NOTES_SYSTEM = `${PREAMBLE}
+
+Task: compare call notes with the contract. A call note is what someone at AtliQ wrote down was said or agreed on a call with the client. Notes are OUTSIDE the contract: they are never contract terms, and only the contract binds anyone.
+For each note, give one verdict:
+- "clashes": the contract says something different from what the note says was agreed (e.g. note: 30-day payment agreed; contract: 60 days).
+- "check": the contract is silent on it, or only partly covers it, so a promise made on the call is not in writing.
+- "matches": the contract says the same thing as the note.
+- "not_in_contract": the note is about something a contract would not cover (meeting logistics, people, timing of the next call).
+A note can mention several points; return one item per point, all with the same note_id.
+topic: two to four words (e.g. "payment days", "delay penalty cap").
+For "clashes" and "matches", cite the clause id and quote the contract verbatim (rule 2). For "check" and "not_in_contract", clause and quote are null unless a clause partly covers it.
+explanation: one plain sentence that keeps the two apart, in this form: "The call note says …; the contract (clause X) says …". Never present what the note says as a contract fact.`;
+
+export function notesUser(deal: DealContext, notes: { id: string; label: string; text: string }[], contract: string): string {
+  return `${dealBlock(deal)}\n\n<notes>\n${notes.map((n) => `[${n.id}] ${n.label}: ${n.text}`).join("\n")}\n</notes>\n\n<contract>\n${contract}\n</contract>`;
 }

@@ -3,7 +3,7 @@
 //   Base       a client deal needs its main agreement; an MSA needs a SOW (scope, milestones, fees); NDA-only deals need the NDA
 //   R-HC-US    US client + patient data → NDA, MSA, BAA; no patient data moves until the BAA is signed
 //   R-EU-PD    EU/EEA/UK client + personal data → MSA, DPA with a transfer mechanism to India; no data moves until it is signed
-//   R-PASS     a contractor or agency in the deal → its agreement, with flow-down terms (compared in P12)
+//   R-PASS     a contractor or agency in the deal → its agreement, with flow-down terms (gaps from its AI review)
 //   Register   a live non-compete covering the client's country and field → the beneficiary's written waiver
 import { splitClauses } from "@/lib/ingest/clauses";
 import { isUS } from "@/lib/checks/entityLaw";
@@ -79,7 +79,7 @@ export function buildChecklist(deal: DealFacts, docs: DealDoc[], promises: LiveP
       why: "A contractor or agency on a client deal (R-PASS) must promise at least what AtliQ promised the client.",
       state: c.isSigned ? "signed" : "check",
       doc: c,
-      note: "Term-by-term comparison with the client contract arrives with the AI features (P12).",
+      note: c.band ? "Reviewed against the client contract: see the Pass-down tab." : "Run its AI review to compare it with the client contract, term by term.",
     });
   }
   for (const p of promisesInPlay(deal, promises)) {

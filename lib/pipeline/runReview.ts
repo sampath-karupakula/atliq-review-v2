@@ -4,7 +4,7 @@ import { runGate } from "@/lib/ingest/gate";
 import { AiFailedError } from "@/lib/ai/client";
 import { MaskingLeakError } from "@/lib/privacy/leakcheck";
 import type { DealContext, Reference } from "@/lib/reference/types";
-import { bundleStep, checksStep, clashStep, extractStep, finalizeStep, scanStep, startReview, type StepOptions } from "./steps";
+import { bundleStep, checksStep, clashStep, extractStep, finalizeStep, scanStep, startReview, type CallNote, type StepOptions } from "./steps";
 import type { LinkedDoc } from "@/lib/checks/bundle";
 import { applyVersionDiff, type PreviousFinding } from "./versions";
 import type { ReviewReport } from "./types";
@@ -16,6 +16,8 @@ export type RunInput = {
   linkedToDeal?: boolean;
   linkedTitles?: string[];
   linked?: LinkedDoc[];
+  /** Call notes on the deal, compared with the contract (AI-6). */
+  notes?: CallNote[];
   /** The previous version's text and findings (a returned draft): the new report is tagged new/unchanged/resolved. */
   previous?: { text: string; findings: PreviousFinding[] };
   findByHash?: (hash: string) => string | null | Promise<string | null>;
@@ -53,7 +55,7 @@ export async function runReview(input: RunInput): Promise<ReviewReport> {
     progress("masking");
     const state = startReview({
       text: gate.text, deal: input.deal, docType: gate.docType, title: gate.title, atliqNames: gate.atliqNames,
-      ref: input.ref, linkedTitles: input.linkedTitles, linked: input.linked, config: input.config,
+      ref: input.ref, linkedTitles: input.linkedTitles, linked: input.linked, notes: input.notes, config: input.config,
     });
     for (;;) {
       const p = await extractStep(state, input.ref, input);

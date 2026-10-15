@@ -29,6 +29,7 @@ export type AuditAction =
   | "contract.delete"
   | "contract.delete_request"
   | "contract.delete_decline"
+  | "template.fix"
   | "decision.request"
   | "deal.note"
   | "offer.check"

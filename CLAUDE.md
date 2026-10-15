@@ -39,8 +39,12 @@ pnpm db:generate         # drizzle-kit generate (after editing lib/db/schema.ts)
 pnpm db:migrate          # apply migrations
 docker compose up        # Postgres + app with hot reload on :3000
 docker compose --profile prod up   # the production image (same build as Vercel)
+pnpm seed                # demo data + accounts (SEED_USER_PASSWORD); pnpm seed:users --reset-passwords
+pnpm eval --gate-only    # no AI: input gate, masking, leak checks (CI)
+pnpm eval --quick        # 10 cases through the AI pipeline, about USD 1 — run before and after a prompt or rule change
+pnpm eval --all | --dataset | --cases TC19 --repeat 3
+pnpm portfolio           # re-scan the signed contracts into data/exposure.json (AI)
 ```
-Later phases add `pnpm seed`, `pnpm portfolio`, `pnpm eval --quick|--all|--dataset|--gate-only`.
 
 ## Domain cheat sheet
 - **AtliQ companies:** AtliQ Inc (US clients only) and AtliQ Technologies Pvt Ltd (everyone else). Affiliates of each other. Delivery is from Pune.

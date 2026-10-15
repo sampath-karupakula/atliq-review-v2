@@ -109,7 +109,7 @@ export async function listDeals(): Promise<DealSummary[]> {
   });
 }
 
-export type DealConflict = { id: string; contractId: string; contractTitle: string; check: string; severity: string; title: string; clause: string | null; quote: string | null; docB: string | null; clauseB: string | null; quoteB: string | null; whatItMeans: string | null; howToSoften: string | null };
+export type DealConflict = { id: string; contractId: string; contractTitle: string; check: string; severity: string; title: string; clause: string | null; quote: string | null; docB: string | null; clauseB: string | null; quoteB: string | null; whatItMeans: string | null; howToSoften: string | null; absent: boolean; flowDown: string | null; quoteVerified: boolean; quoteBVerified: boolean };
 
 export type DealPage = {
   deal: typeof deals.$inferSelect & { companyName: string | null };
@@ -135,8 +135,8 @@ export async function getDeal(id: string): Promise<DealPage | null> {
 
   const contractIds = docs.filter((x) => !x.isSigned).map((x) => x.id);
   const conflicts = contractIds.length
-    ? await sql<{ id: string; contract_id: string; contract_title: string; check: string; severity: string; title: string; clause: string | null; quote: string | null; related: Record<string, unknown> | null; what_it_means: string | null; how_to_soften: string | null }[]>`
-        select f.id, r.contract_id, c.title as contract_title, f."check", f.severity, f.title, f.clause, f.quote, f.related, f.what_it_means, f.how_to_soften
+    ? await sql<{ id: string; contract_id: string; contract_title: string; check: string; severity: string; title: string; clause: string | null; quote: string | null; related: Record<string, unknown> | null; what_it_means: string | null; how_to_soften: string | null; absent: boolean; quote_verified: boolean }[]>`
+        select f.id, r.contract_id, c.title as contract_title, f."check", f.severity, f.title, f.clause, f.quote, f.related, f.what_it_means, f.how_to_soften, f.absent, f.quote_verified
         from findings f
         join reviews r on r.id = f.review_id
         join contracts c on c.id = r.contract_id
@@ -165,6 +165,11 @@ export async function getDeal(id: string): Promise<DealPage | null> {
       quoteB: (f.related?.quoteB as string | null | undefined) ?? (f.related?.quote as string | undefined) ?? null,
       whatItMeans: f.what_it_means,
       howToSoften: f.how_to_soften,
+      // Missing from the contractor agreement (it may still quote the words that show why the term is needed).
+      absent: f.absent || f.related?.absentInB === true,
+      flowDown: (f.related?.flowDown as string | null | undefined) ?? null,
+      quoteVerified: f.quote_verified,
+      quoteBVerified: f.related?.quoteBVerified === true,
     })),
     notes,
   };

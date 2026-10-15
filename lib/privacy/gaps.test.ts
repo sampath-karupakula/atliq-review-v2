@@ -109,3 +109,15 @@ describe("across the dataset", () => {
     }
   });
 });
+
+describe("defined terms are not names", () => {
+  it('"the Company" in bold is a defined term: neither it nor "the" is masked', () => {
+    const text = 'between **Saffron Wealth Managers Private Limited**, having its office at Mumbai 400021, India ("**the Company**"), and AtliQ. The Company shall keep the information confidential.';
+    const m = new Masker({});
+    const masked = m.mask(text);
+    expect(masked).not.toContain("Saffron");
+    expect(masked).toContain("the Company");
+    expect(masked).toContain("The Company shall keep the information");
+    expect(m.dictionaryValues().map((d) => d.value.toLowerCase())).not.toContain("the");
+  });
+});

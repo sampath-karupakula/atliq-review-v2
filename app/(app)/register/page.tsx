@@ -8,20 +8,24 @@ import { formatDate } from "@/lib/checks/dates";
 import { commitmentTypeLabel, PRECEDENT_LABELS, termLabel } from "@/lib/format";
 import { getCurrentUser } from "@/lib/auth/session";
 import { can } from "@/lib/auth/permissions";
-import { AddPromiseButton, LabelSelect, PromiseControls, type PromiseValues } from "@/components/register/RegisterControls";
+import { AddPromiseButton, LabelSelect, MarkTemplateDone, PromiseControls, type PromiseValues } from "@/components/register/RegisterControls";
+import { desc } from "drizzle-orm";
+import { getDb } from "@/lib/db/client";
+import { templateFixes } from "@/lib/db/schema";
 import { termStrength } from "@/lib/memory/strength";
 import { CLAUSE_TYPES, normalise, searchClauses, type ClauseType } from "@/lib/memory/search";
 
 export const metadata: Metadata = { title: "Register" };
 export const dynamic = "force-dynamic";
 
-type Tab = "promises" | "usual" | "prec" | "search";
+type Tab = "promises" | "usual" | "prec" | "templates" | "search";
 type PromiseFilter = "live" | "unconf" | "expired" | "all";
 
 const TABS: [Tab, string][] = [
   ["promises", "Promises"],
   ["usual", "Our usual terms"],
   ["prec", "Precedent labels"],
+  ["templates", "Template fixes"],
   ["search", "Search past contracts"],
 ];
 
@@ -77,14 +81,14 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
   const canEdit = can(me, "register.edit");
   const tab: Tab = TABS.some(([k]) => k === sp.tab) ? (sp.tab as Tab) : "promises";
   const f: PromiseFilter = (["live", "unconf", "expired", "all"] as const).includes(sp.f as PromiseFilter) ? (sp.f as PromiseFilter) : "live";
-  const [register, coverage, baseline, positions] = await Promise.all([getRegister(), getCoverage(), getBaseline(), getPositions()]);
+  const [register, coverage, baseline, positions, fixes] = await Promise.all([getRegister(), getCoverage(), getBaseline(), getPositions(), getDb().select().from(templateFixes).orderBy(desc(templateFixes.approvedAt))]);
   const counts: Record<PromiseFilter, number> = {
     live: register.filter((r) => matches(r, "live")).length,
     unconf: register.filter((r) => matches(r, "unconf")).length,
     expired: register.filter((r) => matches(r, "expired")).length,
     all: register.length,
   };
-  const tabCount: Record<Tab, number | null> = { promises: register.length, usual: baseline.length, prec: positions.length, search: null };
+  const tabCount: Record<Tab, number | null> = { promises: register.length, usual: baseline.length, prec: positions.length, templates: fixes.filter((x) => x.status === "approved").length, search: null };
   const order = ["standard", "deliberate_exception", "waved_through", "unclear"];
 
   const q = (sp.q ?? "").slice(0, 120);
@@ -313,6 +317,60 @@ export default async function RegisterPage({ searchParams }: { searchParams: Pro
             </table>
           </div>
           <p className="hint">Only a Standard position counts as precedent on a report. Waved through and deliberate exceptions show as warnings, never as something to copy.</p>
+        </>
+      ) : null}
+
+      {tab === "templates" ? (
+        <>
+          <div className="sec-head">
+            <h2>Template fixes</h2>
+            <p>Clauses in AtliQ&apos;s own buyer-side paper that AtliQ wouldn&apos;t accept from a client</p>
+          </div>
+          {fixes.length ? (
+            <div className="tablewrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Clause</th>
+                    <th>Spotted in</th>
+                    <th>Fair version</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fixes.map((x) => (
+                    <tr key={x.id}>
+                      <td className="co" style={{ maxWidth: 280 }}>
+                        {x.title}
+                        {x.quote ? <small>&ldquo;{x.quote}&rdquo;</small> : null}
+                      </td>
+                      <td>
+                        {x.contractId ? <Link href={`/contracts/${x.contractId}`}>{x.contractTitle}</Link> : x.contractTitle}
+                        {x.clause ? <small className="hint" style={{ display: "block" }}>Clause {x.clause}</small> : null}
+                      </td>
+                      <td style={{ maxWidth: 360 }}>{x.fairVersion}</td>
+                      <td>
+                        {x.status === "done" ? (
+                          <span style={{ color: "var(--ok)", fontWeight: 600 }}>Done{x.doneBy ? ` · ${x.doneBy}` : ""}</span>
+                        ) : (
+                          <>
+                            <Tag kind="overdue">Approved by {x.approvedBy}</Tag>
+                            {canEdit ? (
+                              <span style={{ display: "block", marginTop: 6 }}>
+                                <MarkTemplateDone id={x.id} />
+                              </span>
+                            ) : null}
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="hint">No template fixes yet. When an agency or freelancer agreement on AtliQ&apos;s paper is reviewed, &ldquo;Would we accept this?&rdquo; lets Karandeep approve fixing a clause.</p>
+          )}
         </>
       ) : null}
 
