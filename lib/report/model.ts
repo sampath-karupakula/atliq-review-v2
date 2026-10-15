@@ -30,7 +30,8 @@ export type ReportFinding = {
   acceptNote: string | null;
   source: string;
   related: Record<string, unknown>;
-  positions: { id: number; counterparty: string; date: string; term: string; outcome: string; label: string; quote: string }[];
+  /** Past positions on this term; contractId is the signed contract it came from, when that contract is on file. */
+  positions: { id: number; counterparty: string; date: string; term: string; outcome: string; label: string; quote: string; contractId?: string | null }[];
 };
 
 const live = (f: ReportFinding) => !f.dismissed && f.versionTag !== "resolved";

@@ -322,8 +322,19 @@ export function Report(p: ReportProps) {
               <div className="prec">
                 <span>How AtliQ handled this before:</span>
                 {f.positions.map((x) => (
-                  <span key={x.id} className={`p ${LABELS[x.label]?.cls ?? "unclear"}`} title={`${x.term} → ${x.outcome}`}>
-                    {x.counterparty} ({x.date}): {LABELS[x.label]?.text ?? x.label}
+                  <span key={x.id} className="prec-item">
+                    <Link
+                      href={`/register?tab=prec#pos-${x.id}`}
+                      className={`p ${LABELS[x.label]?.cls ?? "unclear"}`}
+                      title={`${x.term} → ${x.outcome}. Open in the register.`}
+                    >
+                      {x.counterparty} ({x.date}): {LABELS[x.label]?.text ?? x.label}
+                    </Link>
+                    {x.contractId ? (
+                      <Link href={`/contracts/${x.contractId}?tab=text`} className="prec-src" title={`Open the signed ${x.counterparty} contract`}>
+                        Contract
+                      </Link>
+                    ) : null}
                   </span>
                 ))}
               </div>
