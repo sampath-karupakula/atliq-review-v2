@@ -20,7 +20,7 @@ export function TimePlan({ times, title, sub, href, showReviewer }: { times: Rev
       ).sort((a, b) => b[1] - a[1])
     : [];
   return (
-    <section className="panel">
+    <section className="panel" id="time-plan" style={{ scrollMarginTop: 80 }}>
       <div className="sec-head">
         <h3>{title}</h3>
         <span className="hint">

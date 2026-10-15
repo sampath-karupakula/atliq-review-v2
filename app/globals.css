@@ -344,7 +344,7 @@ dialog.dialog::backdrop { background: rgba(10, 14, 20, 0.45); }
 .today-head .display { max-width: 22ch; margin-top: 6px; }
 .trust { font-size: 13px; color: var(--ink-2); border: 1px solid var(--rule); border-radius: 999px; padding: 6px 12px; background: var(--surface); }
 .trust span { color: var(--ink-3); margin-left: 4px; }
-.needs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; counter-reset: n; }
+.needs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 16px; counter-reset: n; }
 .need { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 10px; counter-increment: n; min-width: 0; }
 .need.first { border-color: var(--serious); box-shadow: var(--shadow); }
 .need .k { font-size: 12.5px; font-weight: 600; color: var(--ink-2); display: flex; gap: 8px; align-items: center; }

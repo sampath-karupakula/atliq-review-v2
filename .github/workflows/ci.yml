@@ -94,6 +94,8 @@ jobs:
           curl -s -b atliq_role=counsel localhost:3000/dashboard | grep -q 'Questions waiting for you'
           # Review time on every dashboard (team plan for Karandeep and counsel).
           curl -s localhost:3000/dashboard | grep -q 'Team review time'
+          curl -s localhost:3000/dashboard | grep -q 'Review time needed'
+          curl -s -b atliq_role=reviewer localhost:3000/dashboard | grep -q 'Quick decisions'
           curl -s -b atliq_role=counsel localhost:3000/dashboard | grep -q '<h3>Review time</h3>'
           # Upload (no AI): a contract is stored, a scanned PDF and a duplicate are refused, a viewer is refused,
           # and a bulk signed upload moves coverage from 17 to 18.

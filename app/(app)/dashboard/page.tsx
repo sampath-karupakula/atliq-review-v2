@@ -9,6 +9,8 @@ import { getOfferInputs } from "@/lib/data/offer";
 import { counselQuestionsList, reviewTimes } from "@/lib/data/handoff";
 import { questionStatus } from "@/lib/review/handoff";
 import { TimePlan } from "@/components/handoff/TimePlan";
+import { TimeNeededCard } from "@/components/handoff/TimeNeededCard";
+import { hm } from "@/lib/review/handoff";
 import { StageTracker } from "@/components/report/StageTracker";
 import { currentRole } from "@/lib/viewer";
 import { getCurrentUser } from "@/lib/auth/session";
@@ -18,7 +20,7 @@ import { getCoverage } from "@/lib/data/register";
 import { dealsOwnedBy, finishedReviewsOf, seriousFlagHistory } from "@/lib/data/dashboard";
 import { getContractStage } from "@/lib/data/stage";
 import { listPeople } from "@/lib/data/people";
-import { decideCard, dueByWeek, onTime, reviewsToChase, seriousTrend, toAssign, workload } from "@/lib/dashboard";
+import { decideCard, decideList, firstReviews, dueByWeek, onTime, reviewsToChase, seriousTrend, toAssign, workload } from "@/lib/dashboard";
 import { deadlineWords, filterCounts, filterQueue, type QueueRow } from "@/lib/queue";
 import { daysBetween, formatDate } from "@/lib/checks/dates";
 import { docLabel } from "@/lib/display";
@@ -60,15 +62,32 @@ async function CeoDashboard({ queue, coverage, today, longDate }: { queue: Queue
   const things = [decide, chase[0], assign[0]].filter(Boolean).length;
   const missing = coverage.signedInTracker - coverage.onFile;
 
-  const chaseItems: CarouselItem[] = chase.map((c) => {
-    const d = daysBetween(today, c.reviewDeadline!);
+  const decisions = decideList(queue);
+  const firsts = firstReviews(queue);
+  const teamTimes = await reviewTimes(firsts.map((q) => q.id));
+  const timeOf = new Map(teamTimes.map((t) => [t.contractId, t]));
+  const decideItems: CarouselItem[] = decisions.map((c, k) => ({
+    id: c.id,
+    kicker: `${c.decisionRequestedBy ? `${c.decisionRequestedBy} asks for a quick decision · ` : ""}Decide by ${formatDate(c.deadline)} · ${deadlineWords(c.deadline ? daysBetween(today, c.deadline) : null)}`,
+    title: name(c),
+    note: c.decisionRequestNote,
+    body: `${c.seriousOpen ? `${c.seriousOpen} Serious item${c.seriousOpen === 1 ? "" : "s"} open. ` : c.band ? `${c.band} risk. ` : ""}${c.liveClash ? "It breaks a promise AtliQ already made." : c.topIssue ? `${c.topIssue}.` : ""}`,
+    href: `/contracts/${c.id}`,
+    open: { label: "Open the report", primary: true },
+    urgent: k === 0 || !!c.decisionRequestedBy,
+  }));
+  const firstItems: CarouselItem[] = firsts.map((c) => {
+    const d = c.reviewDeadline ? daysBetween(today, c.reviewDeadline) : null;
+    const t = timeOf.get(c.id);
+    const late = d !== null && d <= 1;
     return {
       id: c.id,
-      kicker: d < 0 ? `First review overdue · ${-d} day${d === -1 ? "" : "s"}` : `First review due ${d === 0 ? "today" : "tomorrow"}`,
+      kicker: d === null ? `First review · ${c.reviewer}` : d < 0 ? `First review overdue · ${-d} day${d === -1 ? "" : "s"}` : `First review due ${d === 0 ? "today" : d === 1 ? "tomorrow" : formatDate(c.reviewDeadline)}`,
       title: name(c),
-      body: `${c.reviewer}'s review ${d < 0 ? "was" : "is"} due ${formatDate(c.reviewDeadline)}. Client deadline ${formatDate(c.deadline)}.`,
+      body: `${c.reviewer} · ${c.reviewState === "done" ? "AI review done" : "AI review not run yet"}${t ? ` · ${hm(t.left)} left of ${hm(t.est)}` : ""}.${c.deadline ? ` Client deadline ${formatDate(c.deadline)}.` : ""}`,
       href: `/contracts/${c.id}`,
-      remind: { contractId: c.id, who: c.reviewer! },
+      urgent: d !== null && d < 0,
+      remind: late ? { contractId: c.id, who: c.reviewer! } : undefined,
     };
   });
   const assignItems: CarouselItem[] = assign.map((c) => ({
@@ -93,32 +112,10 @@ async function CeoDashboard({ queue, coverage, today, longDate }: { queue: Queue
       </div>
 
       <ol className="needs">
-        {decide ? (
-          <li className="need first">
-            <span className="k">
-              {decide.decisionRequestedBy ? `${decide.decisionRequestedBy} asks for a quick decision · ` : ""}Decide by {formatDate(decide.deadline)} · {deadlineWords(decide.deadline ? daysBetween(today, decide.deadline) : null)}
-            </span>
-            <h3>{name(decide)}</h3>
-            {decide.decisionRequestNote ? <p className="ask">{decide.decisionRequestNote}</p> : null}
-            <p>
-              {decide.seriousOpen ? `${decide.seriousOpen} Serious item${decide.seriousOpen === 1 ? "" : "s"} open. ` : decide.band ? `${decide.band} risk. ` : ""}
-              {decide.liveClash ? "It breaks a promise AtliQ already made. " : decide.topIssue ? `${decide.topIssue}.` : ""}
-            </p>
-            <div>
-              <Link className="btn primary" href={`/contracts/${decide.id}`}>
-                Open the report
-              </Link>
-            </div>
-          </li>
-        ) : (
-          <li className="need">
-            <span className="k">Decisions</span>
-            <h3>Nothing is waiting for a decision</h3>
-            <p>Reviewed contracts appear here, soonest deadline first.</p>
-          </li>
-        )}
-        <Carousel label="Reviews to chase" items={chaseItems} empty={{ kicker: "First reviews", title: "All first reviews are on track", body: "Nothing is overdue or due tomorrow." }} />
+        <Carousel label="Decisions waiting" items={decideItems} empty={{ kicker: "Decisions", title: "Nothing is waiting for a decision", body: "Reviewed contracts appear here, quick-decision requests first, then the soonest deadline." }} />
+        <Carousel label="First reviews" items={firstItems} empty={{ kicker: "First reviews", title: "No first reviews are open", body: "Assign a contract to start one." }} />
         <Carousel label="Contracts to assign" items={assignItems} empty={{ kicker: "No reviewer yet", title: "Every contract has a reviewer", body: "Nothing to assign." }} />
+        <TimeNeededCard times={teamTimes} who="team" planHref="#time-plan" />
       </ol>
 
       <div className="kpis">
@@ -149,7 +146,7 @@ async function CeoDashboard({ queue, coverage, today, longDate }: { queue: Queue
           <p className="hint">A flag dismissed as a false alarm counts against it. If the line drops below the target, the rules need tuning before people stop listening.</p>
         </Panel>
       </div>
-      <TimePlan times={await reviewTimes(queue.filter((q) => q.reviewer && !q.decision).map((q) => q.id))} title="Team review time" sub="Open first reviews" href={(t) => `/contracts/${t.contractId}`} showReviewer />
+      <TimePlan times={teamTimes} title="Team review time" sub="Open first reviews" href={(t) => `/contracts/${t.contractId}`} showReviewer />
     </section>
   );
 }
@@ -161,6 +158,39 @@ async function ReviewerDashboard({ queue, today, longDate, me }: { queue: QueueR
   const stages = await Promise.all(deals.map((d) => (d.mainContractId ? getContractStage(d.mainContractId) : Promise.resolve(null))));
   const unassigned = toAssign(queue).filter((q) => q.deadline && daysBetween(today, q.deadline) <= 14);
   const onTimeCount = finished.filter((f) => onTime(f.reviewDeadline, f.completedOn) >= 0).length;
+  const timeOf = new Map(times.map((t) => [t.contractId, t]));
+  const myReviews: CarouselItem[] = [...mine]
+    .sort((a, b) => (a.reviewDeadline ?? "9999").localeCompare(b.reviewDeadline ?? "9999"))
+    .map((c) => {
+      const d = c.reviewDeadline ? daysBetween(today, c.reviewDeadline) : null;
+      const t = timeOf.get(c.id);
+      const reviewed = c.reviewState === "done";
+      return {
+        id: c.id,
+        kicker: d === null ? "Your first review" : d < 0 ? `Your review is ${-d} day${d === -1 ? "" : "s"} late` : `Review by ${d === 0 ? "today" : d === 1 ? "tomorrow" : formatDate(c.reviewDeadline)}`,
+        title: name(c),
+        body: `${reviewed ? "The AI review is done; mark each finding." : "Start the AI review, then mark each finding."}${t ? ` About ${hm(t.left)} left of ${hm(t.est)}.` : ""}${c.deadline ? ` Client deadline ${formatDate(c.deadline)}.` : ""}`,
+        href: reviewed ? `/mark/${c.id}` : `/contracts/${c.id}`,
+        open: { label: reviewed ? "Mark each finding" : "Start the review", primary: true },
+        urgent: d !== null && d < 0,
+      };
+    });
+  // Deals you own that are ready for Karandeep: first review done (or none assigned) and no decision yet.
+  const quick: CarouselItem[] = queue
+    .filter((q) => q.owner === me && !q.decision && q.reviewState === "done" && (q.decisionRequestedBy || !q.reviewer))
+    .sort((a, b) => Number(!!a.decisionRequestedBy) - Number(!!b.decisionRequestedBy) || (a.deadline ?? "9999").localeCompare(b.deadline ?? "9999"))
+    .map((c) => ({
+      id: c.id,
+      kicker: c.decisionRequestedBy ? "Waiting for Karandeep · you asked for a quick decision" : `Ready for a decision · client deadline ${formatDate(c.deadline)}`,
+      title: name(c),
+      note: c.decisionRequestNote,
+      body: c.decisionRequestedBy
+        ? `It leads his decide card.${c.seriousOpen ? ` ${c.seriousOpen} Serious item${c.seriousOpen === 1 ? "" : "s"} must be settled before he can intend to sign.` : ""}`
+        : `The first review is done. If the client wants to sign soon, ask Karandeep to decide.${c.seriousOpen ? ` ${c.seriousOpen} Serious item${c.seriousOpen === 1 ? "" : "s"} open.` : ""}`,
+      href: `/contracts/${c.id}`,
+      open: { label: c.decisionRequestedBy ? "Open" : "Ask for a quick decision", primary: !c.decisionRequestedBy },
+      urgent: !c.decisionRequestedBy && !!c.deadline && daysBetween(today, c.deadline) <= 3,
+    }));
 
   return (
     <section className="wrap page">
@@ -173,6 +203,11 @@ async function ReviewerDashboard({ queue, today, longDate, me }: { queue: QueueR
           </Link>
         }
       />
+      <ol className="needs">
+        <Carousel label="Your first reviews" items={myReviews} empty={{ kicker: "Your first reviews", title: "No reviews assigned to you", body: "Take an unassigned contract from the list on the right." }} />
+        <Carousel label="Quick decisions" items={quick} empty={{ kicker: "Quick decisions", title: "Nothing ready for Karandeep", body: "Deals you own appear here once their first review is done, so you can ask him to decide quickly." }} />
+        <TimeNeededCard times={times} who="me" planHref="#time-plan" />
+      </ol>
       <div className="kpis">
         <Kpi value={mine.length} label="Reviews assigned" sub={mine.map((m) => m.companyName ?? m.counterparty).join(", ") || "None"} href="/contracts?view=mine" />
         <Kpi value={dueSoon.length} label="Due within 2 days" sub={dueSoon[0] ? `${dueSoon[0].companyName}, ${formatDate(dueSoon[0].reviewDeadline)}` : "Nothing urgent"} href="/contracts?view=mine" />
@@ -273,9 +308,26 @@ async function CounselDashboard({ queue, longDate, today }: { queue: QueueRow[];
   const toRead = queue.filter((q) => q.reviewState === "done" && q.band === "High" && !q.decision);
   const waiting = (await counselQuestionsList()).filter((q) => !q.answer);
   const late = waiting.filter((q) => ["overdue", "soon"].includes(questionStatus({ answerBy: q.answerBy, answeredOn: null }, today).key)).length;
+  const teamTimes = await reviewTimes(firstReviews(queue).map((q) => q.id));
+  const questionItems: CarouselItem[] = waiting
+    .map((q) => ({ q, st: questionStatus({ answerBy: q.answerBy, answeredOn: null }, today) }))
+    .sort((a, b) => a.st.rank - b.st.rank || (a.q.answerBy ?? "9999").localeCompare(b.q.answerBy ?? "9999"))
+    .map(({ q, st }) => ({
+      id: q.id,
+      kicker: `${st.label}${q.answerBy && st.key === "waiting" ? ` · answer by ${formatDate(q.answerBy)}` : ""}`,
+      title: q.contractTitle,
+      body: q.question,
+      href: "/counsel",
+      open: { label: "Answer", primary: true },
+      urgent: st.key === "overdue",
+    }));
   return (
     <section className="wrap page">
       <PageHead eyebrow={`${longDate} · outside counsel · read-only`} title="Reports to read" />
+      <ol className="needs">
+        <Carousel label="Questions for you" items={questionItems} empty={{ kicker: "Questions for you", title: "No questions waiting", body: "Questions Karandeep shares with you appear here with their answer-by dates." }} />
+        <TimeNeededCard times={teamTimes} who="team" planHref="#time-plan" />
+      </ol>
       <div className="kpis">
         <Kpi value={waiting.length} label="Questions waiting for you" sub={late ? `${late} due within 2 days or overdue` : "Nothing urgent"} href="/counsel" alert={late > 0} />
         <Kpi value={toRead.length} label="High-risk reports" sub="Waiting for Karandeep's decision" />
@@ -283,7 +335,7 @@ async function CounselDashboard({ queue, longDate, today }: { queue: QueueRow[];
       <p className="muted" style={{ maxWidth: "68ch" }}>
         Answer the questions shared with you on the Questions page; answers show on the report and in Karandeep&apos;s tracker. These are the High-risk reports waiting for a decision.
       </p>
-      <TimePlan times={await reviewTimes(queue.filter((q) => q.reviewer && !q.decision).map((q) => q.id))} title="Review time" sub="First reviews in progress at AtliQ" href={(t) => `/contracts/${t.contractId}`} showReviewer />
+      <TimePlan times={teamTimes} title="Review time" sub="First reviews in progress at AtliQ" href={(t) => `/contracts/${t.contractId}`} showReviewer />
       <div className="cards2" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
         {toRead.length ? (
           toRead.map((q) => (

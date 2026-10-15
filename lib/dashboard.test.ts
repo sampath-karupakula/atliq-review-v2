@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decideCard, dueByWeek, onTime, reviewsToChase, seriousTrend, toAssign, workload } from "./dashboard";
+import { decideCard, decideList, firstReviews, dueByWeek, onTime, reviewsToChase, seriousTrend, toAssign, workload } from "./dashboard";
 import type { QueueRow } from "./queue";
 
 const TODAY = "2026-09-28";
@@ -46,6 +46,22 @@ const rows = [
 describe("dashboard", () => {
   it("puts the soonest undecided reviewed contract in the decide card, riskiest on a tie", () => {
     expect(decideCard(rows)?.id).toBe("harr");
+  });
+
+  it("lists open first reviews by review-by date, leaving decided ones out", () => {
+    const list = firstReviews([
+      row({ id: "b", reviewer: "Jay", reviewDeadline: "2026-10-02" }),
+      row({ id: "a", reviewer: "Bhavin", reviewDeadline: "2026-09-27" }),
+      row({ id: "none" }),
+      row({ id: "decided", reviewer: "Jay", reviewDeadline: "2026-09-20", decision: "reject" }),
+    ]);
+    expect(list.map((r) => r.id)).toEqual(["a", "b"]);
+  });
+
+  it("lists every decision waiting, requests first", () => {
+    const later = row({ id: "later", deadline: "2026-11-30", reviewState: "done", band: "Low", decisionRequestedBy: "Bhavin" });
+    expect(decideList([...rows, later])[0]?.id).toBe("later");
+    expect(decideList([...rows, later]).length).toBeGreaterThan(1);
   });
 
   it("puts a contract whose owner asked for a quick decision first", () => {

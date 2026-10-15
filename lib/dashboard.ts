@@ -10,6 +10,12 @@ const open = (r: QueueRow) => !r.decision;
  * first when deadlines tie. Undated contracts come last.
  */
 export function decideCard(rows: QueueRow[]): QueueRow | null {
+  return decideList(rows)[0] ?? null;
+}
+
+/** Every reviewed, undecided contract in the order Karandeep should take them: quick-decision requests first, then
+ * the soonest client deadline, riskiest on a tie. */
+export function decideList(rows: QueueRow[]): QueueRow[] {
   const c = rows.filter((r) => open(r) && r.reviewState === "done");
   c.sort((a, b) => {
     // A deal owner who asked for a quick decision goes first.
@@ -21,7 +27,14 @@ export function decideCard(rows: QueueRow[]): QueueRow | null {
     }
     return (b.band ? RANK[b.band] : 0) - (a.band ? RANK[a.band] : 0);
   });
-  return c[0] ?? null;
+  return c;
+}
+
+/** Open first reviews, overdue and due-soon first, then by review-by date. */
+export function firstReviews(rows: QueueRow[]): QueueRow[] {
+  return rows
+    .filter((r) => open(r) && r.reviewer)
+    .sort((a, b) => (a.reviewDeadline ?? "9999").localeCompare(b.reviewDeadline ?? "9999") || a.title.localeCompare(b.title));
 }
 
 /** First reviews overdue or due by tomorrow, most overdue first. */
