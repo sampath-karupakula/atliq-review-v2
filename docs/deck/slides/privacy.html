@@ -1,0 +1,32 @@
+<section id="privacy" data-transition="fade" style="background:#18212C;color:#F4F5F2;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15">Private details never reach the AI</h2>
+<div style="display:flex;gap:40px">
+<div style="flex:1.1;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#232E3B;border-radius:14px;padding:28px 32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#8A95A3">In the contract</p>
+<p style="font-family:'IBM Plex Sans', Arial, sans-serif;font-size:28px;line-height:1.45">Invoices to Priya Nair, priya.nair@example.sa, 14 King Fahd Road, Riyadh. Bank: IBAN SA44 2000 0001 2345 6789 1234.</p>
+</div>
+<x-shape kind="arrow-down" style="width:44px;height:56px;background:#8FB4D6"></x-shape>
+<div style="display:flex;flex-direction:column;gap:10px;background:#232E3B;border:2px solid #8FB4D6;border-radius:14px;padding:28px 32px">
+<p style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#8FB4D6">What the AI sees</p>
+<p style="font-size:28px;line-height:1.45">Invoices to <span style="color:#8FB4D6">PERSON_1</span>, <span style="color:#8FB4D6">EMAIL_1</span>, <span style="color:#8FB4D6">ADDRESS_1</span>, Riyadh. Bank: IBAN <span style="color:#8FB4D6">ACCOUNT_1</span>.</p>
+</div>
+<p style="font-size:24px;color:#8A95A3">Illustration. The real masked text is on every report’s “What the AI saw” tab.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:22px">
+<h3 style="font-size:34px;font-weight:600">Masked before every AI call</h3>
+<ul style="font-size:26px;line-height:1.6;color:#C9D2DC">
+<li>Names of people and companies</li>
+<li>Emails, phone numbers, street addresses</li>
+<li>Tax, company, passport and Aadhaar numbers</li>
+<li>Bank accounts, IBAN, SWIFT and routing codes</li>
+<li>Medical record numbers, dates of birth</li>
+<li>Web links, IP addresses, client and PO references</li>
+</ul>
+<p style="font-size:26px;line-height:1.45;color:#F4F5F2;border-top:1px solid #3A4757;padding:20px 0 0 0"><b>Then a leak check:</b> if any original value is still in the text, the call is blocked. The masking key stays on the server.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-size:24px;color:#8A95A3">AtliQ Review</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;color:#8A95A3;text-align:right">8</p>
+<aside>Client contracts are full of personal and banking data. Before any text is sent to the model, code replaces it with tokens, and the answer is mapped back afterwards so the founder reads real names. Only the street is masked in an address, so the city and country still inform the legal analysis. A second pass, the leak check, looks for every original value in the outgoing text and blocks the call if one slipped through. Unmasked contract text is never written to logs. The name and address on this slide are made up for illustration.</aside>
+</section>
