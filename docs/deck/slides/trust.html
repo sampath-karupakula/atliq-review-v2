@@ -1,0 +1,24 @@
+<section id="trust" data-transition="fade" style="background:#F4F5F2;color:#18212C;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<h2 style="font-family:'Source Serif 4', Georgia, serif;font-size:64px;font-weight:600;line-height:1.15">Four rules that keep the report honest</h2>
+<div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:28px">
+<div style="display:flex;flex-direction:column;gap:14px;background:#FBFBF8;border:1px solid #D8DCD4;border-radius:16px;padding:36px 40px">
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Verified" style="color:#1E4A73;width:44px;height:44px"></x-icon><h3 style="font-size:36px;font-weight:600">A quote, or “Not sure”</h3></div>
+<p style="font-size:26px;line-height:1.45;color:#465160">Every finding carries the exact words and clause number. Code checks them against the contract; anything it can’t find goes to the Not sure tray.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#FBFBF8;border:1px solid #D8DCD4;border-radius:16px;padding:36px 40px">
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Warning" style="color:#B42318;width:44px;height:44px"></x-icon><h3 style="font-size:36px;font-weight:600">Strict on Serious</h3></div>
+<p style="font-size:26px;line-height:1.45;color:#465160">Serious only when verified and irreversible, unbounded or a live clash. Bounded issues are Negotiable, and clean contracts score Low.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#FBFBF8;border:1px solid #D8DCD4;border-radius:16px;padding:36px 40px">
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Code" style="color:#1E4A73;width:44px;height:44px"></x-icon><h3 style="font-size:36px;font-weight:600">The contract is data</h3></div>
+<p style="font-size:26px;line-height:1.45;color:#465160">Text hidden in a contract that tells an AI what to do is reported as a finding and never obeyed.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#FBFBF8;border:1px solid #D8DCD4;border-radius:16px;padding:36px 40px">
+<div style="display:flex;gap:16px;align-items:center"><x-icon name="Lock" style="color:#1E4A73;width:44px;height:44px"></x-icon><h3 style="font-size:36px;font-weight:600">Fail closed</h3></div>
+<p style="font-size:26px;line-height:1.45;color:#465160">If the AI’s answer doesn’t validate after one retry, the review stops with a plain message. A partial report is never shown as complete.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:900px;font-size:24px;color:#5B6573">AtliQ Review</p>
+<p style="position:absolute;right:128px;bottom:64px;width:200px;font-size:24px;color:#5B6573;text-align:right">7</p>
+<aside>A founder will only act on the report if he can trust it, so trust is built in rather than promised. The quote rule is the most important: the model can’t invent a clause, because code looks for the exact words in the contract. In the full test run, 290 of 290 quotes were verbatim. One test contract hides a sentence telling AI reviewers to ignore the penalty clause; the tool reports the sentence and flags the penalty as Serious anyway.</aside>
+</section>

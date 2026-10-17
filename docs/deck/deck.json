@@ -1,0 +1,20 @@
+{
+  "v": 4,
+  "createdOnFiles": { "v": 1, "at": "2026-10-16T09:00:00Z" },
+  "lists": "css",
+  "title": "AtliQ Review",
+  "cover": "cover",
+  "order": ["cover", "problem", "what", "rule", "pipeline", "example", "trust", "privacy", "memory", "workflow", "deals", "results", "build", "next"],
+  "sections": {
+    "s1": { "description": "Why AtliQ needs a contract reviewer", "start": "cover" },
+    "s2": { "description": "How a review works", "start": "what" },
+    "s3": { "description": "Why the results can be trusted", "start": "trust" },
+    "s4": { "description": "Beyond one report: memory, workflow and deals", "start": "memory" },
+    "s5": { "description": "Results, build and what comes next", "start": "results" }
+  },
+  "faces": {
+    "source-serif-4": { "family": "Source Serif 4", "href": "https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" },
+    "ibm-plex-sans": { "family": "IBM Plex Sans", "href": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" }
+  },
+  "designSystems": []
+}
